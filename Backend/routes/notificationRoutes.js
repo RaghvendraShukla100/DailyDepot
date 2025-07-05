@@ -10,7 +10,7 @@ import {
 
 import { protect, authorizeRoles } from "../middlewares/authMiddleware.js";
 import validateResource from "../middlewares/validateResourceMiddleware.js";
-import { createNotificationSchema } from "../validations/notificationValidation.js";
+import { createNotificationValidation } from "../validations/notificationValidation.js";
 
 const router = express.Router();
 
@@ -30,7 +30,7 @@ router.post(
   "/",
   protect,
   authorizeRoles("admin"),
-  validateResource(createNotificationSchema),
+  validateResource(createNotificationValidation),
   createNotificationController
 );
 

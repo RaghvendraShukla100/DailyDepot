@@ -13,8 +13,8 @@ import {
 } from "../middlewares/authMiddleware.js";
 import validateResource from "../middlewares/validateResourceMiddleware.js";
 import {
-  createCategorySchema,
-  updateCategorySchema,
+  createCategoryValidation,
+  updateCategoryValidation,
 } from "../validations/categoryValidation.js";
 
 const router = express.Router();
@@ -31,7 +31,7 @@ router.post(
   protect,
   authorizeRoles("admin"),
   attachAdminProfile,
-  validateResource(createCategorySchema),
+  validateResource(createCategoryValidation),
   createCategoryController
 );
 
@@ -41,7 +41,7 @@ router.put(
   protect,
   authorizeRoles("admin"),
   attachAdminProfile,
-  validateResource(updateCategorySchema),
+  validateResource(updateCategoryValidation),
   updateCategoryByIdController
 );
 

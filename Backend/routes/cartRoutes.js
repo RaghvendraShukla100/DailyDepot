@@ -10,8 +10,8 @@ import {
 import { protect } from "../middlewares/authMiddleware.js";
 import validateResource from "../middlewares/validateResourceMiddleware.js";
 import {
-  addToCartSchema,
-  updateCartItemSchema,
+  addToCartValidation,
+  updateCartItemValidation,
 } from "../validations/cartValidation.js";
 
 const router = express.Router();
@@ -31,7 +31,7 @@ router.get("/", protect, getUserCartItemsController);
 router.post(
   "/add",
   protect,
-  validateResource(addToCartSchema),
+  validateResource(addToCartValidation),
   addToCartController
 );
 
@@ -43,7 +43,7 @@ router.post(
 router.put(
   "/update/:id",
   protect,
-  validateResource(updateCartItemSchema),
+  validateResource(updateCartItemValidation),
   updateCartItemController
 );
 

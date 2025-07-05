@@ -15,7 +15,7 @@ import {
   attachSellerProfile,
 } from "../middlewares/authMiddleware.js";
 import validateResource from "../middlewares/validateResourceMiddleware.js";
-import { updateSellerSchema } from "../validations/sellerValidation.js";
+import { updateSellerValidation } from "../validations/sellerValidation.js";
 
 const router = express.Router();
 
@@ -42,7 +42,7 @@ router.put(
   protect,
   authorizeRoles("seller"),
   attachSellerProfile,
-  validateResource(updateSellerProfileSchema),
+  validateResource(updateSellerProfileValidation),
   updateSellerProfileController
 );
 

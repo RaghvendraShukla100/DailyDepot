@@ -16,7 +16,7 @@ import {
   attachAdminProfile,
 } from "../middlewares/authMiddleware.js";
 import validateResource from "../middlewares/validateResourceMiddleware.js";
-import { updateAdminProfileSchema } from "../validations/adminValidation.js";
+import { updateAdminProfileValidation } from "../validations/adminValidation.js";
 
 const router = express.Router();
 
@@ -43,7 +43,7 @@ router.put(
   protect,
   authorizeRoles("admin"),
   attachAdminProfile,
-  validateResource(updateAdminProfileSchema),
+  validateResource(updateAdminProfileValidation),
   updateAdminProfileController
 );
 

@@ -12,7 +12,7 @@ import {
 
 import { protect, authorizeRoles } from "../middlewares/authMiddleware.js";
 import validateResource from "../middlewares/validateResourceMiddleware.js";
-import { updateUserProfileSchema } from "../validations/userValidation.js";
+import { updateUserProfileValidation } from "../validations/userValidation.js";
 
 const router = express.Router();
 
@@ -31,7 +31,7 @@ router.get("/profile", protect, getUserProfileController);
 router.put(
   "/profile",
   protect,
-  validateResource(updateUserProfileSchema),
+  validateResource(updateUserProfileValidation),
   updateUserProfileController
 );
 

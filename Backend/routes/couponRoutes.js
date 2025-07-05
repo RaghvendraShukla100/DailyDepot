@@ -17,8 +17,8 @@ import {
 
 import validateResource from "../middlewares/validateResourceMiddleware.js";
 import {
-  createCouponSchema,
-  updateCouponSchema,
+  createCouponValidation,
+  updateCouponValidation,
 } from "../validations/couponValidation.js";
 
 const router = express.Router();
@@ -47,7 +47,7 @@ router.post(
   protect,
   authorizeRoles("admin"),
   attachAdminProfile,
-  validateResource(createCouponSchema),
+  validateResource(createCouponValidation),
   createCouponController
 );
 
@@ -61,7 +61,7 @@ router.put(
   protect,
   authorizeRoles("admin"),
   attachAdminProfile,
-  validateResource(updateCouponSchema),
+  validateResource(updateCouponValidation),
   updateCouponByIdController
 );
 

@@ -9,7 +9,10 @@ import {
 } from "../controllers/authController.js";
 
 import validateResourceMiddleware from "../middlewares/validateResourceMiddleware.js";
-import { registerSchema, loginSchema } from "../validations/authValidation.js";
+import {
+  registerValidation,
+  loginValidation,
+} from "../validations/authValidation.js";
 import { protect } from "../middlewares/authMiddleware.js";
 
 const router = express.Router();
@@ -19,7 +22,7 @@ const router = express.Router();
 // @access  Public
 router.post(
   "/register",
-  validateResourceMiddleware(registerSchema),
+  validateResourceMiddleware(registerValidation),
   registerUserController
 );
 
@@ -28,7 +31,7 @@ router.post(
 // @access  Public
 router.post(
   "/login",
-  validateResourceMiddleware(loginSchema),
+  validateResourceMiddleware(loginValidation),
   loginUserController
 );
 

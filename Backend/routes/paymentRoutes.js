@@ -12,8 +12,8 @@ import {
 import { protect, authorizeRoles } from "../middlewares/authMiddleware.js";
 import validateResource from "../middlewares/validateResourceMiddleware.js";
 import {
-  createPaymentSchema,
-  updatePaymentSchema,
+  createPaymentValidation,
+  updatePaymentValidation,
 } from "../validations/paymentValidation.js";
 
 const router = express.Router();
@@ -26,7 +26,7 @@ const router = express.Router();
 router.post(
   "/",
   protect,
-  validateResource(createPaymentSchema),
+  validateResource(createPaymentValidation),
   createPaymentControllers
 );
 
@@ -53,7 +53,7 @@ router.put(
   "/:id",
   protect,
   authorizeRoles("admin"),
-  validateResource(updatePaymentSchema),
+  validateResource(updatePaymentValidation),
   updatePaymentControllers
 );
 

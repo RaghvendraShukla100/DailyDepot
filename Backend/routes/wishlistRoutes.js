@@ -13,10 +13,10 @@ import {
 import { protect } from "../middlewares/authMiddleware.js";
 import validateResource from "../middlewares/validateResourceMiddleware.js";
 import {
-  createWishlistSchema,
-  updateWishlistSchema,
-  addWishlistItemSchema,
-  updateWishlistItemSchema,
+  createWishlistValidation,
+  updateWishlistValidation,
+  addWishlistItemValidation,
+  updateWishlistItemValidation,
 } from "../validations/wishlistValidation.js";
 
 const router = express.Router();
@@ -36,7 +36,7 @@ router.get("/", protect, getUserWishlistController);
 router.post(
   "/",
   protect,
-  validateResource(createWishlistSchema),
+  validateResource(createWishlistValidation),
   createWishlistController
 );
 
@@ -48,7 +48,7 @@ router.post(
 router.put(
   "/:id",
   protect,
-  validateResource(updateWishlistSchema),
+  validateResource(updateWishlistValidation),
   updateWishlistController
 );
 
@@ -67,7 +67,7 @@ router.delete("/:id", protect, deleteWishlistController);
 router.post(
   "/:id/add",
   protect,
-  validateResource(modifyWishlistProductSchema),
+  validateResource(modifyWishlistProductValidation),
   addProductToWishlistController
 );
 
@@ -79,7 +79,7 @@ router.post(
 router.post(
   "/:id/remove",
   protect,
-  validateResource(modifyWishlistProductSchema),
+  validateResource(modifyWishlistProductValidation),
   removeProductFromWishlistController
 );
 

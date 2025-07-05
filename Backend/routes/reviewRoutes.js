@@ -12,8 +12,8 @@ import {
 import { protect, authorizeRoles } from "../middlewares/authMiddleware.js";
 import validateResource from "../middlewares/validateResourceMiddleware.js";
 import {
-  createReviewSchema,
-  updateReviewSchema,
+  createReviewValidation,
+  updateReviewValidation,
 } from "../validations/reviewValidation.js";
 
 const router = express.Router();
@@ -40,7 +40,7 @@ router.get("/:id", getReviewByIdController);
 router.post(
   "/",
   protect,
-  validateResource(createReviewSchema),
+  validateResource(createReviewValidation),
   createReviewController
 );
 
@@ -52,7 +52,7 @@ router.post(
 router.put(
   "/:id",
   protect,
-  validateResource(updateReviewSchema),
+  validateResource(updateReviewValidation),
   updateReviewController
 );
 

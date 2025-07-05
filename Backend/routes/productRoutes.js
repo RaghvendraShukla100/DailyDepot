@@ -12,8 +12,8 @@ import {
 import { protect, authorizeRoles } from "../middlewares/authMiddleware.js";
 import validateResource from "../middlewares/validateResourceMiddleware.js";
 import {
-  createProductSchema,
-  updateProductSchema,
+  createProductValidation,
+  updateProductValidation,
 } from "../validations/productValidation.js";
 
 const router = express.Router();
@@ -41,7 +41,7 @@ router.post(
   "/",
   protect,
   authorizeRoles("admin", "seller"),
-  validateResource(createProductSchema),
+  validateResource(createProductValidation),
   createProductController
 );
 
@@ -54,7 +54,7 @@ router.put(
   "/:id",
   protect,
   authorizeRoles("admin", "seller"),
-  validateResource(updateProductSchema),
+  validateResource(updateProductValidation),
   updateProductController
 );
 

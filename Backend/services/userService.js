@@ -1,51 +1,23 @@
-import mongoose from "mongoose";
-import User from "../models/userModel.js";
-import Seller from "../models/sellerModel.js";
-import Admin from "../models/adminModel.js";
-import { ROLES } from "../constants/roles.js";
-
-// Create Seller and User atomically
-export const createSellerWithUser = async (userData, sellerData) => {
-  const session = await mongoose.startSession();
-  session.startTransaction();
-  try {
-    const user = await User.create([{ ...userData, role: ROLES.SELLER }], {
-      session,
-    });
-    const seller = await Seller.create([{ ...sellerData, user: user[0]._id }], {
-      session,
-    });
-
-    await session.commitTransaction();
-    session.endSession();
-
-    return { user: user[0], seller: seller[0] };
-  } catch (error) {
-    await session.abortTransaction();
-    session.endSession();
-    throw error;
-  }
+// Fetch user profile excluding password
+export const getUserProfile = async (userId) => {
+  const user = await User.findById(userId).select("-password");
+  if (!user) throw new Error("User not found");
+  return user;
 };
 
-// Create Admin and User atomically
-export const createAdminWithUser = async (userData, adminData) => {
-  const session = await mongoose.startSession();
-  session.startTransaction();
-  try {
-    const user = await User.create([{ ...userData, role: ROLES.ADMIN }], {
-      session,
-    });
-    const admin = await Admin.create([{ ...adminData, user: user[0]._id }], {
-      session,
-    });
+// Update user profile (excluding password)
+export const updateUserProfile = async (userId, updateData) => {
+  const user = await User.findByIdAndUpdate(userId, updateData, {
+    new: true,
+    runValidators: true,
+  }).select("-password");
+  if (!user) throw new Error("User not found");
+  return user;
+};
 
-    await session.commitTransaction();
-    session.endSession();
-
-    return { user: user[0], admin: admin[0] };
-  } catch (error) {
-    await session.abortTransaction();
-    session.endSession();
-    throw error;
-  }
+// Delete user
+export const deleteUserById = async (userId) => {
+  const user = await User.findByIdAndDelete(userId);
+  if (!user) throw new Error("User not found or already deleted");
+  return user;
 };

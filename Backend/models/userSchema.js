@@ -28,7 +28,7 @@ const userSchema = new mongoose.Schema(
     wishlist: [{ type: mongoose.Schema.Types.ObjectId, ref: "Wishlist" }], // supporting advanced multi-wishlist
     cart: [{ type: mongoose.Schema.Types.ObjectId, ref: "CartItem" }],
     orders: [{ type: mongoose.Schema.Types.ObjectId, ref: "Order" }],
-    role: { type: String, enum: ["user", "admin", "seller"], default: "user" },
+    role: { type: String, enum: ["user", "seller", "admin"], default: "user" },
     isEmailVerified: { type: Boolean, default: false },
     isPhoneVerified: { type: Boolean, default: false },
     status: {

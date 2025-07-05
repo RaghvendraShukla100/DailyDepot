@@ -13,6 +13,7 @@ const adminSchema = new mongoose.Schema(
       enum: ["superadmin", "admin", "support", "finance"],
       default: "admin",
     },
+
     permissions: [{ type: String }], // granular permission system if needed
     contactEmail: { type: String, trim: true },
     contactPhone: { type: String, trim: true },

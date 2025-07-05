@@ -17,6 +17,7 @@ import {
   updateWishlistValidation,
   addWishlistItemValidation,
   updateWishlistItemValidation,
+  modifyWishlistProductValidation, // <-- ADD THIS LINE
 } from "../validations/wishlistValidation.js";
 
 const router = express.Router();

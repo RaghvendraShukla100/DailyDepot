@@ -3,7 +3,7 @@
 import { z } from "zod";
 
 /**
- * Validation schema for creating a seller
+ * Validation Validation for creating a seller
  */
 export const createSellerValidation = z.object({
   shopName: z
@@ -28,9 +28,9 @@ export const createSellerValidation = z.object({
 });
 
 /**
- * Validation schema for updating a seller profile (partial updates)
+ * Validation Validation for updating a seller profile (partial updates)
  * Used in:
  *    PUT /api/sellers/profile
  *    PUT /api/sellers/:id (if later added)
  */
-export const updateSellerValidation = createSellerSchema.partial();
+export const updateSellerProfileValidation = createSellerValidation.partial();

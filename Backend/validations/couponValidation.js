@@ -19,4 +19,4 @@ export const createCouponValidation = z.object({
     .default("active"),
 });
 
-export const updateCouponValidation = createCouponSchema.partial();
+export const updateCouponValidation = createCouponValidation.partial();

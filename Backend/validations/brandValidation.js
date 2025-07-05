@@ -15,4 +15,4 @@ export const createBrandValidation = z.object({
   status: z.enum(["active", "inactive", "deleted"]).optional(),
 });
 
-export const updateBrandValidation = createBrandSchema.partial();
+export const updateBrandValidation = createBrandValidation.partial();

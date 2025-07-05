@@ -16,4 +16,4 @@ export const createAddressValidation = z.object({
   isDefault: z.boolean().optional(),
 });
 
-export const updateAddressValidation = createAddressSchema.partial();
+export const updateAddressValidation = createAddressValidation.partial();

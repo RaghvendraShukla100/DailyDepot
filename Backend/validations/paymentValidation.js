@@ -3,7 +3,7 @@
 import { z } from "zod";
 
 /**
- * Schema for creating a payment
+ * Validation for creating a payment
  */
 export const createPaymentValidation = z.object({
   order: z.string({ required_error: "Order ID is required." }),
@@ -22,7 +22,7 @@ export const createPaymentValidation = z.object({
 });
 
 /**
- * Schema for updating a payment
+ * Validation for updating a payment
  */
 export const updatePaymentValidation = z.object({
   paymentStatus: z.enum(["paid", "pending", "failed", "refunded"]).optional(),

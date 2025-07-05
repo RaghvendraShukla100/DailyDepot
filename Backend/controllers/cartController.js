@@ -166,3 +166,30 @@ export const clearCartController = asyncHandler(async (req, res) => {
     .status(STATUS_CODES.OK)
     .json(new ApiResponse(STATUS_CODES.OK, null, "Cart cleared successfully."));
 });
+export const toggleSaveForLaterController = asyncHandler(async (req, res) => {
+  const cartItem = await CartItem.findOne({
+    _id: req.params.id,
+    user: req.user._id,
+    deleted: false,
+    status: "active",
+  });
+
+  if (!cartItem) {
+    throw ApiError.notFound("Cart item");
+  }
+
+  cartItem.savedForLater = !cartItem.savedForLater;
+  await cartItem.save();
+
+  res
+    .status(STATUS_CODES.OK)
+    .json(
+      new ApiResponse(
+        STATUS_CODES.OK,
+        cartItem,
+        `Cart item ${
+          cartItem.savedForLater ? "saved for later" : "moved back to cart"
+        } successfully.`
+      )
+    );
+});

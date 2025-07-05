@@ -18,4 +18,4 @@ export const createCategoryValidation = z.object({
     .default("active"),
 });
 
-export const updateCategoryValidation = createCategorySchema.partial();
+export const updateCategoryValidation = createCategoryValidation.partial();

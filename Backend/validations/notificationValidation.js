@@ -3,7 +3,7 @@
 import { z } from "zod";
 
 /**
- * Schema for creating a notification
+ * Validation for creating a notification
  */
 export const createNotificationValidation = z.object({
   user: z.string().optional(), // Optional for system notifications

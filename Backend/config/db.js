@@ -1,17 +1,18 @@
-// /backend/config/db.js
-
 import mongoose from "mongoose";
+import chalk from "chalk";
 
 const connectDB = async () => {
   try {
-    const conn = await mongoose.connect(process.env.MONGO_URI, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    });
-    console.log(`MongoDB Connected: ${conn.connection.host}`.cyan.bold);
+    const conn = await mongoose.connect(process.env.MONGO_URI);
+    console.clear();
+    console.log(
+      chalk.green.bold(`✅ MongoDB Connected: ${conn.connection.host}`)
+    );
   } catch (error) {
-    console.error(`Error: ${error.message}`.red.bold);
-    process.exit(1); // Exit with failure
+    console.error(
+      chalk.red.bold(`❌ MongoDB Connection Error: ${error.message}`)
+    );
+    process.exit(1);
   }
 };
 

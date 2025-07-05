@@ -3,7 +3,7 @@
 import { z } from "zod";
 
 /**
- * Schema for creating a review
+ * Validation for creating a review
  */
 export const createReviewValidation = z.object({
   product: z.string({
@@ -21,7 +21,7 @@ export const createReviewValidation = z.object({
 });
 
 /**
- * Schema for updating a review
+ * Validation for updating a review
  */
 export const updateReviewValidation = z.object({
   rating: z.number().min(1).max(5).optional(),

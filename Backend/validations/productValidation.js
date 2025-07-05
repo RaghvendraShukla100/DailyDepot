@@ -23,4 +23,4 @@ export const createProductValidation = z.object({
   status: z.enum(["active", "inactive", "deleted"]).optional(),
 });
 
-export const updateProductValidation = createProductSchema.partial();
+export const updateProductValidation = createProductValidation.partial();

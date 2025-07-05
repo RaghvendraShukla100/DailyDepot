@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 /**
- * Schema for adding an item to the cart
+ * Validation for adding an item to the cart
  * Used in POST /api/cart/add
  */
 export const addToCartValidation = z.object({
@@ -29,7 +29,7 @@ export const addToCartValidation = z.object({
 });
 
 /**
- * Schema for updating a cart item
+ * Validation for updating a cart item
  * Used in PUT /api/cart/update/:id
  */
 export const updateCartItemValidation = z.object({

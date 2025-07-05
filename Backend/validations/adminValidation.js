@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-// Create Admin Schema
+// Create Admin Validation
 export const createAdminValidation = z.object({
   department: z
     .string()
@@ -14,5 +14,5 @@ export const createAdminValidation = z.object({
     .optional(),
 });
 
-// Update Admin Schema (partial for PATCH/PUT flexibility)
-export const updateAdminProfileValidation = createAdminSchema.partial();
+// Update Admin Validation (partial for PATCH/PUT flexibility)
+export const updateAdminProfileValidation = createAdminValidation.partial();

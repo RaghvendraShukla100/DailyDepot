@@ -1,9 +1,9 @@
 // Backend/controllers/cartController.js
 
-import asyncHandler from "../middlewares/asyncHandler.js";
-import CartItem from "../models/cartItemModel.js";
-import Product from "../models/productModel.js";
-import Coupon from "../models/couponModel.js";
+import asyncHandler from "../middlewares/asyncHandlerMiddleware.js";
+import CartItem from "../models/cartItemSchema.js";
+import Product from "../models/productSchema.js";
+import Coupon from "../models/couponSchema.js";
 import ApiError from "../utils/ApiError.js";
 import ApiResponse from "../utils/ApiResponse.js";
 import { STATUS_CODES } from "../constants/statusCodes.js";
@@ -12,7 +12,7 @@ import { MESSAGES } from "../constants/messages.js";
 // @desc    Add an item to the cart
 // @route   POST /api/cart
 // @access  Private
-export const addToCart = asyncHandler(async (req, res) => {
+export const addToCartController = asyncHandler(async (req, res) => {
   const {
     productId,
     quantity,
@@ -72,7 +72,7 @@ export const addToCart = asyncHandler(async (req, res) => {
 // @desc    Get all cart items for the authenticated user
 // @route   GET /api/cart
 // @access  Private
-export const getUserCartItems = asyncHandler(async (req, res) => {
+export const getUserCartItemsController = asyncHandler(async (req, res) => {
   const cartItems = await CartItem.find({
     user: req.user._id,
     deleted: false,
@@ -85,7 +85,7 @@ export const getUserCartItems = asyncHandler(async (req, res) => {
 // @desc    Update a cart item's quantity or options
 // @route   PUT /api/cart/:id
 // @access  Private
-export const updateCartItem = asyncHandler(async (req, res) => {
+export const updateCartItemController = asyncHandler(async (req, res) => {
   const { quantity, selectedSize, selectedColor, notes, appliedCoupon } =
     req.body;
 
@@ -129,7 +129,7 @@ export const updateCartItem = asyncHandler(async (req, res) => {
 // @desc    Remove a cart item (soft delete)
 // @route   DELETE /api/cart/:id
 // @access  Private
-export const removeCartItem = asyncHandler(async (req, res) => {
+export const removeCartItemController = asyncHandler(async (req, res) => {
   const cartItem = await CartItem.findOne({
     _id: req.params.id,
     user: req.user._id,
@@ -156,7 +156,7 @@ export const removeCartItem = asyncHandler(async (req, res) => {
 // @desc    Clear entire cart
 // @route   DELETE /api/cart
 // @access  Private
-export const clearCart = asyncHandler(async (req, res) => {
+export const clearCartController = asyncHandler(async (req, res) => {
   await CartItem.updateMany(
     { user: req.user._id, deleted: false, status: "active" },
     { $set: { deleted: true, deletedAt: new Date(), status: "removed" } }

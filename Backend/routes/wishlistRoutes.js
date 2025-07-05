@@ -15,7 +15,8 @@ import validateResource from "../middlewares/validateResourceMiddleware.js";
 import {
   createWishlistSchema,
   updateWishlistSchema,
-  modifyWishlistProductSchema,
+  addWishlistItemSchema,
+  updateWishlistItemSchema,
 } from "../validations/wishlistValidation.js";
 
 const router = express.Router();

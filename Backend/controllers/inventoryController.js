@@ -1,7 +1,7 @@
 // Backend/controllers/inventoryController.js
 
 import Inventory from "../models/inventorySchema.js";
-import asyncHandler from "../middlewares/asyncHandler.js";
+import asyncHandler from "../middlewares/asyncHandlerMiddleware.js";
 import ApiError from "../utils/ApiError.js";
 import ApiResponse from "../utils/ApiResponse.js";
 import { STATUS_CODES } from "../constants/statusCodes.js";
@@ -9,7 +9,7 @@ import { STATUS_CODES } from "../constants/statusCodes.js";
 // @desc    Create a new inventory entry
 // @route   POST /api/inventories
 // @access  Admin/Seller
-export const createInventory = asyncHandler(async (req, res) => {
+export const createInventoryController = asyncHandler(async (req, res) => {
   const inventory = await Inventory.create(req.body);
 
   res
@@ -26,7 +26,7 @@ export const createInventory = asyncHandler(async (req, res) => {
 // @desc    Get all inventory entries
 // @route   GET /api/inventories
 // @access  Admin/Seller
-export const getInventories = asyncHandler(async (req, res) => {
+export const getInventoriesController = asyncHandler(async (req, res) => {
   const inventories = await Inventory.find({ deleted: false }).populate(
     "product supplier"
   );
@@ -39,7 +39,7 @@ export const getInventories = asyncHandler(async (req, res) => {
 // @desc    Get a single inventory entry by ID
 // @route   GET /api/inventories/:id
 // @access  Admin/Seller
-export const getInventoryById = asyncHandler(async (req, res) => {
+export const getInventoryByIdController = asyncHandler(async (req, res) => {
   const inventory = await Inventory.findById(req.params.id)
     .where({ deleted: false })
     .populate("product supplier");
@@ -54,7 +54,7 @@ export const getInventoryById = asyncHandler(async (req, res) => {
 // @desc    Update inventory entry by ID
 // @route   PUT /api/inventories/:id
 // @access  Admin/Seller
-export const updateInventory = asyncHandler(async (req, res) => {
+export const updateInventoryController = asyncHandler(async (req, res) => {
   const inventory = await Inventory.findById(req.params.id).where({
     deleted: false,
   });
@@ -83,7 +83,7 @@ export const updateInventory = asyncHandler(async (req, res) => {
 // @desc    Soft delete inventory entry by ID
 // @route   DELETE /api/inventories/:id
 // @access  Admin/Seller
-export const deleteInventory = asyncHandler(async (req, res) => {
+export const deleteInventoryController = asyncHandler(async (req, res) => {
   const inventory = await Inventory.findById(req.params.id).where({
     deleted: false,
   });

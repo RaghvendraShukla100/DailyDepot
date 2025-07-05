@@ -1,16 +1,18 @@
-// Backend/controllers/categoryController.js
+// /backend/controllers/categoryController.js
 
-import Category from "../models/categoryModel.js";
-import asyncHandler from "../middlewares/asyncHandler.js";
+import Category from "../models/categorySchema.js";
+import asyncHandler from "../middlewares/asyncHandlerMiddleware.js";
 import ApiError from "../utils/ApiError.js";
 import ApiResponse from "../utils/ApiResponse.js";
 import { STATUS_CODES } from "../constants/statusCodes.js";
 import { MESSAGES } from "../constants/messages.js";
 
-// @desc    Create a new category
-// @route   POST /api/categories
-// @access  Admin
-export const createCategory = asyncHandler(async (req, res) => {
+/**
+ * @desc    Create a new category
+ * @route   POST /api/categories
+ * @access  Private/Admin
+ */
+export const createCategoryController = asyncHandler(async (req, res) => {
   const category = await Category.create(req.body);
 
   res
@@ -24,10 +26,12 @@ export const createCategory = asyncHandler(async (req, res) => {
     );
 });
 
-// @desc    Get all categories
-// @route   GET /api/categories
-// @access  Public
-export const getCategories = asyncHandler(async (req, res) => {
+/**
+ * @desc    Get all categories
+ * @route   GET /api/categories
+ * @access  Public
+ */
+export const getAllCategoriesController = asyncHandler(async (req, res) => {
   const categories = await Category.find({ deleted: false }).populate(
     "parentCategory",
     "name slug"
@@ -35,13 +39,21 @@ export const getCategories = asyncHandler(async (req, res) => {
 
   res
     .status(STATUS_CODES.OK)
-    .json(new ApiResponse(STATUS_CODES.OK, categories));
+    .json(
+      new ApiResponse(
+        STATUS_CODES.OK,
+        categories,
+        "Categories fetched successfully."
+      )
+    );
 });
 
-// @desc    Get a single category by ID
-// @route   GET /api/categories/:id
-// @access  Public
-export const getCategoryById = asyncHandler(async (req, res) => {
+/**
+ * @desc    Get a single category by ID
+ * @route   GET /api/categories/:id
+ * @access  Public
+ */
+export const getCategoryByIdController = asyncHandler(async (req, res) => {
   const category = await Category.findById(req.params.id)
     .where({ deleted: false })
     .populate("parentCategory", "name slug");
@@ -50,13 +62,23 @@ export const getCategoryById = asyncHandler(async (req, res) => {
     throw ApiError.notFound("Category");
   }
 
-  res.status(STATUS_CODES.OK).json(new ApiResponse(STATUS_CODES.OK, category));
+  res
+    .status(STATUS_CODES.OK)
+    .json(
+      new ApiResponse(
+        STATUS_CODES.OK,
+        category,
+        "Category fetched successfully."
+      )
+    );
 });
 
-// @desc    Update a category
-// @route   PUT /api/categories/:id
-// @access  Admin
-export const updateCategory = asyncHandler(async (req, res) => {
+/**
+ * @desc    Update a category by ID
+ * @route   PUT /api/categories/:id
+ * @access  Private/Admin
+ */
+export const updateCategoryByIdController = asyncHandler(async (req, res) => {
   const category = await Category.findById(req.params.id).where({
     deleted: false,
   });
@@ -65,7 +87,7 @@ export const updateCategory = asyncHandler(async (req, res) => {
     throw ApiError.notFound("Category");
   }
 
-  const updateFields = [
+  const updatableFields = [
     "name",
     "slug",
     "description",
@@ -75,7 +97,7 @@ export const updateCategory = asyncHandler(async (req, res) => {
     "status",
   ];
 
-  updateFields.forEach((field) => {
+  updatableFields.forEach((field) => {
     if (req.body[field] !== undefined) {
       category[field] = req.body[field];
     }
@@ -94,10 +116,12 @@ export const updateCategory = asyncHandler(async (req, res) => {
     );
 });
 
-// @desc    Soft delete a category
-// @route   DELETE /api/categories/:id
-// @access  Admin
-export const deleteCategory = asyncHandler(async (req, res) => {
+/**
+ * @desc    Soft delete a category by ID
+ * @route   DELETE /api/categories/:id
+ * @access  Private/Admin
+ */
+export const deleteCategoryByIdController = asyncHandler(async (req, res) => {
   const category = await Category.findById(req.params.id).where({
     deleted: false,
   });
@@ -113,10 +137,6 @@ export const deleteCategory = asyncHandler(async (req, res) => {
   res
     .status(STATUS_CODES.OK)
     .json(
-      new ApiResponse(
-        STATUS_CODES.OK,
-        null,
-        "Category soft-deleted successfully."
-      )
+      new ApiResponse(STATUS_CODES.OK, null, "Category deleted successfully.")
     );
 });

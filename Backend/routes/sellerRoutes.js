@@ -15,7 +15,7 @@ import {
   attachSellerProfile,
 } from "../middlewares/authMiddleware.js";
 import validateResource from "../middlewares/validateResourceMiddleware.js";
-import { updateSellerProfileSchema } from "../validations/sellerValidation.js";
+import { updateSellerSchema } from "../validations/sellerValidation.js";
 
 const router = express.Router();
 

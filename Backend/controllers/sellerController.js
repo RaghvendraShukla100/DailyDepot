@@ -1,43 +1,36 @@
-// Backend/controllers/sellerController.js
+// /backend/controllers/sellerController.js
 
-import asyncHandler from "../middlewares/asyncHandler.js";
+import asyncHandler from "../middlewares/asyncHandlerMiddleware.js";
 import * as sellerService from "../services/sellerService.js";
-import Seller from "../models/sellerModel.js";
-import Product from "../models/productModel.js";
+import Seller from "../models/sellerSchema.js";
+import Product from "../models/productSchema.js";
 import ApiError from "../utils/ApiError.js";
 import { STATUS_CODES } from "../constants/statusCodes.js";
 
-// @desc    Get current seller profile
-// @route   GET /api/sellers/me
-// @access  Private (Seller)
-export const getMe = asyncHandler(async (req, res) => {
-  const seller = await Seller.findOne({ user: req.user._id }).populate(
-    "user",
-    "-password"
-  );
-  if (!seller) {
-    throw ApiError.notFound("Seller profile not found");
-  }
-
+/**
+ * @desc    Get seller's own profile
+ * @route   GET /api/sellers/profile
+ * @access  Private (Seller)
+ */
+export const getSellerProfileController = asyncHandler(async (req, res) => {
+  const seller = req.seller; // provided by attachSellerProfile middleware
   res.status(STATUS_CODES.OK).json({
     success: true,
     data: seller,
   });
 });
 
-// @desc    Update seller profile
-// @route   PUT /api/sellers/me
-// @access  Private (Seller)
-export const updateMe = asyncHandler(async (req, res) => {
-  const updatedSeller = await Seller.findOneAndUpdate(
-    { user: req.user._id },
+/**
+ * @desc    Update seller's own profile
+ * @route   PUT /api/sellers/profile
+ * @access  Private (Seller)
+ */
+export const updateSellerProfileController = asyncHandler(async (req, res) => {
+  const updatedSeller = await Seller.findByIdAndUpdate(
+    req.seller._id,
     { ...req.body },
     { new: true, runValidators: true }
   ).populate("user", "-password");
-
-  if (!updatedSeller) {
-    throw ApiError.notFound("Seller profile not found");
-  }
 
   res.status(STATUS_CODES.OK).json({
     success: true,
@@ -46,83 +39,63 @@ export const updateMe = asyncHandler(async (req, res) => {
   });
 });
 
-// @desc    Upload seller store logo and banner
-// @route   PUT /api/sellers/me/store-media
-// @access  Private (Seller)
-export const uploadStoreMedia = asyncHandler(async (req, res) => {
-  const { logoUrl, bannerUrl } = req.body;
-
-  const updatedSeller = await Seller.findOneAndUpdate(
-    { user: req.user._id },
-    { ...(logoUrl && { logoUrl }), ...(bannerUrl && { bannerUrl }) },
-    { new: true }
+/**
+ * @desc    Get all sellers (Admin)
+ * @route   GET /api/sellers
+ * @access  Private (Admin)
+ */
+export const getAllSellersController = asyncHandler(async (req, res) => {
+  const sellers = await Seller.find({ deleted: { $ne: true } }).populate(
+    "user",
+    "-password"
   );
 
-  if (!updatedSeller) {
-    throw ApiError.notFound("Seller profile not found");
-  }
-
   res.status(STATUS_CODES.OK).json({
     success: true,
-    message: "Store media updated successfully.",
-    data: updatedSeller,
+    data: sellers,
   });
 });
 
-// @desc    Get all products for the current seller
-// @route   GET /api/sellers/me/products
-// @access  Private (Seller)
-export const getMyProducts = asyncHandler(async (req, res) => {
-  const seller = await Seller.findOne({ user: req.user._id });
-  if (!seller) {
-    throw ApiError.notFound("Seller profile not found");
-  }
+/**
+ * @desc    Get seller by ID (Admin)
+ * @route   GET /api/sellers/:id
+ * @access  Private (Admin)
+ */
+export const getSellerByIdController = asyncHandler(async (req, res) => {
+  const seller = await Seller.findById(req.params.id).populate(
+    "user",
+    "-password"
+  );
 
-  const products = await Product.find({
-    seller: seller._id,
-    deleted: false,
-  });
+  if (!seller) {
+    throw ApiError.notFound("Seller not found.");
+  }
 
   res.status(STATUS_CODES.OK).json({
     success: true,
-    data: products,
-  });
-});
-
-// @desc    Toggle seller store active status
-// @route   PUT /api/sellers/me/toggle-status
-// @access  Private (Seller)
-export const toggleStoreStatus = asyncHandler(async (req, res) => {
-  const seller = await Seller.findOne({ user: req.user._id });
-  if (!seller) {
-    throw ApiError.notFound("Seller profile not found");
-  }
-
-  seller.status = seller.status === "active" ? "inactive" : "active";
-  await seller.save();
-
-  res.status(STATUS_CODES.OK).json({
-    success: true,
-    message: `Store status changed to ${seller.status}.`,
     data: seller,
   });
 });
 
-// @desc    Request seller verification (manual verification flow)
-// @route   POST /api/sellers/me/request-verification
-// @access  Private (Seller)
-export const requestVerification = asyncHandler(async (req, res) => {
-  const updatedSeller = await sellerService.requestSellerVerification(
-    req.user._id
-  );
+/**
+ * @desc    Delete seller by ID (Admin - soft delete)
+ * @route   DELETE /api/sellers/:id
+ * @access  Private (Admin)
+ */
+export const deleteSellerByIdController = asyncHandler(async (req, res) => {
+  const seller = await Seller.findByIdAndUpdate(
+    req.params.id,
+    { deleted: true, status: "deleted" },
+    { new: true }
+  ).populate("user", "-password");
 
-  if (!updatedSeller) {
-    throw ApiError.notFound("Seller profile not found");
+  if (!seller) {
+    throw ApiError.notFound("Seller not found.");
   }
 
   res.status(STATUS_CODES.OK).json({
     success: true,
-    message: "Verification request submitted.",
-    data: updatedSeller,
+    message: "Seller marked as deleted.",
+    data: seller,
   });
 });

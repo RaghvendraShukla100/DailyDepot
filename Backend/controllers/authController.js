@@ -1,6 +1,6 @@
 // Backend/controllers/authController.js
 
-import asyncHandler from "../middlewares/asyncHandler.js";
+import asyncHandler from "../middlewares/asyncHandlerMiddleware.js";
 import * as authService from "../services/authService.js";
 import ApiError from "../utils/ApiError.js";
 import ApiResponse from "../utils/ApiResponse.js";
@@ -10,7 +10,7 @@ import { MESSAGES } from "../constants/messages.js";
 // @desc    Register user/seller/admin
 // @route   POST /api/auth/register
 // @access  Public
-export const registerUser = asyncHandler(async (req, res) => {
+export const registerUserController = asyncHandler(async (req, res) => {
   const { userData, sellerData, adminData } = req.body;
 
   let result;
@@ -38,7 +38,7 @@ export const registerUser = asyncHandler(async (req, res) => {
 // @desc    Login user
 // @route   POST /api/auth/login
 // @access  Public
-export const loginUser = asyncHandler(async (req, res) => {
+export const loginUserController = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
   const { user, token } = await authService.loginUser(email, password);
 
@@ -63,7 +63,7 @@ export const loginUser = asyncHandler(async (req, res) => {
 // @desc    Logout user
 // @route   POST /api/auth/logout
 // @access  Private
-export const logoutUser = asyncHandler(async (req, res) => {
+export const logoutUserController = asyncHandler(async (req, res) => {
   res.cookie("token", "", {
     httpOnly: true,
     expires: new Date(0),
@@ -77,7 +77,7 @@ export const logoutUser = asyncHandler(async (req, res) => {
 // @desc    Request password reset
 // @route   POST /api/auth/request-password-reset
 // @access  Public
-export const requestPasswordReset = asyncHandler(async (req, res) => {
+export const requestPasswordResetController = asyncHandler(async (req, res) => {
   const { email } = req.body;
   await authService.requestPasswordReset(email);
 
@@ -95,7 +95,7 @@ export const requestPasswordReset = asyncHandler(async (req, res) => {
 // @desc    Reset password
 // @route   POST /api/auth/reset-password/:token
 // @access  Public
-export const resetPassword = asyncHandler(async (req, res) => {
+export const resetPasswordController = asyncHandler(async (req, res) => {
   const { token } = req.params;
   const { password } = req.body;
 
@@ -109,7 +109,7 @@ export const resetPassword = asyncHandler(async (req, res) => {
 // @desc    Verify email
 // @route   GET /api/auth/verify-email/:token
 // @access  Public
-export const verifyEmail = asyncHandler(async (req, res) => {
+export const verifyEmailController = asyncHandler(async (req, res) => {
   const { token } = req.params;
 
   await authService.verifyEmail(token);

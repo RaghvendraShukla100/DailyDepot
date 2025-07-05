@@ -1,10 +1,10 @@
 import express from "express";
 import {
-  createCategory,
-  getAllCategories,
-  getCategoryById,
-  updateCategoryById,
-  deleteCategoryById,
+  createCategoryController,
+  getAllCategoriesController,
+  getCategoryByIdController,
+  updateCategoryByIdController,
+  deleteCategoryByIdController,
 } from "../controllers/categoryController.js";
 import {
   protect,
@@ -20,10 +20,10 @@ import {
 const router = express.Router();
 
 // Public - Get all categories
-router.get("/", getAllCategories);
+router.get("/", getAllCategoriesController);
 
 // Public - Get category by ID
-router.get("/:id", getCategoryById);
+router.get("/:id", getCategoryByIdController);
 
 // Admin only - Create category
 router.post(
@@ -32,7 +32,7 @@ router.post(
   authorizeRoles("admin"),
   attachAdminProfile,
   validateResource(createCategorySchema),
-  createCategory
+  createCategoryController
 );
 
 // Admin only - Update category
@@ -42,7 +42,7 @@ router.put(
   authorizeRoles("admin"),
   attachAdminProfile,
   validateResource(updateCategorySchema),
-  updateCategoryById
+  updateCategoryByIdController
 );
 
 // Admin only - Delete category
@@ -51,7 +51,7 @@ router.delete(
   protect,
   authorizeRoles("admin"),
   attachAdminProfile,
-  deleteCategoryById
+  deleteCategoryByIdController
 );
 
 export default router;

@@ -2,11 +2,11 @@
 
 import express from "express";
 import {
-  getAllReviewsController,
+  getReviewsController,
   getReviewByIdController,
   createReviewController,
   updateReviewController,
-  deleteReviewController,
+  softDeleteReviewController,
 } from "../controllers/reviewController.js";
 
 import { protect, authorizeRoles } from "../middlewares/authMiddleware.js";
@@ -20,10 +20,10 @@ const router = express.Router();
 
 /**
  * @route   GET /api/reviews
- * @desc    Get all reviews, optionally filter by product/user
- * @access  Public/Admin
+ * @desc    Get all reviews, optionally filter by product/user/rating
+ * @access  Public
  */
-router.get("/", getAllReviewsController);
+router.get("/", getReviewsController);
 
 /**
  * @route   GET /api/reviews/:id
@@ -61,6 +61,6 @@ router.put(
  * @desc    Soft-delete a review
  * @access  User/Admin
  */
-router.delete("/:id", protect, deleteReviewController);
+router.delete("/:id", protect, softDeleteReviewController);
 
 export default router;

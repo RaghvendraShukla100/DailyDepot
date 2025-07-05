@@ -1,11 +1,9 @@
-// /backend/routes/cartRoutes.js
-
 import express from "express";
 import {
-  getUserCartController,
+  getUserCartItemsController,
   addToCartController,
   updateCartItemController,
-  removeFromCartController,
+  removeCartItemController,
   toggleSaveForLaterController,
 } from "../controllers/cartController.js";
 
@@ -20,15 +18,15 @@ const router = express.Router();
 
 /**
  * @route   GET /api/cart
- * @desc    Get logged-in user's cart
- * @access  User
+ * @desc    Get logged-in user's cart items
+ * @access  Private (User)
  */
-router.get("/", protect, getUserCartController);
+router.get("/", protect, getUserCartItemsController);
 
 /**
  * @route   POST /api/cart/add
  * @desc    Add item to cart
- * @access  User
+ * @access  Private (User)
  */
 router.post(
   "/add",
@@ -39,8 +37,8 @@ router.post(
 
 /**
  * @route   PUT /api/cart/update/:id
- * @desc    Update cart item quantity/selection
- * @access  User
+ * @desc    Update cart item quantity or options
+ * @access  Private (User)
  */
 router.put(
   "/update/:id",
@@ -51,15 +49,15 @@ router.put(
 
 /**
  * @route   DELETE /api/cart/remove/:id
- * @desc    Remove item from cart
- * @access  User
+ * @desc    Remove item from cart (soft delete)
+ * @access  Private (User)
  */
-router.delete("/remove/:id", protect, removeFromCartController);
+router.delete("/remove/:id", protect, removeCartItemController);
 
 /**
  * @route   POST /api/cart/save-for-later/:id
  * @desc    Toggle save for later on cart item
- * @access  User
+ * @access  Private (User)
  */
 router.post("/save-for-later/:id", protect, toggleSaveForLaterController);
 

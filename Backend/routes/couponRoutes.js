@@ -1,16 +1,20 @@
+// /backend/routes/couponRoutes.js
+
 import express from "express";
 import {
-  createCoupon,
-  getAllCoupons,
-  getCouponById,
-  updateCouponById,
-  deleteCouponById,
+  createCouponController,
+  getAllCouponsController,
+  getCouponByIdController,
+  updateCouponByIdController,
+  deleteCouponByIdController,
 } from "../controllers/couponController.js";
+
 import {
   protect,
   authorizeRoles,
   attachAdminProfile,
 } from "../middlewares/authMiddleware.js";
+
 import validateResource from "../middlewares/validateResourceMiddleware.js";
 import {
   createCouponSchema,
@@ -19,39 +23,59 @@ import {
 
 const router = express.Router();
 
-// Public - View all coupons
-router.get("/", getAllCoupons);
+/**
+ * @route   GET /api/coupons
+ * @desc    Public - View all coupons
+ * @access  Public
+ */
+router.get("/", getAllCouponsController);
 
-// Public - View a single coupon by ID
-router.get("/:id", getCouponById);
+/**
+ * @route   GET /api/coupons/:id
+ * @desc    Public - View a single coupon by ID
+ * @access  Public
+ */
+router.get("/:id", getCouponByIdController);
 
-// Admin only - Create coupon
+/**
+ * @route   POST /api/coupons
+ * @desc    Admin - Create a new coupon
+ * @access  Private/Admin
+ */
 router.post(
   "/",
   protect,
   authorizeRoles("admin"),
   attachAdminProfile,
   validateResource(createCouponSchema),
-  createCoupon
+  createCouponController
 );
 
-// Admin only - Update coupon
+/**
+ * @route   PUT /api/coupons/:id
+ * @desc    Admin - Update a coupon by ID
+ * @access  Private/Admin
+ */
 router.put(
   "/:id",
   protect,
   authorizeRoles("admin"),
   attachAdminProfile,
   validateResource(updateCouponSchema),
-  updateCouponById
+  updateCouponByIdController
 );
 
-// Admin only - Delete coupon
+/**
+ * @route   DELETE /api/coupons/:id
+ * @desc    Admin - Soft delete a coupon by ID
+ * @access  Private/Admin
+ */
 router.delete(
   "/:id",
   protect,
   authorizeRoles("admin"),
   attachAdminProfile,
-  deleteCouponById
+  deleteCouponByIdController
 );
 
 export default router;

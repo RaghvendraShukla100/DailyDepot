@@ -1,8 +1,8 @@
 // Backend/controllers/reviewController.js
 
-import asyncHandler from "../middlewares/asyncHandler.js";
-import Review from "../models/reviewModel.js";
-import Product from "../models/productModel.js";
+import asyncHandler from "../middlewares/asyncHandlerMiddleware.js";
+import Review from "../models/reviewSchema.js";
+import Product from "../models/productSchema.js";
 import ApiError from "../utils/ApiError.js";
 import ApiResponse from "../utils/ApiResponse.js";
 import { STATUS_CODES } from "../constants/statusCodes.js";
@@ -10,7 +10,7 @@ import { STATUS_CODES } from "../constants/statusCodes.js";
 // @desc    Create a new review
 // @route   POST /api/reviews
 // @access  Private (User)
-export const createReview = asyncHandler(async (req, res) => {
+export const createReviewController = asyncHandler(async (req, res) => {
   const { product, rating, comment, images, videos } = req.body;
 
   if (!product || !rating) {
@@ -63,7 +63,7 @@ export const createReview = asyncHandler(async (req, res) => {
 // @desc    Get all reviews
 // @route   GET /api/reviews
 // @access  Public
-export const getReviews = asyncHandler(async (req, res) => {
+export const getReviewsController = asyncHandler(async (req, res) => {
   const { product, user, rating, page = 1, limit = 10 } = req.query;
 
   const filter = { deleted: false };
@@ -92,7 +92,7 @@ export const getReviews = asyncHandler(async (req, res) => {
 // @desc    Get a single review
 // @route   GET /api/reviews/:id
 // @access  Public
-export const getReviewById = asyncHandler(async (req, res) => {
+export const getReviewByIdController = asyncHandler(async (req, res) => {
   const review = await Review.findById(req.params.id).populate("user product");
 
   if (!review || review.deleted) {
@@ -109,7 +109,7 @@ export const getReviewById = asyncHandler(async (req, res) => {
 // @desc    Update a review
 // @route   PUT /api/reviews/:id
 // @access  Private (User who wrote the review)
-export const updateReview = asyncHandler(async (req, res) => {
+export const updateReviewController = asyncHandler(async (req, res) => {
   const { rating, comment, images, videos, status } = req.body;
 
   const review = await Review.findById(req.params.id);
@@ -154,7 +154,7 @@ export const updateReview = asyncHandler(async (req, res) => {
 // @desc    Delete a review (soft delete)
 // @route   DELETE /api/reviews/:id
 // @access  Private (User who wrote it, Admin)
-export const softDeleteReview = asyncHandler(async (req, res) => {
+export const softDeleteReviewController = asyncHandler(async (req, res) => {
   const review = await Review.findById(req.params.id);
 
   if (!review || review.deleted) {

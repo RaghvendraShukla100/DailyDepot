@@ -1,8 +1,8 @@
 // Backend/controllers/paymentController.js
 
-import asyncHandler from "../middlewares/asyncHandler.js";
-import Payment from "../models/paymentModel.js";
-import Order from "../models/orderModel.js";
+import asyncHandler from "../middlewares/asyncHandlerMiddleware.js";
+import Payment from "../models/paymentSchema.js";
+import Order from "../models/orderSchema.js";
 import ApiError from "../utils/ApiError.js";
 import ApiResponse from "../utils/ApiResponse.js";
 import { STATUS_CODES } from "../constants/statusCodes.js";
@@ -10,7 +10,7 @@ import { STATUS_CODES } from "../constants/statusCodes.js";
 // @desc    Create a new payment record
 // @route   POST /api/payments
 // @access  Private (User)
-export const createPayment = asyncHandler(async (req, res) => {
+export const createPaymentController = asyncHandler(async (req, res) => {
   const {
     order,
     paymentMethod,
@@ -61,7 +61,7 @@ export const createPayment = asyncHandler(async (req, res) => {
 // @desc    Get all payments
 // @route   GET /api/payments
 // @access  Private (Admin, User can see their payments)
-export const getPayments = asyncHandler(async (req, res) => {
+export const getPaymentsController = asyncHandler(async (req, res) => {
   const page = parseInt(req.query.page) || 1;
   const limit = parseInt(req.query.limit) || 10;
   const skip = (page - 1) * limit;
@@ -101,7 +101,7 @@ export const getPayments = asyncHandler(async (req, res) => {
 // @desc    Get a payment by ID
 // @route   GET /api/payments/:id
 // @access  Private (Admin, User can see their payment)
-export const getPaymentById = asyncHandler(async (req, res) => {
+export const getPaymentByIdController = asyncHandler(async (req, res) => {
   const payment = await Payment.findById(req.params.id).populate("user order");
 
   if (!payment || payment.deleted) {
@@ -126,7 +126,7 @@ export const getPaymentById = asyncHandler(async (req, res) => {
 // @desc    Update payment status or refund details
 // @route   PUT /api/payments/:id
 // @access  Private (Admin)
-export const updatePayment = asyncHandler(async (req, res) => {
+export const updatePaymentController = asyncHandler(async (req, res) => {
   const { paymentStatus, refundedAmount, refundStatus, notes } = req.body;
 
   const payment = await Payment.findById(req.params.id);
@@ -152,7 +152,7 @@ export const updatePayment = asyncHandler(async (req, res) => {
 // @desc    Soft delete a payment
 // @route   DELETE /api/payments/:id
 // @access  Private (Admin)
-export const softDeletePayment = asyncHandler(async (req, res) => {
+export const softDeletePaymentController = asyncHandler(async (req, res) => {
   const payment = await Payment.findById(req.params.id);
 
   if (!payment || payment.deleted) {

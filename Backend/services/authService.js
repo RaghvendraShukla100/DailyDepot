@@ -3,7 +3,7 @@ import jwt from "jsonwebtoken";
 import User from "../models/userSchema.js";
 import Seller from "../models/sellerSchema.js";
 import Admin from "../models/adminSchema.js";
-import config from "../config/config.js";
+import { config } from "../config/config.js";
 
 const generateToken = (payload) => {
   return jwt.sign(payload, config.JWT_SECRET, {

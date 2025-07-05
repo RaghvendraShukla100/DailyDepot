@@ -7,7 +7,7 @@ import mongoSanitize from "express-mongo-sanitize";
 import xss from "xss-clean";
 import compression from "compression";
 
-import config from "./config/config.js";
+import { config } from "./config/config.js";
 
 // Middlewares
 import { notFound, errorHandler } from "./middlewares/errorMiddleware.js";

@@ -2,40 +2,29 @@
 
 import express from "express";
 import {
-  getAllNotificationsController,
-  getNotificationByIdController,
   createNotificationController,
-  updateNotificationController,
+  getNotificationsController,
+  markNotificationAsReadController,
   deleteNotificationController,
 } from "../controllers/notificationController.js";
 
 import { protect, authorizeRoles } from "../middlewares/authMiddleware.js";
 import validateResource from "../middlewares/validateResourceMiddleware.js";
-import {
-  createNotificationSchema,
-  updateNotificationSchema,
-} from "../validations/notificationValidation.js";
+import { createNotificationSchema } from "../validations/notificationValidation.js";
 
 const router = express.Router();
 
 /**
  * @route   GET /api/notifications
- * @desc    Get all notifications for logged-in user/admin
- * @access  Auth
+ * @desc    Get all notifications for logged-in user
+ * @access  Private (User)
  */
-router.get("/", protect, getAllNotificationsController);
-
-/**
- * @route   GET /api/notifications/:id
- * @desc    Get single notification by ID
- * @access  Auth
- */
-router.get("/:id", protect, getNotificationByIdController);
+router.get("/", protect, getNotificationsController);
 
 /**
  * @route   POST /api/notifications
- * @desc    Create a notification (admin use)
- * @access  Admin
+ * @desc    Create a notification (admin/system)
+ * @access  Private (Admin)
  */
 router.post(
   "/",
@@ -46,22 +35,16 @@ router.post(
 );
 
 /**
- * @route   PUT /api/notifications/:id
- * @desc    Update a notification (admin use)
- * @access  Admin
+ * @route   PATCH /api/notifications/:id/read
+ * @desc    Mark a notification as read
+ * @access  Private (User)
  */
-router.put(
-  "/:id",
-  protect,
-  authorizeRoles("admin"),
-  validateResource(updateNotificationSchema),
-  updateNotificationController
-);
+router.patch("/:id/read", protect, markNotificationAsReadController);
 
 /**
  * @route   DELETE /api/notifications/:id
  * @desc    Soft-delete a notification
- * @access  User (self) / Admin
+ * @access  Private (User/Admin)
  */
 router.delete("/:id", protect, deleteNotificationController);
 

@@ -2,12 +2,11 @@
 
 import express from "express";
 import {
-  getAllPaymentsController,
-  getUserPaymentsController,
-  getPaymentByIdController,
-  createPaymentController,
-  updatePaymentController,
-  deletePaymentController,
+  createPaymentControllers,
+  getPaymentsControllers,
+  getPaymentByIdControllers,
+  updatePaymentControllers,
+  softDeletePaymentControllers,
 } from "../controllers/paymentController.js";
 
 import { protect, authorizeRoles } from "../middlewares/authMiddleware.js";
@@ -20,37 +19,30 @@ import {
 const router = express.Router();
 
 /**
- * @route   GET /api/payments
- * @desc    Get all payments (admin)
- * @access  Admin
- */
-router.get("/", protect, authorizeRoles("admin"), getAllPaymentsController);
-
-/**
- * @route   GET /api/payments/my
- * @desc    Get payments of logged-in user
- * @access  Auth
- */
-router.get("/my", protect, getUserPaymentsController);
-
-/**
- * @route   GET /api/payments/:id
- * @desc    Get payment by ID
- * @access  Auth
- */
-router.get("/:id", protect, getPaymentByIdController);
-
-/**
  * @route   POST /api/payments
  * @desc    Create a payment
- * @access  Auth
+ * @access  Auth (User)
  */
 router.post(
   "/",
   protect,
   validateResource(createPaymentSchema),
-  createPaymentController
+  createPaymentControllers
 );
+
+/**
+ * @route   GET /api/payments
+ * @desc    Get all payments (Admin sees all, User sees own)
+ * @access  Auth (User/Admin)
+ */
+router.get("/", protect, getPaymentsControllers);
+
+/**
+ * @route   GET /api/payments/:id
+ * @desc    Get payment by ID
+ * @access  Auth (User/Admin)
+ */
+router.get("/:id", protect, getPaymentByIdControllers);
 
 /**
  * @route   PUT /api/payments/:id
@@ -62,7 +54,7 @@ router.put(
   protect,
   authorizeRoles("admin"),
   validateResource(updatePaymentSchema),
-  updatePaymentController
+  updatePaymentControllers
 );
 
 /**
@@ -74,7 +66,7 @@ router.delete(
   "/:id",
   protect,
   authorizeRoles("admin"),
-  deletePaymentController
+  softDeletePaymentControllers
 );
 
 export default router;

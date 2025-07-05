@@ -1,11 +1,12 @@
-// Backend/controllers/productController.js
+// /backend/controllers/productController.js
 
-import asyncHandler from "../middlewares/asyncHandler.js";
-import Product from "../models/productModel.js";
+import asyncHandler from "../middlewares/asyncHandlerMiddleware.js";
+import Product from "../models/productSchema.js";
 import {
   uploadToCloudinary,
   deleteFromCloudinary,
-} from "../utils/cloudinary.js";
+} from "../config/cloudinary.js";
+
 import ApiError from "../utils/ApiError.js";
 import ApiResponse from "../utils/ApiResponse.js";
 import { STATUS_CODES } from "../constants/statusCodes.js";
@@ -13,7 +14,7 @@ import { STATUS_CODES } from "../constants/statusCodes.js";
 // @desc    Create a product
 // @route   POST /api/products
 // @access  Private (Admin, Seller)
-export const createProduct = asyncHandler(async (req, res) => {
+const createProductController = asyncHandler(async (req, res) => {
   const product = await Product.create(req.body);
 
   res
@@ -30,7 +31,7 @@ export const createProduct = asyncHandler(async (req, res) => {
 // @desc    Get all products with filters, pagination, search
 // @route   GET /api/products
 // @access  Public
-export const getProducts = asyncHandler(async (req, res) => {
+const getAllProductsController = asyncHandler(async (req, res) => {
   const page = parseInt(req.query.page) || 1;
   const limit = parseInt(req.query.limit) || 10;
   const skip = (page - 1) * limit;
@@ -75,13 +76,13 @@ export const getProducts = asyncHandler(async (req, res) => {
 // @desc    Get single product by ID
 // @route   GET /api/products/:id
 // @access  Public
-export const getProductById = asyncHandler(async (req, res) => {
+const getProductByIdController = asyncHandler(async (req, res) => {
   const product = await Product.findById(req.params.id).populate(
     "category brand reviews"
   );
 
   if (!product || product.deleted) {
-    throw ApiError.notFound("Product");
+    throw ApiError.notFound("Product not found");
   }
 
   res
@@ -94,11 +95,11 @@ export const getProductById = asyncHandler(async (req, res) => {
 // @desc    Update product by ID
 // @route   PUT /api/products/:id
 // @access  Private (Admin, Seller)
-export const updateProduct = asyncHandler(async (req, res) => {
+const updateProductController = asyncHandler(async (req, res) => {
   const product = await Product.findById(req.params.id);
 
   if (!product || product.deleted) {
-    throw ApiError.notFound("Product");
+    throw ApiError.notFound("Product not found");
   }
 
   Object.assign(product, req.body);
@@ -114,11 +115,11 @@ export const updateProduct = asyncHandler(async (req, res) => {
 // @desc    Soft delete product
 // @route   DELETE /api/products/:id
 // @access  Private (Admin, Seller)
-export const softDeleteProduct = asyncHandler(async (req, res) => {
+const deleteProductController = asyncHandler(async (req, res) => {
   const product = await Product.findById(req.params.id);
 
   if (!product || product.deleted) {
-    throw ApiError.notFound("Product");
+    throw ApiError.notFound("Product not found");
   }
 
   product.deleted = true;
@@ -135,11 +136,11 @@ export const softDeleteProduct = asyncHandler(async (req, res) => {
 // @desc    Upload product images
 // @route   POST /api/products/:id/images
 // @access  Private (Admin, Seller)
-export const uploadProductImages = asyncHandler(async (req, res) => {
+const uploadProductImagesController = asyncHandler(async (req, res) => {
   const product = await Product.findById(req.params.id);
 
   if (!product || product.deleted) {
-    throw ApiError.notFound("Product");
+    throw ApiError.notFound("Product not found");
   }
 
   if (!req.files || req.files.length === 0) {
@@ -152,7 +153,7 @@ export const uploadProductImages = asyncHandler(async (req, res) => {
     const uploadResult = await uploadToCloudinary(file.path, "products");
     uploadedImages.push({
       url: uploadResult.secure_url,
-      public_id: uploadResult.public_id, // For deletion support
+      public_id: uploadResult.public_id,
       alt: file.originalname || "Product image",
     });
   }
@@ -174,11 +175,11 @@ export const uploadProductImages = asyncHandler(async (req, res) => {
 // @desc    Remove product image
 // @route   DELETE /api/products/:id/images/:imageId
 // @access  Private (Admin, Seller)
-export const removeProductImage = asyncHandler(async (req, res) => {
+const removeProductImageController = asyncHandler(async (req, res) => {
   const product = await Product.findById(req.params.id);
 
   if (!product || product.deleted) {
-    throw ApiError.notFound("Product");
+    throw ApiError.notFound("Product not found");
   }
 
   const imageIndex = product.images.findIndex(
@@ -186,14 +187,13 @@ export const removeProductImage = asyncHandler(async (req, res) => {
   );
 
   if (imageIndex === -1) {
-    throw ApiError.notFound("Image");
+    throw ApiError.notFound("Image not found");
   }
 
-  // Optional: delete from Cloudinary if using
-  // const publicId = product.images[imageIndex].public_id;
-  // if (publicId) {
-  //   await deleteFromCloudinary(publicId);
-  // }
+  const publicId = product.images[imageIndex].public_id;
+  if (publicId) {
+    await deleteFromCloudinary(publicId);
+  }
 
   product.images.splice(imageIndex, 1);
   await product.save();
@@ -208,3 +208,13 @@ export const removeProductImage = asyncHandler(async (req, res) => {
       )
     );
 });
+
+export {
+  createProductController,
+  getAllProductsController,
+  getProductByIdController,
+  updateProductController,
+  deleteProductController,
+  uploadProductImagesController,
+  removeProductImageController,
+};

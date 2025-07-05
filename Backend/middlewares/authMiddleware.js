@@ -1,7 +1,7 @@
 import jwt from "jsonwebtoken";
-import User from "../models/userModel.js";
-import Seller from "../models/sellerModel.js";
-import Admin from "../models/adminModel.js";
+import User from "../models/userSchema.js";
+import Seller from "../models/sellerSchema.js";
+import Admin from "../models/adminSchema.js";
 
 // Protect: verify JWT and attach user
 export const protect = async (req, res, next) => {

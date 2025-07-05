@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 
+// Analytics Schema for tracking user behavior, soft delete enabled
 const analyticsSchema = new mongoose.Schema(
   {
     user: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
@@ -20,7 +21,7 @@ const analyticsSchema = new mongoose.Schema(
       ],
       required: true,
     },
-    eventData: { type: Object }, // flexible structured data (e.g., productId, categoryId, filters)
+    eventData: { type: Object }, // Flexible structure for additional event-related data
     device: {
       type: String,
       enum: ["mobile", "desktop", "tablet"],
@@ -37,14 +38,14 @@ const analyticsSchema = new mongoose.Schema(
     deleted: { type: Boolean, default: false },
     deletedAt: { type: Date, default: null, index: { expireAfterSeconds: 0 } },
   },
-  { timestamps: true }
+  { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } }
 );
 
+// Soft delete handler before saving
 analyticsSchema.pre("save", function (next) {
   if (this.deleted && !this.deletedAt) {
     this.deletedAt = new Date();
-  }
-  if (!this.deleted) {
+  } else if (!this.deleted) {
     this.deletedAt = null;
   }
   next();

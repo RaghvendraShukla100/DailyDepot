@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
 
+// User Schema for DailyDepot with comprehensive fields and soft delete handling
 const userSchema = new mongoose.Schema(
   {
     name: {
@@ -15,7 +16,7 @@ const userSchema = new mongoose.Schema(
       trim: true,
     },
     phone: { type: String, unique: true, sparse: true, trim: true },
-    password: { type: String, required: true },
+    password: { type: String, required: true, select: false }, // Password excluded by default from queries for security
     gender: {
       type: String,
       enum: ["male", "female", "other"],
@@ -25,7 +26,7 @@ const userSchema = new mongoose.Schema(
     profilePic: { type: String, trim: true },
     bio: { type: String, trim: true },
     addresses: [{ type: mongoose.Schema.Types.ObjectId, ref: "Address" }],
-    wishlist: [{ type: mongoose.Schema.Types.ObjectId, ref: "Wishlist" }], // supporting advanced multi-wishlist
+    wishlist: [{ type: mongoose.Schema.Types.ObjectId, ref: "Wishlist" }],
     cart: [{ type: mongoose.Schema.Types.ObjectId, ref: "CartItem" }],
     orders: [{ type: mongoose.Schema.Types.ObjectId, ref: "Order" }],
     role: { type: String, enum: ["user", "seller", "admin"], default: "user" },
@@ -53,26 +54,33 @@ const userSchema = new mongoose.Schema(
     deleted: { type: Boolean, default: false },
     deletedAt: { type: Date, default: null, index: { expireAfterSeconds: 0 } },
   },
-  { timestamps: true }
+  { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } }
 );
 
+// Hash password before saving if modified
 userSchema.pre("save", async function (next) {
   if (this.isModified("password")) {
-    const salt = await bcrypt.genSalt(10);
+    const salt = await bcrypt.genSalt(12); // Using 12 rounds for enhanced security
     this.password = await bcrypt.hash(this.password, salt);
   }
+  // Handle soft delete timestamp
   if (this.deleted && !this.deletedAt) {
     this.deletedAt = new Date();
-  }
-  if (!this.deleted) {
+  } else if (!this.deleted) {
     this.deletedAt = null;
   }
   next();
 });
 
+// Compare entered password with stored hash
 userSchema.methods.comparePassword = async function (enteredPassword) {
-  return await bcrypt.compare(enteredPassword, this.password);
+  return bcrypt.compare(enteredPassword, this.password);
 };
+
+// Virtual field for user's full name
+userSchema.virtual("fullName").get(function () {
+  return `${this.name.first} ${this.name.last}`;
+});
 
 const User = mongoose.model("User", userSchema);
 export default User;

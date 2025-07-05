@@ -12,8 +12,8 @@ import {
 import { protect } from "../middlewares/authMiddleware.js";
 import validateResource from "../middlewares/validateResourceMiddleware.js";
 import {
-  createAddressSchema,
-  updateAddressSchema,
+  createAddressValidation,
+  updateAddressValidation,
 } from "../validations/addressValidation.js";
 
 const router = express.Router();
@@ -40,7 +40,7 @@ router.get("/:id", protect, getAddressByIdController);
 router.post(
   "/",
   protect,
-  validateResource(createAddressSchema),
+  validateResource(createAddressValidation),
   createAddressController
 );
 
@@ -52,7 +52,7 @@ router.post(
 router.put(
   "/:id",
   protect,
-  validateResource(updateAddressSchema),
+  validateResource(updateAddressValidation),
   updateAddressController
 );
 

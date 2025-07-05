@@ -2,7 +2,7 @@
 
 import { z } from "zod";
 
-export const createOrderSchema = z.object({
+export const createOrderValidation = z.object({
   items: z
     .array(
       z.object({
@@ -27,7 +27,7 @@ export const createOrderSchema = z.object({
   notes: z.string().optional(),
 });
 
-export const updateOrderStatusSchema = z.object({
+export const updateOrderStatusValidation = z.object({
   orderStatus: z.enum([
     "pending",
     "processing",
@@ -40,6 +40,6 @@ export const updateOrderStatusSchema = z.object({
   notes: z.string().optional(),
 });
 
-export const updatePaymentStatusSchema = z.object({
+export const updatePaymentStatusValidation = z.object({
   paymentStatus: z.enum(["pending", "paid", "failed", "refunded"]),
 });

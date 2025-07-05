@@ -3,7 +3,7 @@ import { z } from "zod";
 /**
  * Schema for creating a new wishlist
  */
-export const createWishlistSchema = z.object({
+export const createWishlistValidation = z.object({
   name: z.string().min(1, "Wishlist name is required."),
   isPublic: z.boolean().optional(),
   products: z
@@ -23,7 +23,7 @@ export const createWishlistSchema = z.object({
 /**
  * Schema for updating wishlist properties (name, isPublic)
  */
-export const updateWishlistSchema = z.object({
+export const updateWishlistValidation = z.object({
   name: z.string().min(1).optional(),
   isPublic: z.boolean().optional(),
 });
@@ -31,7 +31,7 @@ export const updateWishlistSchema = z.object({
 /**
  * Schema for adding a product to the wishlist
  */
-export const addWishlistItemSchema = z.object({
+export const addWishlistItemValidation = z.object({
   productId: z.string({
     required_error: "Product ID is required.",
   }),
@@ -43,7 +43,7 @@ export const addWishlistItemSchema = z.object({
 /**
  * Schema for updating a wishlist item's notes or options
  */
-export const updateWishlistItemSchema = z.object({
+export const updateWishlistItemValidation = z.object({
   selectedSize: z.string().max(50).optional(),
   selectedColor: z.string().max(50).optional(),
   notes: z.string().max(300).optional(),

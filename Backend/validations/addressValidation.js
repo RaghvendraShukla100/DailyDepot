@@ -2,7 +2,7 @@
 
 import { z } from "zod";
 
-export const createAddressSchema = z.object({
+export const createAddressValidation = z.object({
   name: z.string().min(2).max(50),
   phone: z.string().min(10).max(15),
   addressLine1: z.string().min(5).max(200),
@@ -16,4 +16,4 @@ export const createAddressSchema = z.object({
   isDefault: z.boolean().optional(),
 });
 
-export const updateAddressSchema = createAddressSchema.partial();
+export const updateAddressValidation = createAddressSchema.partial();

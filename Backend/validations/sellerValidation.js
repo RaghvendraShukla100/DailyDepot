@@ -5,7 +5,7 @@ import { z } from "zod";
 /**
  * Validation schema for creating a seller
  */
-export const createSellerSchema = z.object({
+export const createSellerValidation = z.object({
   shopName: z
     .string({
       required_error: "Shop name is required.",
@@ -33,4 +33,4 @@ export const createSellerSchema = z.object({
  *    PUT /api/sellers/profile
  *    PUT /api/sellers/:id (if later added)
  */
-export const updateSellerSchema = createSellerSchema.partial();
+export const updateSellerValidation = createSellerSchema.partial();

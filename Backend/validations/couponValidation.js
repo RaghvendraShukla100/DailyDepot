@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const createCouponSchema = z.object({
+export const createCouponValidation = z.object({
   code: z.string().trim().min(3).max(20),
   description: z.string().trim().optional(),
   discountType: z.enum(["percentage", "flat"]),
@@ -19,4 +19,4 @@ export const createCouponSchema = z.object({
     .default("active"),
 });
 
-export const updateCouponSchema = createCouponSchema.partial();
+export const updateCouponValidation = createCouponSchema.partial();

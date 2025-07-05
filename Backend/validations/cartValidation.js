@@ -4,7 +4,7 @@ import { z } from "zod";
  * Schema for adding an item to the cart
  * Used in POST /api/cart/add
  */
-export const addToCartSchema = z.object({
+export const addToCartValidation = z.object({
   productId: z.string({
     required_error: "Product ID is required.",
   }),
@@ -32,7 +32,7 @@ export const addToCartSchema = z.object({
  * Schema for updating a cart item
  * Used in PUT /api/cart/update/:id
  */
-export const updateCartItemSchema = z.object({
+export const updateCartItemValidation = z.object({
   quantity: z.number().min(1, "Quantity must be at least 1.").optional(),
   selectedSize: z
     .string()

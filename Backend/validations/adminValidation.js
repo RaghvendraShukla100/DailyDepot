@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 // Create Admin Schema
-export const createAdminSchema = z.object({
+export const createAdminValidation = z.object({
   department: z
     .string()
     .trim()
@@ -15,4 +15,4 @@ export const createAdminSchema = z.object({
 });
 
 // Update Admin Schema (partial for PATCH/PUT flexibility)
-export const updateAdminProfileSchema = createAdminSchema.partial();
+export const updateAdminProfileValidation = createAdminSchema.partial();

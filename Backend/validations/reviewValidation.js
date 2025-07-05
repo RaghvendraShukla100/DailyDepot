@@ -5,7 +5,7 @@ import { z } from "zod";
 /**
  * Schema for creating a review
  */
-export const createReviewSchema = z.object({
+export const createReviewValidation = z.object({
   product: z.string({
     required_error: "Product ID is required.",
   }),
@@ -23,7 +23,7 @@ export const createReviewSchema = z.object({
 /**
  * Schema for updating a review
  */
-export const updateReviewSchema = z.object({
+export const updateReviewValidation = z.object({
   rating: z.number().min(1).max(5).optional(),
   comment: z.string().max(1000).optional(),
   images: z.array(z.string()).optional(),

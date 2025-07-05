@@ -2,7 +2,7 @@
 
 import { z } from "zod";
 
-export const createProductSchema = z.object({
+export const createProductValidation = z.object({
   name: z.string().min(2).max(200),
   description: z.string().optional(),
   price: z.number().positive(),
@@ -23,4 +23,4 @@ export const createProductSchema = z.object({
   status: z.enum(["active", "inactive", "deleted"]).optional(),
 });
 
-export const updateProductSchema = createProductSchema.partial();
+export const updateProductValidation = createProductSchema.partial();

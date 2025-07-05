@@ -5,7 +5,7 @@ import { z } from "zod";
 /**
  * Schema for creating a payment
  */
-export const createPaymentSchema = z.object({
+export const createPaymentValidation = z.object({
   order: z.string({ required_error: "Order ID is required." }),
   paymentMethod: z.enum(
     ["credit_card", "debit_card", "upi", "net_banking", "cod", "wallet"],
@@ -24,7 +24,7 @@ export const createPaymentSchema = z.object({
 /**
  * Schema for updating a payment
  */
-export const updatePaymentSchema = z.object({
+export const updatePaymentValidation = z.object({
   paymentStatus: z.enum(["paid", "pending", "failed", "refunded"]).optional(),
   refundedAmount: z
     .number()

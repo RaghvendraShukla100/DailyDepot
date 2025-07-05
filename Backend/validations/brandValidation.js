@@ -2,7 +2,7 @@
 
 import { z } from "zod";
 
-export const createBrandSchema = z.object({
+export const createBrandValidation = z.object({
   name: z.string().min(2).max(100),
   slug: z.string().min(2).max(100),
   description: z.string().optional(),
@@ -15,4 +15,4 @@ export const createBrandSchema = z.object({
   status: z.enum(["active", "inactive", "deleted"]).optional(),
 });
 
-export const updateBrandSchema = createBrandSchema.partial();
+export const updateBrandValidation = createBrandSchema.partial();

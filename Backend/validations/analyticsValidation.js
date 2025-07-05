@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const createAnalyticsSchema = z.object({
+export const createAnalyticsValidation = z.object({
   sessionId: z.string().trim().optional(),
   eventType: z.enum([
     "page_view",

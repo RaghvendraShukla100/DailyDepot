@@ -11,11 +11,12 @@ import generateToken from "../utils/generateToken.js";
 import {
   registerUserValidation,
   updateUserProfileValidation,
+  loginUserValidation,
 } from "../validations/userValidation.js";
 
 /**
  * @desc    Register a new user
- * @route   POST /api/auth/register
+ * @route   POST /api/user/register
  * @access  Public
  */
 export const registerUser = asyncHandler(async (req, res) => {
@@ -26,13 +27,12 @@ export const registerUser = asyncHandler(async (req, res) => {
     throw ApiError.conflict(MESSAGES.USER.ALREADY_EXISTS);
   }
 
-  const hashedPassword = await bcrypt.hash(password, 10);
   const [first, ...last] = name.trim().split(" ");
 
   const user = await User.create({
     name: { first, last: last.join(" ") },
     email,
-    password: hashedPassword,
+    password, // raw password
   });
 
   const token = generateToken(user._id);
@@ -70,9 +70,27 @@ export const loginUser = asyncHandler(async (req, res) => {
     throw ApiError.badRequest("Email and password are required.");
   }
 
-  const user = await User.findOne({ email });
+  const user = await User.findOne({ email }).select(
+    "+password name email role"
+  );
+
   if (!user) {
     throw ApiError.unauthorized(MESSAGES.AUTH.LOGIN_FAIL);
+  }
+
+  // LOG HERE:
+  console.log("Retrieved user:", {
+    id: user._id,
+    email: user.email,
+    password: user.password,
+    name: user.name,
+  });
+
+  if (!user.password) {
+    logger.error(`Login failed: Missing password in DB for user ${email}`);
+    throw ApiError.internal(
+      "Password missing in user record. Please contact support."
+    );
   }
 
   const isMatch = await bcrypt.compare(password, user.password);

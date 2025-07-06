@@ -5,6 +5,7 @@ dotenv.config(); // Load .env immediately
 
 import app from "./app.js";
 import connectDB from "./config/db.js";
+import logger from "./utils/logger.js";
 
 // Get environment variables
 const PORT = process.env.PORT || 5000;
@@ -16,23 +17,24 @@ const startServer = async () => {
     await connectDB();
 
     const server = app.listen(PORT, () => {
-      console.log(`🚀 Server running in ${NODE_ENV} mode on port ${PORT}`);
+      logger.info(`🚀 Server running in ${NODE_ENV} mode on port ${PORT}`);
     });
 
     // Graceful shutdown on unhandled promise rejections
     process.on("unhandledRejection", (err) => {
-      console.error(`❌ Unhandled Rejection: ${err.message}`);
+      logger.error(`❌ Unhandled Rejection: ${err.message}`);
       server.close(() => process.exit(1));
     });
 
+    // Graceful shutdown on SIGTERM
     process.on("SIGTERM", () => {
-      console.log("👋 SIGTERM received, shutting down gracefully.");
+      logger.info("👋 SIGTERM received, shutting down gracefully.");
       server.close(() => {
-        console.log("💤 Process terminated.");
+        logger.info("💤 Process terminated.");
       });
     });
   } catch (error) {
-    console.error(`❌ Failed to start server: ${error.message}`);
+    logger.error(`❌ Failed to start server: ${error.message}`);
     process.exit(1);
   }
 };

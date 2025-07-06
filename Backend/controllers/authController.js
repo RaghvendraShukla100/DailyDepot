@@ -1,6 +1,6 @@
 // Backend/controllers/authController.js
 
-import asyncHandler from "../middlewares/asyncHandlerMiddleware.js";
+import asyncHandler from "../middlewares/asyncHandler.js";
 import * as authService from "../services/authService.js";
 import ApiError from "../utils/ApiError.js";
 import ApiResponse from "../utils/ApiResponse.js";

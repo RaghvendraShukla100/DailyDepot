@@ -1,6 +1,6 @@
 // Backend/controllers/reviewController.js
 
-import asyncHandler from "../middlewares/asyncHandlerMiddleware.js";
+import asyncHandler from "../middlewares/asyncHandler.js";
 import Review from "../models/reviewSchema.js";
 import Product from "../models/productSchema.js";
 import ApiError from "../utils/ApiError.js";

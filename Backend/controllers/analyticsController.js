@@ -1,6 +1,6 @@
 // /Backend/controllers/analyticsController.js
 
-import asyncHandlerMiddleware from "../middlewares/asyncHandlerMiddleware.js";
+import asyncHandlerMiddleware from "../middlewares/asyncHandler.js";
 import ApiResponse from "../utils/ApiResponse.js";
 import ApiError from "../utils/ApiError.js";
 import Analytics from "../models/analyticsSchema.js";

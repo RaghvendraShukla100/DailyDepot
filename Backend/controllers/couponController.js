@@ -1,7 +1,7 @@
 // Backend/controllers/couponController.js
 
 import Coupon from "../models/couponSchema.js";
-import asyncHandler from "../middlewares/asyncHandlerMiddleware.js";
+import asyncHandler from "../middlewares/asyncHandler.js";
 import ApiError from "../utils/ApiError.js";
 import ApiResponse from "../utils/ApiResponse.js";
 import { STATUS_CODES } from "../constants/statusCodes.js";

@@ -1,108 +1,141 @@
-// /backend/controllers/userController.js
-
-import asyncHandler from "../middlewares/asyncHandlerMiddleware.js";
-import * as userService from "../services/userService.js";
+import asyncHandler from "../middlewares/asyncHandler.js";
+import ApiError from "../utils/ApiError.js";
+import ApiResponse from "../utils/ApiResponse.js";
 import User from "../models/userSchema.js";
-import Wishlist from "../models/wishlistSchema.js";
-import Order from "../models/orderSchema.js";
+import { STATUS_CODES } from "../constants/statusCodes.js";
+import { MESSAGES } from "../constants/messages.js";
+import logger from "../utils/logger.js";
 
 /**
- * @desc    Get current user profile
+ * @desc    Fetch the currently logged-in user's profile
  * @route   GET /api/users/profile
- * @access  Private
+ * @access  Private (user must be logged in)
  */
-export const getUserProfileController = asyncHandler(async (req, res) => {
+export const getUserProfile = asyncHandler(async (req, res) => {
   const user = await User.findById(req.user._id).select("-password");
-  res.status(200).json({
-    success: true,
-    data: user,
-  });
+
+  if (!user) {
+    throw ApiError.notFound("User");
+  }
+
+  res
+    .status(STATUS_CODES.OK)
+    .json(new ApiResponse(STATUS_CODES.OK, user, "User profile fetched."));
 });
 
 /**
- * @desc    Update current user profile
+ * @desc    Update the currently logged-in user's profile
  * @route   PUT /api/users/profile
- * @access  Private
+ * @access  Private (user must be logged in)
  */
-export const updateUserProfileController = asyncHandler(async (req, res) => {
-  const updatedUser = await User.findByIdAndUpdate(
-    req.user._id,
-    { ...req.body },
-    { new: true, runValidators: true }
-  ).select("-password");
+export const updateUserProfile = asyncHandler(async (req, res) => {
+  const user = await User.findById(req.user._id);
 
-  res.status(200).json({
-    success: true,
-    message: "Profile updated successfully.",
-    data: updatedUser,
-  });
+  if (!user) {
+    throw ApiError.notFound("User");
+  }
+
+  const { name, bio, phone, address } = req.body;
+
+  // Update user fields only if provided
+  if (name) {
+    const [first, ...last] = name.split(" ");
+    user.name.first = first || user.name.first;
+    user.name.last = last.join(" ") || user.name.last;
+  }
+  if (bio) user.bio = bio;
+  if (phone) user.phone = phone;
+  if (address) user.addresses.push(address);
+
+  await user.save();
+
+  res
+    .status(STATUS_CODES.OK)
+    .json(
+      new ApiResponse(STATUS_CODES.OK, user, "Profile updated successfully.")
+    );
 });
 
 /**
- * @desc    Soft delete current user account
+ * @desc    Soft delete the currently logged-in user's account
  * @route   DELETE /api/users/profile
- * @access  Private
+ * @access  Private (user must be logged in)
  */
-export const deleteUserProfileController = asyncHandler(async (req, res) => {
-  await User.findByIdAndUpdate(req.user._id, {
-    deleted: true,
-    status: "deleted",
-  });
+export const deleteUserProfile = asyncHandler(async (req, res) => {
+  const user = await User.findById(req.user._id);
 
-  res.status(200).json({
-    success: true,
-    message: "Account marked as deleted.",
-  });
+  if (!user) {
+    throw ApiError.notFound("User");
+  }
+
+  // Perform soft delete by updating relevant fields
+  user.deleted = true;
+  user.status = "deleted";
+  user.deletedAt = new Date();
+  await user.save();
+
+  res
+    .status(STATUS_CODES.OK)
+    .json(
+      new ApiResponse(
+        STATUS_CODES.OK,
+        null,
+        "User account deleted successfully."
+      )
+    );
 });
 
 /**
- * @desc    Get all users (Admin)
+ * @desc    Fetch all non-deleted users (Admin only)
  * @route   GET /api/users
- * @access  Private (Admin)
+ * @access  Private/Admin
  */
-export const getAllUsersController = asyncHandler(async (req, res) => {
+export const getAllUsers = asyncHandler(async (req, res) => {
   const users = await User.find({ deleted: { $ne: true } }).select("-password");
-  res.status(200).json({
-    success: true,
-    data: users,
-  });
+
+  res
+    .status(STATUS_CODES.OK)
+    .json(
+      new ApiResponse(STATUS_CODES.OK, users, "All users fetched successfully.")
+    );
 });
 
 /**
- * @desc    Get user by ID (Admin)
+ * @desc    Fetch a specific user by ID (Admin only)
  * @route   GET /api/users/:id
- * @access  Private (Admin)
+ * @access  Private/Admin
  */
-export const getUserByIdController = asyncHandler(async (req, res) => {
+export const getUserById = asyncHandler(async (req, res) => {
   const user = await User.findById(req.params.id).select("-password");
+
   if (!user) {
-    res.status(404);
-    throw new Error("User not found.");
+    throw ApiError.notFound("User");
   }
-  res.status(200).json({
-    success: true,
-    data: user,
-  });
+
+  res
+    .status(STATUS_CODES.OK)
+    .json(new ApiResponse(STATUS_CODES.OK, user, "User fetched successfully."));
 });
 
 /**
- * @desc    Delete user by ID (Admin - Soft delete)
+ * @desc    Soft delete a specific user by ID (Admin only)
  * @route   DELETE /api/users/:id
- * @access  Private (Admin)
+ * @access  Private/Admin
  */
-export const deleteUserByIdController = asyncHandler(async (req, res) => {
-  const user = await User.findByIdAndUpdate(
-    req.params.id,
-    { deleted: true, status: "deleted" },
-    { new: true }
-  );
+export const deleteUserById = asyncHandler(async (req, res) => {
+  const user = await User.findById(req.params.id);
+
   if (!user) {
-    res.status(404);
-    throw new Error("User not found.");
+    throw ApiError.notFound("User");
   }
-  res.status(200).json({
-    success: true,
-    message: "User account marked as deleted.",
-    data: user,
-  });
+
+  // Soft delete the user
+  user.deleted = true;
+  user.status = "deleted";
+  user.deletedAt = new Date();
+  await user.save();
+
+  res
+    .status(STATUS_CODES.OK)
+    .json(new ApiResponse(STATUS_CODES.OK, null, "User deleted successfully."));
 });

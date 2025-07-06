@@ -1,22 +1,70 @@
+// /backend/models/userSchema.js
+
 import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
 
-// User Schema for DailyDepot with comprehensive fields and soft delete handling
+// Email regex for basic structure validation
+const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+// Phone regex (10-digit Indian mobile + general support)
+const phoneRegex = /^\+?[0-9]{10,15}$/;
+
+// Password regex: min 8 chars, 1 uppercase, 1 lowercase, 1 number, 1 special character
+const passwordRegex =
+  /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?#&^_-])[A-Za-z\d@$!%*?#&^_-]{8,}$/;
+
 const userSchema = new mongoose.Schema(
   {
     name: {
-      first: { type: String, required: true, trim: true },
-      last: { type: String, required: true, trim: true },
+      first: {
+        type: String,
+        required: [true, "First name is required."],
+        trim: true,
+      },
+      last: {
+        type: String,
+        required: [true, "Last name is required."],
+        trim: true,
+      },
     },
     email: {
       type: String,
-      required: true,
+      required: [true, "Email is required."],
       unique: true,
       lowercase: true,
       trim: true,
+      validate: {
+        validator: function (v) {
+          return emailRegex.test(v);
+        },
+        message: "Please enter a valid email address.",
+      },
     },
-    phone: { type: String, unique: true, sparse: true, trim: true },
-    password: { type: String, required: true, select: false }, // Password excluded by default from queries for security
+    phone: {
+      type: String,
+      unique: true,
+      sparse: true,
+      trim: true,
+      validate: {
+        validator: function (v) {
+          if (!v) return true; // allow empty if not provided
+          return phoneRegex.test(v);
+        },
+        message: "Please enter a valid phone number.",
+      },
+    },
+    password: {
+      type: String,
+      required: [true, "Password is required."],
+      select: false,
+      validate: {
+        validator: function (v) {
+          return passwordRegex.test(v);
+        },
+        message:
+          "Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, one number, and one special character.",
+      },
+    },
     gender: {
       type: String,
       enum: ["male", "female", "other"],
@@ -60,7 +108,7 @@ const userSchema = new mongoose.Schema(
 // Hash password before saving if modified
 userSchema.pre("save", async function (next) {
   if (this.isModified("password")) {
-    const salt = await bcrypt.genSalt(12); // Using 12 rounds for enhanced security
+    const salt = await bcrypt.genSalt(12);
     this.password = await bcrypt.hash(this.password, salt);
   }
   // Handle soft delete timestamp

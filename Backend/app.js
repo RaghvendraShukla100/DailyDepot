@@ -6,6 +6,7 @@ import cookieParser from "cookie-parser";
 import mongoSanitize from "express-mongo-sanitize";
 import xss from "xss-clean";
 import compression from "compression";
+import path from "path";
 
 import { config } from "./config/config.js";
 
@@ -36,6 +37,8 @@ const app = express();
 app.use(helmet());
 app.use(mongoSanitize());
 app.use(xss());
+
+app.use("/uploads", express.static(path.join(path.resolve(), "uploads")));
 
 // 2️⃣ Logging for development
 if (process.env.NODE_ENV === "development") {

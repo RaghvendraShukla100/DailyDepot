@@ -1,6 +1,6 @@
 // Backend/controllers/paymentController.js
 
-import asyncHandler from "../middlewares/asyncHandlerMiddleware.js";
+import asyncHandler from "../middlewares/asyncHandler.js";
 import Payment from "../models/paymentSchema.js";
 import Order from "../models/orderSchema.js";
 import ApiError from "../utils/ApiError.js";

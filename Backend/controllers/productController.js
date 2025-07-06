@@ -1,220 +1,164 @@
 // /backend/controllers/productController.js
 
-import asyncHandler from "../middlewares/asyncHandlerMiddleware.js";
 import Product from "../models/productSchema.js";
-import {
-  uploadToCloudinary,
-  deleteFromCloudinary,
-} from "../config/cloudinary.js";
-
-import ApiError from "../utils/ApiError.js";
-import ApiResponse from "../utils/ApiResponse.js";
+import asyncHandler from "../middlewares/asyncHandler.js";
 import { STATUS_CODES } from "../constants/statusCodes.js";
+import { MESSAGES } from "../constants/messages.js";
+import ApiError from "../utils/ApiError.js";
+import fs from "fs";
+import path from "path";
+import {
+  createProductValidation,
+  updateProductValidation,
+} from "../validations/productValidation.js";
+import { ROLES } from "../constants/roles.js";
 
-// @desc    Create a product
-// @route   POST /api/products
-// @access  Private (Admin, Seller)
-const createProductController = asyncHandler(async (req, res) => {
-  const product = await Product.create(req.body);
+/**
+ * @desc Create a new product
+ * @route POST /api/products
+ * @access Private (seller/admin)
+ */
+export const createProduct = asyncHandler(async (req, res) => {
+  // Validate using zod
+  const validatedData = createProductValidation.parse(req.body);
 
-  res
-    .status(STATUS_CODES.CREATED)
-    .json(
-      new ApiResponse(
-        STATUS_CODES.CREATED,
-        product,
-        "Product created successfully."
-      )
-    );
+  // Construct media array from uploaded files
+  const media =
+    req.files?.map((file) => ({
+      url: file.path, // Local path
+      type: file.mimetype.startsWith("video") ? "video" : "image",
+    })) || [];
+
+  const product = await Product.create({
+    ...validatedData,
+    media,
+    createdBy: req.user._id,
+  });
+
+  res.status(STATUS_CODES.CREATED).json({
+    message: "Product created successfully.",
+    product,
+  });
 });
 
-// @desc    Get all products with filters, pagination, search
-// @route   GET /api/products
-// @access  Public
-const getAllProductsController = asyncHandler(async (req, res) => {
+/**
+ * @desc Get all products with filtering, pagination, sorting
+ * @route GET /api/products
+ * @access Public
+ */
+export const getProducts = asyncHandler(async (req, res) => {
   const page = parseInt(req.query.page) || 1;
   const limit = parseInt(req.query.limit) || 10;
-  const skip = (page - 1) * limit;
+  const sort = req.query.sort || "-createdAt";
+  const keyword = req.query.keyword || "";
 
-  const queryObj = { deleted: false };
+  const query = {
+    deleted: false,
+    name: { $regex: keyword, $options: "i" },
+  };
 
-  if (req.query.category) {
-    queryObj.category = req.query.category;
-  }
+  const total = await Product.countDocuments(query);
+  const products = await Product.find(query)
+    .sort(sort)
+    .skip((page - 1) * limit)
+    .limit(limit)
+    .populate("createdBy", "name email");
 
-  if (req.query.brand) {
-    queryObj.brand = req.query.brand;
-  }
-
-  if (req.query.search) {
-    const regex = new RegExp(req.query.search, "i");
-    queryObj.$or = [{ name: regex }, { description: regex }, { tags: regex }];
-  }
-
-  const total = await Product.countDocuments(queryObj);
-
-  const products = await Product.find(queryObj)
-    .populate("category brand reviews")
-    .sort({ createdAt: -1 })
-    .skip(skip)
-    .limit(limit);
-
-  res.status(STATUS_CODES.OK).json(
-    new ApiResponse(
-      STATUS_CODES.OK,
-      products,
-      "Products fetched successfully.",
-      {
-        total,
-        page,
-        pages: Math.ceil(total / limit),
-      }
-    )
-  );
+  res.status(STATUS_CODES.OK).json({
+    total,
+    page,
+    pages: Math.ceil(total / limit),
+    products,
+  });
 });
 
-// @desc    Get single product by ID
-// @route   GET /api/products/:id
-// @access  Public
-const getProductByIdController = asyncHandler(async (req, res) => {
+/**
+ * @desc Get single product by ID
+ * @route GET /api/products/:id
+ * @access Public
+ */
+export const getProductById = asyncHandler(async (req, res) => {
   const product = await Product.findById(req.params.id).populate(
-    "category brand reviews"
+    "createdBy",
+    "name email"
   );
 
   if (!product || product.deleted) {
-    throw ApiError.notFound("Product not found");
+    throw new ApiError(STATUS_CODES.NOT_FOUND, MESSAGES.GENERAL.NOT_FOUND);
   }
 
-  res
-    .status(STATUS_CODES.OK)
-    .json(
-      new ApiResponse(STATUS_CODES.OK, product, "Product fetched successfully.")
-    );
+  res.status(STATUS_CODES.OK).json(product);
 });
 
-// @desc    Update product by ID
-// @route   PUT /api/products/:id
-// @access  Private (Admin, Seller)
-const updateProductController = asyncHandler(async (req, res) => {
-  const product = await Product.findById(req.params.id);
+/**
+ * @desc Update a product
+ * @route PUT /api/products/:id
+ * @access Private (seller/admin)
+ */
+export const updateProduct = asyncHandler(async (req, res) => {
+  const validatedData = updateProductValidation.parse(req.body);
 
+  const product = await Product.findById(req.params.id);
   if (!product || product.deleted) {
-    throw ApiError.notFound("Product not found");
+    throw new ApiError(STATUS_CODES.NOT_FOUND, MESSAGES.GENERAL.NOT_FOUND);
   }
 
-  Object.assign(product, req.body);
+  // Authorization: only owner (seller) or admin can update
+  if (
+    req.user.role === ROLES.SELLER &&
+    product.createdBy.toString() !== req.user._id.toString()
+  ) {
+    throw new ApiError(STATUS_CODES.FORBIDDEN, MESSAGES.AUTH.UNAUTHORIZED);
+  }
+
+  // Handle media replacement if new files are uploaded
+  if (req.files?.length) {
+    // Remove old local files
+    for (const file of product.media) {
+      fs.unlink(file.url, (err) => {
+        if (err) console.error("Error deleting file:", err);
+      });
+    }
+    product.media = req.files.map((file) => ({
+      url: file.path,
+      type: file.mimetype.startsWith("video") ? "video" : "image",
+    }));
+  }
+
+  // Update fields
+  Object.assign(product, validatedData);
   await product.save();
 
-  res
-    .status(STATUS_CODES.OK)
-    .json(
-      new ApiResponse(STATUS_CODES.OK, product, "Product updated successfully.")
-    );
+  res.status(STATUS_CODES.OK).json({
+    message: "Product updated successfully.",
+    product,
+  });
 });
 
-// @desc    Soft delete product
-// @route   DELETE /api/products/:id
-// @access  Private (Admin, Seller)
-const deleteProductController = asyncHandler(async (req, res) => {
+/**
+ * @desc Delete (soft delete) a product
+ * @route DELETE /api/products/:id
+ * @access Private (seller/admin)
+ */
+export const deleteProduct = asyncHandler(async (req, res) => {
   const product = await Product.findById(req.params.id);
-
   if (!product || product.deleted) {
-    throw ApiError.notFound("Product not found");
+    throw new ApiError(STATUS_CODES.NOT_FOUND, MESSAGES.GENERAL.NOT_FOUND);
+  }
+
+  // Authorization: only owner (seller) or admin can delete
+  if (
+    req.user.role === ROLES.SELLER &&
+    product.createdBy.toString() !== req.user._id.toString()
+  ) {
+    throw new ApiError(STATUS_CODES.FORBIDDEN, MESSAGES.AUTH.UNAUTHORIZED);
   }
 
   product.deleted = true;
   product.deletedAt = new Date();
   await product.save();
 
-  res
-    .status(STATUS_CODES.OK)
-    .json(
-      new ApiResponse(STATUS_CODES.OK, null, "Product deleted successfully.")
-    );
+  res.status(STATUS_CODES.OK).json({
+    message: "Product deleted successfully.",
+  });
 });
-
-// @desc    Upload product images
-// @route   POST /api/products/:id/images
-// @access  Private (Admin, Seller)
-const uploadProductImagesController = asyncHandler(async (req, res) => {
-  const product = await Product.findById(req.params.id);
-
-  if (!product || product.deleted) {
-    throw ApiError.notFound("Product not found");
-  }
-
-  if (!req.files || req.files.length === 0) {
-    throw ApiError.badRequest("No images provided.");
-  }
-
-  const uploadedImages = [];
-
-  for (const file of req.files) {
-    const uploadResult = await uploadToCloudinary(file.path, "products");
-    uploadedImages.push({
-      url: uploadResult.secure_url,
-      public_id: uploadResult.public_id,
-      alt: file.originalname || "Product image",
-    });
-  }
-
-  product.images.push(...uploadedImages);
-  await product.save();
-
-  res
-    .status(STATUS_CODES.OK)
-    .json(
-      new ApiResponse(
-        STATUS_CODES.OK,
-        product.images,
-        "Images uploaded successfully."
-      )
-    );
-});
-
-// @desc    Remove product image
-// @route   DELETE /api/products/:id/images/:imageId
-// @access  Private (Admin, Seller)
-const removeProductImageController = asyncHandler(async (req, res) => {
-  const product = await Product.findById(req.params.id);
-
-  if (!product || product.deleted) {
-    throw ApiError.notFound("Product not found");
-  }
-
-  const imageIndex = product.images.findIndex(
-    (img) => img._id.toString() === req.params.imageId
-  );
-
-  if (imageIndex === -1) {
-    throw ApiError.notFound("Image not found");
-  }
-
-  const publicId = product.images[imageIndex].public_id;
-  if (publicId) {
-    await deleteFromCloudinary(publicId);
-  }
-
-  product.images.splice(imageIndex, 1);
-  await product.save();
-
-  res
-    .status(STATUS_CODES.OK)
-    .json(
-      new ApiResponse(
-        STATUS_CODES.OK,
-        product.images,
-        "Image removed successfully."
-      )
-    );
-});
-
-export {
-  createProductController,
-  getAllProductsController,
-  getProductByIdController,
-  updateProductController,
-  deleteProductController,
-  uploadProductImagesController,
-  removeProductImageController,
-};

@@ -1,93 +1,64 @@
-// /backend/routes/adminRoutes.js
-
 import express from "express";
 import {
-  getAdminProfileController,
-  updateAdminProfileController,
-  getAllUsersController,
-  deleteUserByIdController,
-  getAllSellersController,
-  deleteSellerByIdController,
+  createAdmin,
+  getAdmin,
+  updateAdmin,
+  removeAdmin,
+  getAllAdmins,
+  getAdminById,
+  removeAdminById,
 } from "../controllers/adminController.js";
-
-import {
-  protect,
-  authorizeRoles,
-  attachAdminProfile,
-} from "../middlewares/authMiddleware.js";
-import validateResource from "../middlewares/validateResourceMiddleware.js";
-import { updateAdminProfileValidation } from "../validations/adminValidation.js";
+import { protect, authorizeRoles } from "../middlewares/authMiddleware.js";
 
 const router = express.Router();
 
 /**
- * @route   GET /api/admins/profile
- * @desc    Get admin's own profile
- * @access  Private (Admin)
+ * @route   POST /api/admins
+ * @desc    Create admin profile (user must be logged in)
+ * @access  Private
  */
-router.get(
-  "/profile",
-  protect,
-  authorizeRoles("admin"),
-  attachAdminProfile,
-  getAdminProfileController
-);
+router.post("/", protect, createAdmin);
 
 /**
- * @route   PUT /api/admins/profile
- * @desc    Update admin's own profile
- * @access  Private (Admin)
+ * @route   GET /api/admins/me
+ * @desc    Get current admin profile
+ * @access  Private (admin)
  */
-router.put(
-  "/profile",
-  protect,
-  authorizeRoles("admin"),
-  attachAdminProfile,
-  validateResource(updateAdminProfileValidation),
-  updateAdminProfileController
-);
+router.get("/me", protect, getAdmin);
 
 /**
- * @route   GET /api/admins/users
- * @desc    Get all users
- * @access  Private (Admin)
+ * @route   PUT /api/admins/me
+ * @desc    Update current admin profile
+ * @access  Private (admin)
  */
-router.get("/users", protect, authorizeRoles("admin"), getAllUsersController);
+router.put("/me", protect, updateAdmin);
 
 /**
- * @route   DELETE /api/admins/users/:id
- * @desc    Delete user by ID
- * @access  Private (Admin)
+ * @route   DELETE /api/admins/me
+ * @desc    Delete (soft delete) current admin profile
+ * @access  Private (admin)
  */
-router.delete(
-  "/users/:id",
-  protect,
-  authorizeRoles("admin"),
-  deleteUserByIdController
-);
+router.delete("/me", protect, removeAdmin);
 
 /**
- * @route   GET /api/admins/sellers
- * @desc    Get all sellers
- * @access  Private (Admin)
+ * @route   GET /api/admins
+ * @desc    Get all admins
+ * @access  Private/Admin
  */
-router.get(
-  "/sellers",
-  protect,
-  authorizeRoles("admin"),
-  getAllSellersController
-);
+router.get("/", protect, authorizeRoles("admin"), getAllAdmins);
 
 /**
- * @route   DELETE /api/admins/sellers/:id
- * @desc    Delete seller by ID
- * @access  Private (Admin)
+ * @route   GET /api/admins/:id
+ * @desc    Get admin by ID
+ * @access  Private/Admin
  */
-router.delete(
-  "/sellers/:id",
-  protect,
-  authorizeRoles("admin"),
-  deleteSellerByIdController
-);
+router.get("/:id", protect, authorizeRoles("admin"), getAdminById);
+
+/**
+ * @route   DELETE /api/admins/:id
+ * @desc    Soft delete admin by ID
+ * @access  Private/Admin
+ */
+router.delete("/:id", protect, authorizeRoles("admin"), removeAdminById);
 
 export default router;

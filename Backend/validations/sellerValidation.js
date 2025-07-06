@@ -3,7 +3,7 @@
 import { z } from "zod";
 
 /**
- * Validation Validation for creating a seller
+ * Validation for creating a seller
  */
 export const createSellerValidation = z.object({
   shopName: z
@@ -12,7 +12,7 @@ export const createSellerValidation = z.object({
     })
     .trim()
     .min(2, "Shop name must be at least 2 characters.")
-    .max(100, "Shop name must be at most 100 characters."),
+    .max(100, "Shop name cannot exceed 100 characters."),
 
   gstNumber: z
     .string()
@@ -23,14 +23,14 @@ export const createSellerValidation = z.object({
   address: z
     .string()
     .trim()
-    .max(300, "Address must be at most 300 characters.")
+    .max(300, "Address cannot exceed 300 characters.")
     .optional(),
 });
 
 /**
- * Validation Validation for updating a seller profile (partial updates)
+ * Validation for updating a seller profile (partial updates)
  * Used in:
- *    PUT /api/sellers/profile
- *    PUT /api/sellers/:id (if later added)
+ *    PUT /api/sellers/me
+ *    PUT /api/sellers/:id (admin if needed)
  */
-export const updateSellerProfileValidation = createSellerValidation.partial();
+export const updateSellerValidation = createSellerValidation.partial();

@@ -1,4 +1,4 @@
-// /backend/middlewares/validateResourceMiddleware.js
+// /backend/middlewares/validateResource.js
 
 import ApiError from "../utils/ApiError.js";
 

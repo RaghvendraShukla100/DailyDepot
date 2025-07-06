@@ -1,6 +1,6 @@
 // Backend/controllers/cartController.js
 
-import asyncHandler from "../middlewares/asyncHandlerMiddleware.js";
+import asyncHandler from "../middlewares/asyncHandler.js";
 import CartItem from "../models/cartItemSchema.js";
 import Product from "../models/productSchema.js";
 import Coupon from "../models/couponSchema.js";

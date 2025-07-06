@@ -2,72 +2,75 @@
 
 import express from "express";
 import {
-  createProductController,
-  getAllProductsController,
-  getProductByIdController,
-  updateProductController,
-  deleteProductController,
+  createProduct,
+  getProducts,
+  getProductById,
+  updateProduct,
+  deleteProduct,
 } from "../controllers/productController.js";
-
 import { protect, authorizeRoles } from "../middlewares/authMiddleware.js";
-import validateResource from "../middlewares/validateResourceMiddleware.js";
+import upload from "../middlewares/uploadMiddleware.js";
+import validateResource from "../middlewares/validateResource.js";
 import {
   createProductValidation,
   updateProductValidation,
 } from "../validations/productValidation.js";
+import { ROLES } from "../constants/roles.js";
 
 const router = express.Router();
 
 /**
- * @route   GET /api/products
- * @desc    Get all products (with optional filters)
- * @access  Public
- */
-router.get("/", getAllProductsController);
-
-/**
- * @route   GET /api/products/:id
- * @desc    Get single product by ID
- * @access  Public
- */
-router.get("/:id", getProductByIdController);
-
-/**
- * @route   POST /api/products
- * @desc    Create a new product
- * @access  Private (Admin, Seller)
+ * @route POST /api/products
+ * @desc Create a new product
+ * @access Private (seller/admin)
  */
 router.post(
   "/",
   protect,
-  authorizeRoles("admin", "seller"),
+  authorizeRoles(ROLES.SELLER, ROLES.ADMIN),
+  upload.array("media", 10), // max 10 images/videos per product
   validateResource(createProductValidation),
-  createProductController
+  createProduct
 );
 
 /**
- * @route   PUT /api/products/:id
- * @desc    Update a product
- * @access  Private (Admin, Seller)
+ * @route GET /api/products
+ * @desc Get all products with filters, pagination, sorting
+ * @access Public
+ */
+router.get("/", getProducts);
+
+/**
+ * @route GET /api/products/:id
+ * @desc Get product by ID
+ * @access Public
+ */
+router.get("/:id", getProductById);
+
+/**
+ * @route PUT /api/products/:id
+ * @desc Update a product
+ * @access Private (seller/admin)
  */
 router.put(
   "/:id",
   protect,
-  authorizeRoles("admin", "seller"),
+  authorizeRoles(ROLES.SELLER, ROLES.ADMIN),
+  upload.array("media", 10),
   validateResource(updateProductValidation),
-  updateProductController
+  updateProduct
 );
 
 /**
- * @route   DELETE /api/products/:id
- * @desc    Delete (soft) a product
- * @access  Private (Admin, Seller)
+ * @route DELETE /api/products/:id
+ * @desc Soft delete a product
+ * @access Private (seller/admin)
  */
 router.delete(
   "/:id",
   protect,
-  authorizeRoles("admin", "seller"),
-  deleteProductController
+  authorizeRoles(ROLES.SELLER, ROLES.ADMIN),
+  deleteProduct
 );
 
 export default router;

@@ -1,7 +1,6 @@
-// /backend/validations/userValidation.js
-
 import { z } from "zod";
 
+// Update user profile validation
 export const updateUserProfileValidation = z.object({
   name: z
     .string()
@@ -48,3 +47,18 @@ export const updateUserProfileValidation = z.object({
     })
     .optional(),
 });
+
+// Register user validation
+export const registerUserValidation = z
+  .object({
+    name: z.string().trim().min(1, "Name is required."),
+    email: z.string().email("Invalid email address."),
+    password: z
+      .string()
+      .min(8, "Password must be at least 8 characters.")
+      .regex(
+        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9])/,
+        "Password must contain uppercase, lowercase, number, and special character."
+      ),
+  })
+  .strict();

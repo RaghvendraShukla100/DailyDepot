@@ -9,7 +9,7 @@ import {
 } from "../controllers/notificationController.js";
 
 import { protect, authorizeRoles } from "../middlewares/authMiddleware.js";
-import validateResource from "../middlewares/validateResourceMiddleware.js";
+import validateResource from "../middlewares/validateResource.js";
 import { createNotificationValidation } from "../validations/notificationValidation.js";
 
 const router = express.Router();

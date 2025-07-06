@@ -9,10 +9,6 @@ const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 // Phone regex (10-digit Indian mobile + general support)
 const phoneRegex = /^\+?[0-9]{10,15}$/;
 
-// Password regex: min 8 chars, 1 uppercase, 1 lowercase, 1 number, 1 special character
-const passwordRegex =
-  /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?#&^_-])[A-Za-z\d@$!%*?#&^_-]{8,}$/;
-
 const userSchema = new mongoose.Schema(
   {
     name: {
@@ -57,14 +53,8 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: [true, "Password is required."],
       select: false,
-      validate: {
-        validator: function (v) {
-          return passwordRegex.test(v);
-        },
-        message:
-          "Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, one number, and one special character.",
-      },
     },
+
     gender: {
       type: String,
       enum: ["male", "female", "other"],

@@ -10,7 +10,7 @@ import {
 } from "../controllers/addressController.js";
 
 import { protect } from "../middlewares/authMiddleware.js";
-import validateResource from "../middlewares/validateResourceMiddleware.js";
+import validateResource from "../middlewares/validateResource.js";
 import {
   createAddressValidation,
   updateAddressValidation,

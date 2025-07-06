@@ -5,6 +5,7 @@ import Seller from "../models/sellerSchema.js";
 import User from "../models/userSchema.js";
 import { STATUS_CODES } from "../constants/statusCodes.js";
 import { MESSAGES } from "../constants/messages.js";
+import logger from "../utils/logger.js";
 import {
   createSellerValidation,
   updateSellerValidation,
@@ -18,19 +19,18 @@ import {
 export const createSeller = asyncHandler(async (req, res) => {
   const validatedData = createSellerValidation.parse(req.body);
 
-  // Check if user exists
   const user = await User.findById(req.user._id);
   if (!user) throw ApiError.notFound(MESSAGES.USER.NOT_FOUND);
 
-  // Prevent duplicate seller registration
   const existingSeller = await Seller.findOne({ user: user._id });
-  if (existingSeller)
-    throw ApiError.conflict("Seller profile already exists for this user.");
+  if (existingSeller) throw ApiError.conflict(MESSAGES.SELLER.ALREADY_EXISTS);
 
   const seller = await Seller.create({
     user: user._id,
     ...validatedData,
   });
+
+  logger.info(`Seller profile created for userId=${req.user._id}`);
 
   res
     .status(STATUS_CODES.CREATED)
@@ -38,7 +38,7 @@ export const createSeller = asyncHandler(async (req, res) => {
       new ApiResponse(
         STATUS_CODES.CREATED,
         seller,
-        "Seller profile created successfully."
+        MESSAGES.SELLER.CREATED_SUCCESS
       )
     );
 });
@@ -53,16 +53,15 @@ export const getSeller = asyncHandler(async (req, res) => {
     "user",
     "-password"
   );
+
   if (!seller) throw ApiError.notFound(MESSAGES.SELLER.NOT_FOUND);
+
+  logger.info(`Seller profile fetched for userId=${req.user._id}`);
 
   res
     .status(STATUS_CODES.OK)
     .json(
-      new ApiResponse(
-        STATUS_CODES.OK,
-        seller,
-        "Seller profile fetched successfully."
-      )
+      new ApiResponse(STATUS_CODES.OK, seller, MESSAGES.SELLER.FETCHED_SUCCESS)
     );
 });
 
@@ -82,14 +81,12 @@ export const updateSeller = asyncHandler(async (req, res) => {
 
   if (!seller) throw ApiError.notFound(MESSAGES.SELLER.NOT_FOUND);
 
+  logger.info(`Seller profile updated for userId=${req.user._id}`);
+
   res
     .status(STATUS_CODES.OK)
     .json(
-      new ApiResponse(
-        STATUS_CODES.OK,
-        seller,
-        "Seller profile updated successfully."
-      )
+      new ApiResponse(STATUS_CODES.OK, seller, MESSAGES.SELLER.UPDATED_SUCCESS)
     );
 });
 
@@ -101,43 +98,57 @@ export const updateSeller = asyncHandler(async (req, res) => {
 export const removeSeller = asyncHandler(async (req, res) => {
   const seller = await Seller.findOneAndUpdate(
     { user: req.user._id },
-    { status: "deleted", deleted: true },
+    { status: "deleted", deleted: true, deletedAt: new Date() },
     { new: true }
   );
 
   if (!seller) throw ApiError.notFound(MESSAGES.SELLER.NOT_FOUND);
 
+  logger.info(`Seller profile soft-deleted for userId=${req.user._id}`);
+
   res
     .status(STATUS_CODES.OK)
     .json(
-      new ApiResponse(
-        STATUS_CODES.OK,
-        seller,
-        "Seller profile marked as deleted."
-      )
+      new ApiResponse(STATUS_CODES.OK, seller, MESSAGES.SELLER.DELETED_SUCCESS)
     );
 });
 
 /**
- * @desc    Get all sellers (Admin)
+ * @desc    Get all sellers (Admin) with pagination
  * @route   GET /api/sellers
  * @access  Private (Admin)
  */
 export const getAllSellers = asyncHandler(async (req, res) => {
-  const sellers = await Seller.find({ deleted: { $ne: true } }).populate(
-    "user",
-    "-password"
+  const page = parseInt(req.query.page) || 1;
+  const limit = parseInt(req.query.limit) || 20;
+  const skip = (page - 1) * limit;
+
+  const [sellers, total] = await Promise.all([
+    Seller.find({ deleted: { $ne: true } })
+      .populate("user", "-password")
+      .skip(skip)
+      .limit(limit)
+      .sort({ createdAt: -1 }),
+    Seller.countDocuments({ deleted: { $ne: true } }),
+  ]);
+
+  logger.info(
+    `Admin userId=${req.user._id} fetched sellers page=${page} limit=${limit}`
   );
 
-  res
-    .status(STATUS_CODES.OK)
-    .json(
-      new ApiResponse(
-        STATUS_CODES.OK,
+  res.status(STATUS_CODES.OK).json(
+    new ApiResponse(
+      STATUS_CODES.OK,
+      {
         sellers,
-        "All sellers fetched successfully."
-      )
-    );
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit),
+      },
+      MESSAGES.SELLER.ALL_FETCHED
+    )
+  );
 });
 
 /**
@@ -150,12 +161,15 @@ export const getSellerById = asyncHandler(async (req, res) => {
     "user",
     "-password"
   );
+
   if (!seller) throw ApiError.notFound(MESSAGES.SELLER.NOT_FOUND);
+
+  logger.info(`Admin userId=${req.user._id} fetched sellerId=${req.params.id}`);
 
   res
     .status(STATUS_CODES.OK)
     .json(
-      new ApiResponse(STATUS_CODES.OK, seller, "Seller fetched successfully.")
+      new ApiResponse(STATUS_CODES.OK, seller, MESSAGES.SELLER.FETCHED_SUCCESS)
     );
 });
 
@@ -167,18 +181,19 @@ export const getSellerById = asyncHandler(async (req, res) => {
 export const removeSellerById = asyncHandler(async (req, res) => {
   const seller = await Seller.findByIdAndUpdate(
     req.params.id,
-    { status: "deleted", deleted: true },
+    { status: "deleted", deleted: true, deletedAt: new Date() },
     { new: true }
   );
+
   if (!seller) throw ApiError.notFound(MESSAGES.SELLER.NOT_FOUND);
+
+  logger.info(
+    `Admin userId=${req.user._id} soft-deleted sellerId=${req.params.id}`
+  );
 
   res
     .status(STATUS_CODES.OK)
     .json(
-      new ApiResponse(
-        STATUS_CODES.OK,
-        seller,
-        "Seller marked as deleted successfully."
-      )
+      new ApiResponse(STATUS_CODES.OK, seller, MESSAGES.SELLER.DELETED_SUCCESS)
     );
 });

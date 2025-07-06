@@ -11,7 +11,7 @@ import {
   authorizeRoles,
   attachAdminProfile,
 } from "../middlewares/authMiddleware.js";
-import validateResource from "../middlewares/validateResourceMiddleware.js";
+import validateResource from "../middlewares/validateResource.js";
 import {
   createCategoryValidation,
   updateCategoryValidation,

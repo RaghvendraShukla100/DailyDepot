@@ -3,8 +3,6 @@ import cors from "cors";
 import helmet from "helmet";
 import morgan from "morgan";
 import cookieParser from "cookie-parser";
-import mongoSanitize from "express-mongo-sanitize";
-import xss from "xss-clean";
 import compression from "compression";
 import path from "path";
 
@@ -35,8 +33,6 @@ const app = express();
 
 // 1️⃣ Security headers and sanitization
 app.use(helmet());
-app.use(mongoSanitize());
-app.use(xss());
 
 app.use("/uploads", express.static(path.join(path.resolve(), "uploads")));
 

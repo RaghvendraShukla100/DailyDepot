@@ -5,6 +5,7 @@ import Admin from "../models/adminSchema.js";
 import User from "../models/userSchema.js";
 import { STATUS_CODES } from "../constants/statusCodes.js";
 import { MESSAGES } from "../constants/messages.js";
+import logger from "../utils/logger.js";
 import {
   createAdminValidation,
   updateAdminProfileValidation,
@@ -22,13 +23,14 @@ export const createAdmin = asyncHandler(async (req, res) => {
   if (!user) throw ApiError.notFound(MESSAGES.USER.NOT_FOUND);
 
   const existingAdmin = await Admin.findOne({ user: user._id });
-  if (existingAdmin)
-    throw ApiError.conflict("Admin profile already exists for this user.");
+  if (existingAdmin) throw ApiError.conflict(MESSAGES.ADMIN.ALREADY_EXISTS);
 
   const admin = await Admin.create({
     user: user._id,
     ...validatedData,
   });
+
+  logger.info(`Admin profile created for userId=${req.user._id}`);
 
   res
     .status(STATUS_CODES.CREATED)
@@ -36,7 +38,7 @@ export const createAdmin = asyncHandler(async (req, res) => {
       new ApiResponse(
         STATUS_CODES.CREATED,
         admin,
-        "Admin profile created successfully."
+        MESSAGES.ADMIN.CREATED_SUCCESS
       )
     );
 });
@@ -54,14 +56,12 @@ export const getAdmin = asyncHandler(async (req, res) => {
 
   if (!admin) throw ApiError.notFound(MESSAGES.ADMIN.NOT_FOUND);
 
+  logger.info(`Admin profile fetched for userId=${req.user._id}`);
+
   res
     .status(STATUS_CODES.OK)
     .json(
-      new ApiResponse(
-        STATUS_CODES.OK,
-        admin,
-        "Admin profile fetched successfully."
-      )
+      new ApiResponse(STATUS_CODES.OK, admin, MESSAGES.ADMIN.FETCHED_SUCCESS)
     );
 });
 
@@ -81,14 +81,12 @@ export const updateAdmin = asyncHandler(async (req, res) => {
 
   if (!admin) throw ApiError.notFound(MESSAGES.ADMIN.NOT_FOUND);
 
+  logger.info(`Admin profile updated for userId=${req.user._id}`);
+
   res
     .status(STATUS_CODES.OK)
     .json(
-      new ApiResponse(
-        STATUS_CODES.OK,
-        admin,
-        "Admin profile updated successfully."
-      )
+      new ApiResponse(STATUS_CODES.OK, admin, MESSAGES.ADMIN.UPDATED_SUCCESS)
     );
 });
 
@@ -106,37 +104,51 @@ export const removeAdmin = asyncHandler(async (req, res) => {
 
   if (!admin) throw ApiError.notFound(MESSAGES.ADMIN.NOT_FOUND);
 
+  logger.info(`Admin profile soft-deleted for userId=${req.user._id}`);
+
   res
     .status(STATUS_CODES.OK)
     .json(
-      new ApiResponse(
-        STATUS_CODES.OK,
-        null,
-        "Admin profile deleted successfully."
-      )
+      new ApiResponse(STATUS_CODES.OK, null, MESSAGES.ADMIN.DELETED_SUCCESS)
     );
 });
 
 /**
- * @desc    Get all admins (Admin only)
+ * @desc    Get all admins (Admin only) with pagination
  * @route   GET /api/admins
  * @access  Private/Admin
  */
 export const getAllAdmins = asyncHandler(async (req, res) => {
-  const admins = await Admin.find({ deleted: { $ne: true } }).populate(
-    "user",
-    "-password"
+  const page = parseInt(req.query.page) || 1;
+  const limit = parseInt(req.query.limit) || 20;
+  const skip = (page - 1) * limit;
+
+  const [admins, total] = await Promise.all([
+    Admin.find({ deleted: { $ne: true } })
+      .populate("user", "-password")
+      .skip(skip)
+      .limit(limit)
+      .sort({ createdAt: -1 }),
+    Admin.countDocuments({ deleted: { $ne: true } }),
+  ]);
+
+  logger.info(
+    `Admin userId=${req.user._id} fetched admins page=${page} limit=${limit}`
   );
 
-  res
-    .status(STATUS_CODES.OK)
-    .json(
-      new ApiResponse(
-        STATUS_CODES.OK,
+  res.status(STATUS_CODES.OK).json(
+    new ApiResponse(
+      STATUS_CODES.OK,
+      {
         admins,
-        "All admin profiles fetched successfully."
-      )
-    );
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit),
+      },
+      MESSAGES.ADMIN.ALL_FETCHED
+    )
+  );
 });
 
 /**
@@ -152,14 +164,12 @@ export const getAdminById = asyncHandler(async (req, res) => {
 
   if (!admin) throw ApiError.notFound(MESSAGES.ADMIN.NOT_FOUND);
 
+  logger.info(`Admin userId=${req.user._id} fetched adminId=${req.params.id}`);
+
   res
     .status(STATUS_CODES.OK)
     .json(
-      new ApiResponse(
-        STATUS_CODES.OK,
-        admin,
-        "Admin profile fetched successfully."
-      )
+      new ApiResponse(STATUS_CODES.OK, admin, MESSAGES.ADMIN.FETCHED_SUCCESS)
     );
 });
 
@@ -177,13 +187,13 @@ export const removeAdminById = asyncHandler(async (req, res) => {
 
   if (!admin) throw ApiError.notFound(MESSAGES.ADMIN.NOT_FOUND);
 
+  logger.info(
+    `Admin userId=${req.user._id} soft-deleted adminId=${req.params.id}`
+  );
+
   res
     .status(STATUS_CODES.OK)
     .json(
-      new ApiResponse(
-        STATUS_CODES.OK,
-        null,
-        "Admin profile deleted successfully."
-      )
+      new ApiResponse(STATUS_CODES.OK, null, MESSAGES.ADMIN.DELETED_SUCCESS)
     );
 });

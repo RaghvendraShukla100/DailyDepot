@@ -11,7 +11,7 @@ import {
 } from "../controllers/orderController.js";
 
 import { protect, authorizeRoles } from "../middlewares/authMiddleware.js";
-import validateResource from "../middlewares/validateResourceMiddleware.js";
+import validateResource from "../middlewares/validateResource.js";
 import {
   createOrderValidation,
   updateOrderStatusValidation,

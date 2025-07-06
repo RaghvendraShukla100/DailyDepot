@@ -8,7 +8,7 @@ import {
   verifyEmailController,
 } from "../controllers/authController.js";
 
-import validateResourceMiddleware from "../middlewares/validateResourceMiddleware.js";
+import validateResourceMiddleware from "../middlewares/validateResource.js";
 import {
   registerValidation,
   loginValidation,

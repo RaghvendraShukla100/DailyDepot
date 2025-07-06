@@ -1,6 +1,6 @@
 // Backend/controllers/notificationController.js
 
-import Notification from "../models/notifictionSchema.js";
+import Notification from "../models/notificationSchema.js";
 import asyncHandler from "../middlewares/asyncHandler.js";
 import ApiError from "../utils/ApiError.js";
 import ApiResponse from "../utils/ApiResponse.js";

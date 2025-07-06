@@ -4,7 +4,7 @@ import chalk from "chalk";
 const connectDB = async () => {
   try {
     const conn = await mongoose.connect(process.env.MONGO_URI);
-    console.clear();
+    // console.clear();
     console.log(
       chalk.green.bold(`✅ MongoDB Connected: ${conn.connection.host}`)
     );

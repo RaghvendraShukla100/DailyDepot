@@ -12,9 +12,15 @@ import Seller from "../models/sellerSchema.js";
  * Seed Orders:
  * Adds test orders for simulating dashboard data, user order histories, and testing payment and delivery workflows.
  */
+
+// Prevent accidental production seeding
+if (process.env.NODE_ENV === "production") {
+  console.log("⚠️ Seeding orders is disabled in production.");
+}
+
 const seedOrders = async () => {
   try {
-    console.log("Seeding Orders...");
+    console.log("🌱 Seeding Orders...");
 
     // Clear existing orders
     await Order.deleteMany();
@@ -34,7 +40,6 @@ const seedOrders = async () => {
       console.log(
         "⚠️ Users, products, sellers, or addresses missing. Please seed them first."
       );
-      process.exit(1);
     }
 
     const orders = [];
@@ -51,15 +56,15 @@ const seedOrders = async () => {
         const seller = sellers[j % sellers.length];
         const quantity = Math.floor(Math.random() * 3) + 1; // 1-3 quantity
         const priceAtPurchase =
-          product.price - (product.price * product.discount) / 100;
+          product.price - (product.price * (product.discount || 0)) / 100;
 
         orderItems.push({
           product: product._id,
           seller: seller._id,
           quantity,
           priceAtPurchase,
-          selectedSize: product.sizes.length ? product.sizes[0] : undefined,
-          selectedColor: product.colors.length ? product.colors[0] : undefined,
+          selectedSize: product.sizes?.length ? product.sizes[0] : undefined,
+          selectedColor: product.colors?.length ? product.colors[0] : undefined,
         });
       }
 
@@ -83,10 +88,21 @@ const seedOrders = async () => {
 
     await Order.insertMany(orders);
 
-    console.log("✅ Orders seeded successfully.");
+    const insertedOrders = await Order.find()
+      .populate("user", "email")
+      .limit(5);
+    console.table(
+      insertedOrders.map((order) => ({
+        OrderID: order._id.toString(),
+        User: order.user?.email,
+        Total: order.totalAmount,
+        Status: order.orderStatus,
+      }))
+    );
+
+    console.log(`✅ Seeded ${orders.length} orders successfully.`);
   } catch (error) {
     console.error("❌ Error seeding orders:", error);
-    process.exit(1);
   }
 };
 

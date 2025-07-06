@@ -8,12 +8,33 @@ import Coupon from "../models/couponSchema.js";
  * Seed Coupons:
  * Adds demo coupons for testing checkout, discounts, and promotional flows.
  */
+
+if (process.env.NODE_ENV === "production") {
+  console.log("⚠️ Seeding coupons is disabled in production.");
+}
+
 const seedCoupons = async () => {
   try {
-    console.log("Seeding Coupons...");
+    console.log("🌱 Seeding Coupons...");
 
     // Clear existing coupons
     await Coupon.deleteMany();
+
+    const now = new Date();
+    const threeMonthsLater = new Date();
+    threeMonthsLater.setMonth(threeMonthsLater.getMonth() + 3);
+
+    const sixMonthsLater = new Date();
+    sixMonthsLater.setMonth(sixMonthsLater.getMonth() + 6);
+
+    const oneMonthLater = new Date();
+    oneMonthLater.setMonth(oneMonthLater.getMonth() + 1);
+
+    const twoMonthsLater = new Date();
+    twoMonthsLater.setMonth(twoMonthsLater.getMonth() + 2);
+
+    const fourMonthsLater = new Date();
+    fourMonthsLater.setMonth(fourMonthsLater.getMonth() + 4);
 
     const coupons = [
       {
@@ -22,24 +43,12 @@ const seedCoupons = async () => {
         discountType: "percentage",
         discountValue: 10,
         maxDiscountAmount: 500,
-        minPurchaseAmount: 1000,
-        validFrom: new Date(),
-        validTo: new Date(new Date().setMonth(new Date().getMonth() + 3)), // 3 months validity
+        minOrderAmount: 1000,
+        validFrom: now,
+        validTill: threeMonthsLater,
         usageLimit: 1000,
-        usageCount: 0,
-        isActive: true,
-      },
-      {
-        code: "FREESHIP",
-        description: "Free shipping on orders above ₹500.",
-        discountType: "free_shipping",
-        discountValue: 0,
-        minPurchaseAmount: 500,
-        validFrom: new Date(),
-        validTo: new Date(new Date().setMonth(new Date().getMonth() + 6)),
-        usageLimit: 5000,
-        usageCount: 0,
-        isActive: true,
+        isStackable: false,
+        status: "active",
       },
       {
         code: "FESTIVE15",
@@ -47,24 +56,24 @@ const seedCoupons = async () => {
         discountType: "percentage",
         discountValue: 15,
         maxDiscountAmount: 1000,
-        minPurchaseAmount: 1500,
-        validFrom: new Date(),
-        validTo: new Date(new Date().setMonth(new Date().getMonth() + 1)),
+        minOrderAmount: 1500,
+        validFrom: now,
+        validTill: oneMonthLater,
         usageLimit: 2000,
-        usageCount: 0,
-        isActive: true,
+        isStackable: false,
+        status: "active",
       },
       {
         code: "FLAT200",
         description: "Flat ₹200 off on orders above ₹2000.",
-        discountType: "fixed",
+        discountType: "flat",
         discountValue: 200,
-        minPurchaseAmount: 2000,
-        validFrom: new Date(),
-        validTo: new Date(new Date().setMonth(new Date().getMonth() + 2)),
+        minOrderAmount: 2000,
+        validFrom: now,
+        validTill: twoMonthsLater,
         usageLimit: 1500,
-        usageCount: 0,
-        isActive: true,
+        isStackable: false,
+        status: "active",
       },
       {
         code: "SUMMER20",
@@ -72,21 +81,30 @@ const seedCoupons = async () => {
         discountType: "percentage",
         discountValue: 20,
         maxDiscountAmount: 800,
-        minPurchaseAmount: 1200,
-        validFrom: new Date(),
-        validTo: new Date(new Date().setMonth(new Date().getMonth() + 4)),
+        minOrderAmount: 1200,
+        validFrom: now,
+        validTill: fourMonthsLater,
         usageLimit: 1000,
-        usageCount: 0,
-        isActive: true,
+        isStackable: false,
+        status: "active",
       },
     ];
 
-    await Coupon.insertMany(coupons);
+    const insertedCoupons = await Coupon.insertMany(coupons);
 
-    console.log("✅ Coupons seeded successfully.");
+    console.table(
+      insertedCoupons.map((coupon) => ({
+        Code: coupon.code,
+        Type: coupon.discountType,
+        Value: coupon.discountValue,
+        Status: coupon.status,
+        ValidTill: coupon.validTill.toDateString(),
+      }))
+    );
+
+    console.log(`✅ Seeded ${insertedCoupons.length} coupons successfully.`);
   } catch (error) {
-    console.error("❌ Error seeding coupons:", error);
-    process.exit(1);
+    console.error("❌ Error seeding coupons:", error.message);
   }
 };
 

@@ -8,11 +8,18 @@ import Brand from "../models/brandSchema.js";
 
 /**
  * Seed Products:
- * Creates realistic demo products for storefront testing.
+ * Creates realistic demo products for storefront testing and pipeline validation.
  */
+
+// Prevent accidental production seeding
+if (process.env.NODE_ENV === "production") {
+  console.log("⚠️ Seeding products is disabled in production.");
+  process.exit(0);
+}
+
 const seedProducts = async () => {
   try {
-    console.log("Seeding Products...");
+    console.log("🌱 Seeding Products...");
 
     // Clear existing products
     await Product.deleteMany();
@@ -23,7 +30,6 @@ const seedProducts = async () => {
 
     if (!categories.length || !brands.length) {
       console.log("❌ Please seed categories and brands first.");
-      process.exit(1);
     }
 
     // Prepare product data
@@ -156,12 +162,22 @@ const seedProducts = async () => {
     ];
 
     // Insert products
-    await Product.insertMany(products);
+    const insertedProducts = await Product.insertMany(products);
 
-    console.log("✅ Products seeded successfully.");
+    // Display summary table for CLI verification
+    console.table(
+      insertedProducts.map((product) => ({
+        Name: product.name,
+        Price: product.price,
+        Discount: `${product.discount}%`,
+        Stock: product.stock,
+        Sold: product.sold,
+      }))
+    );
+
+    console.log(`✅ Seeded ${insertedProducts.length} products successfully.`);
   } catch (error) {
     console.error("❌ Error seeding products:", error);
-    process.exit(1);
   }
 };
 

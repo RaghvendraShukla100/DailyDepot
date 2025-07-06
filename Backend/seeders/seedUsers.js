@@ -18,7 +18,7 @@ const hashPassword = async (password) => {
  */
 const seedUsers = async () => {
   try {
-    console.log("Seeding Users...");
+    console.log("🌱 Seeding Users...");
 
     // Delete all existing users
     await User.deleteMany();
@@ -89,12 +89,23 @@ const seedUsers = async () => {
     ];
 
     // Insert seeded users
-    await User.insertMany(users);
+    const res = await User.insertMany(users);
 
-    console.log("✅ Users seeded successfully.");
+    console.log(`✅ Seeded ${res.length} users successfully.`);
+    console.table(
+      res.map((user, idx) => ({
+        "#": idx + 1,
+        Name: `${user.name.first} ${user.name.last}`,
+        Email: user.email,
+        Phone: user.phone,
+        Role: user.role,
+        EmailVerified: user.isEmailVerified,
+        PhoneVerified: user.isPhoneVerified,
+        ID: user._id.toString(),
+      }))
+    );
   } catch (error) {
     console.error("❌ Error seeding users:", error);
-    process.exit(1);
   }
 };
 

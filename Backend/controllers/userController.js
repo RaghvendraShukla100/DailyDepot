@@ -16,28 +16,32 @@ import {
 
 /**
  * @desc    Register a new user
- * @route   POST /api/user/register
+ * @route   POST /api/users/register
  * @access  Public
  */
 export const registerUser = asyncHandler(async (req, res) => {
-  const { name, email, password } = registerUserValidation.parse(req.body);
+  // ✅ Validate request
+  const data = registerUserValidation.parse(req.body);
 
-  const existingUser = await User.findOne({ email });
+  const existingUser = await User.findOne({ email: data.email });
   if (existingUser) {
     throw ApiError.conflict(MESSAGES.USER.ALREADY_EXISTS);
   }
 
-  const [first, ...last] = name.trim().split(" ");
+  // Handle name splitting
+  const [first, ...last] = data.name.trim().split(" ");
+  const profilePicPath = req.file ? `/uploads/${req.file.filename}` : undefined;
 
   const user = await User.create({
     name: { first, last: last.join(" ") },
-    email,
-    password, // raw password
+    email: data.email,
+    password: data.password,
+    profilePic: profilePicPath,
   });
 
   const token = generateToken(user._id);
 
-  logger.info(`New user registered with email=${email}`);
+  logger.info(`New user registered with email=${data.email}`);
 
   res.status(STATUS_CODES.CREATED).json(
     new ApiResponse(
@@ -47,6 +51,7 @@ export const registerUser = asyncHandler(async (req, res) => {
           _id: user._id,
           name: user.name,
           email: user.email,
+          profilePic: user.profilePic,
           role: user.role,
           createdAt: user.createdAt,
           updatedAt: user.updatedAt,
@@ -60,47 +65,38 @@ export const registerUser = asyncHandler(async (req, res) => {
 
 /**
  * @desc    Login user and get JWT
- * @route   POST /api/auth/login
+ * @route   POST /api/users/login
  * @access  Public
  */
 export const loginUser = asyncHandler(async (req, res) => {
-  const { email, password } = req.body;
+  // ✅ Validate request
+  const data = loginUserValidation.parse(req.body);
 
-  if (!email || !password) {
-    throw ApiError.badRequest("Email and password are required.");
-  }
-
-  const user = await User.findOne({ email }).select(
-    "+password name email role"
+  const user = await User.findOne({ email: data.email }).select(
+    "+password name email role status deleted"
   );
 
   if (!user) {
     throw ApiError.unauthorized(MESSAGES.AUTH.LOGIN_FAIL);
   }
 
-  // LOG HERE:
-  console.log("Retrieved user:", {
-    id: user._id,
-    email: user.email,
-    password: user.password,
-    name: user.name,
-  });
-
-  if (!user.password) {
-    logger.error(`Login failed: Missing password in DB for user ${email}`);
-    throw ApiError.internal(
-      "Password missing in user record. Please contact support."
-    );
+  if (user.deleted || user.status === "deleted") {
+    throw ApiError.unauthorized(MESSAGES.USER.NOT_FOUND);
   }
 
-  const isMatch = await bcrypt.compare(password, user.password);
+  if (!user.password) {
+    logger.error(`Login failed: Missing password in DB for user ${data.email}`);
+    throw ApiError.internal(MESSAGES.AUTH.PASSWORD_MISSING_IN_DB);
+  }
+
+  const isMatch = await bcrypt.compare(data.password, user.password);
   if (!isMatch) {
     throw ApiError.unauthorized(MESSAGES.AUTH.LOGIN_FAIL);
   }
 
   const token = generateToken(user._id);
 
-  logger.info(`User logged in with email=${email}`);
+  logger.info(`User logged in with email=${data.email}`);
 
   res.status(STATUS_CODES.OK).json(
     new ApiResponse(
@@ -149,8 +145,8 @@ export const getUserProfile = asyncHandler(async (req, res) => {
  */
 export const updateUserProfile = asyncHandler(async (req, res) => {
   const data = updateUserProfileValidation.parse(req.body);
-  const user = await User.findById(req.user._id);
 
+  const user = await User.findById(req.user._id);
   if (!user) {
     throw ApiError.notFound(MESSAGES.USER.NOT_FOUND);
   }
@@ -160,9 +156,9 @@ export const updateUserProfile = asyncHandler(async (req, res) => {
     user.name.first = first || user.name.first;
     user.name.last = last.join(" ") || user.name.last;
   }
-  if (data.bio) user.bio = data.bio;
-  if (data.phone) user.phone = data.phone;
-  if (data.address) user.addresses.push(data.address);
+  if (data.bio !== undefined) user.bio = data.bio;
+  if (data.phone !== undefined) user.phone = data.phone;
+  if (data.address !== undefined) user.addresses.push(data.address);
 
   await user.save();
 

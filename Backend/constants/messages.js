@@ -8,6 +8,9 @@ export const MESSAGES = Object.freeze({
     UNAUTHORIZED: "You are not authorized to perform this action.",
     TOKEN_MISSING: "Token missing from request.",
     TOKEN_INVALID: "Invalid or expired token.",
+    EMAIL_PASSWORD_REQUIRED: "Email and password are required.",
+    PASSWORD_MISSING_IN_DB:
+      "Password missing in user record. Please contact support.",
   },
   USER: {
     NOT_FOUND: "User not found.",

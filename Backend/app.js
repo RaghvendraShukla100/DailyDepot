@@ -4,7 +4,8 @@ import helmet from "helmet";
 import morgan from "morgan";
 import cookieParser from "cookie-parser";
 import compression from "compression";
-import path from "path";
+import path, { dirname } from "path";
+import { fileURLToPath } from "url";
 
 import { config } from "./config/config.js";
 
@@ -29,12 +30,17 @@ import analyticsRoutes from "./routes/analyticsRoutes.js";
 import couponRoutes from "./routes/couponRoutes.js";
 import categoryRoutes from "./routes/categoryRoutes.js";
 
+// ✅ Correctly define __dirname in ESM
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
 const app = express();
 
 // 1️⃣ Security headers and sanitization
 app.use(helmet());
 
-app.use("/uploads", express.static(path.join(path.resolve(), "uploads")));
+// ✅ Serve uploads correctly
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 // 2️⃣ Logging for development
 if (process.env.NODE_ENV === "development") {
@@ -51,7 +57,6 @@ app.use(
 
 // 4️⃣ Body parsers
 app.use(express.json({ limit: "10mb" }));
-app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 app.use(cookieParser());
 
 // 5️⃣ Compression

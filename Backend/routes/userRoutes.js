@@ -13,6 +13,7 @@ import {
 } from "../controllers/userController.js";
 import { protect, authorizeRoles } from "../middlewares/authMiddleware.js";
 import { ROLES } from "../constants/roles.js";
+import upload from "../middlewares/uploadMiddleware.js";
 
 const router = express.Router();
 
@@ -21,8 +22,7 @@ const router = express.Router();
  * @desc    Register a new user
  * @access  Public
  */
-router.post("/register", registerUser);
-
+router.post("/register", upload.single("profilePic"), registerUser);
 /**
  * @route   POST /api/users/login
  * @desc    Login user and get JWT

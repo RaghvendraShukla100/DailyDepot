@@ -1,3 +1,4 @@
+// backend/models/addressModel.js
 import mongoose from "mongoose";
 
 const addressSchema = new mongoose.Schema(
@@ -9,14 +10,27 @@ const addressSchema = new mongoose.Schema(
       index: true,
     },
     fullName: { type: String, required: true, trim: true },
-    phone: { type: String, required: true, trim: true },
-    email: { type: String, trim: true },
+    phone: {
+      type: String,
+      required: true,
+      trim: true,
+      match: /^[6-9]\d{9}$/,
+    },
+    email: {
+      type: String,
+      trim: true,
+      match: /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/,
+    },
     addressLine1: { type: String, required: true, trim: true },
     addressLine2: { type: String, trim: true },
     city: { type: String, required: true, trim: true },
     state: { type: String, required: true, trim: true },
     country: { type: String, required: true, trim: true, default: "India" },
-    postalCode: { type: String, required: true, trim: true },
+    postalCode: {
+      type: String,
+      required: true,
+      trim: true,
+    },
     landmark: { type: String, trim: true },
     addressType: {
       type: String,
@@ -25,9 +39,15 @@ const addressSchema = new mongoose.Schema(
     },
     isDefault: { type: Boolean, default: false },
     geoLocation: {
-      lat: { type: Number, min: -90, max: 90 },
-      lng: { type: Number, min: -180, max: 180 },
-      accuracy: { type: Number, min: 0 },
+      type: {
+        type: String,
+        enum: ["Point"],
+        default: "Point",
+      },
+      coordinates: {
+        type: [Number], // [lng, lat]
+        default: [0, 0],
+      },
     },
     notes: { type: String, trim: true },
     isVerified: { type: Boolean, default: false },
@@ -41,9 +61,22 @@ const addressSchema = new mongoose.Schema(
     deleted: { type: Boolean, default: false },
     deletedAt: { type: Date, default: null, index: { expireAfterSeconds: 0 } },
   },
-  { timestamps: true }
+  { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } }
 );
 
+// Indexes for optimized queries
+addressSchema.index({ geoLocation: "2dsphere" });
+addressSchema.index({ user: 1, isDefault: 1 });
+addressSchema.index({ user: 1, deleted: 1 });
+
+// Virtual field for combined address display
+addressSchema.virtual("fullAddress").get(function () {
+  return `${
+    this.addressLine1
+  }, ${this.addressLine2 ? this.addressLine2 + ", " : ""}${this.city}, ${this.state}, ${this.postalCode}, ${this.country}`;
+});
+
+// Soft delete handler
 addressSchema.pre("save", function (next) {
   if (this.deleted && !this.deletedAt) {
     this.deletedAt = new Date();
@@ -53,6 +86,11 @@ addressSchema.pre("save", function (next) {
   }
   next();
 });
+
+// Static utility for soft delete
+addressSchema.statics.softDelete = async function (id) {
+  return this.findByIdAndUpdate(id, { deleted: true, deletedAt: new Date() });
+};
 
 const Address = mongoose.model("Address", addressSchema);
 export default Address;

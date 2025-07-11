@@ -2,15 +2,15 @@
 
 import express from "express";
 import {
-  createAddressController,
-  getAddressesController,
-  getAddressByIdController,
-  updateAddressController,
-  deleteAddressController,
+  createAddress,
+  getAddresses,
+  getAddressById,
+  updateAddress,
+  deleteAddress,
 } from "../controllers/addressController.js";
-
 import { protect } from "../middlewares/authMiddleware.js";
-import validateResource from "../middlewares/validateResource.js";
+import validateRequest from "../middlewares/validateRequest.js";
+import asyncHandler from "../middlewares/asyncHandler.js";
 import {
   createAddressValidation,
   updateAddressValidation,
@@ -20,47 +20,47 @@ const router = express.Router();
 
 /**
  * @route   GET /api/addresses
- * @desc    Get all addresses of logged-in user
+ * @desc    Retrieve all addresses of the logged-in user
  * @access  Private
  */
-router.get("/", protect, getAddressesController);
+router.get("/", protect, asyncHandler(getAddresses));
 
 /**
  * @route   GET /api/addresses/:id
- * @desc    Get single address by ID
+ * @desc    Retrieve a single address by its ID
  * @access  Private
  */
-router.get("/:id", protect, getAddressByIdController);
+router.get("/:id", protect, asyncHandler(getAddressById));
 
 /**
  * @route   POST /api/addresses
- * @desc    Create a new address
+ * @desc    Create a new address for the logged-in user
  * @access  Private
  */
 router.post(
   "/",
   protect,
-  validateResource(createAddressValidation),
-  createAddressController
+  validateRequest(createAddressValidation),
+  asyncHandler(createAddress)
 );
 
 /**
  * @route   PUT /api/addresses/:id
- * @desc    Update an address
+ * @desc    Update an existing address by its ID
  * @access  Private
  */
 router.put(
   "/:id",
   protect,
-  validateResource(updateAddressValidation),
-  updateAddressController
+  validateRequest(updateAddressValidation),
+  asyncHandler(updateAddress)
 );
 
 /**
  * @route   DELETE /api/addresses/:id
- * @desc    Delete (soft) an address
+ * @desc    Soft delete an address by its ID
  * @access  Private
  */
-router.delete("/:id", protect, deleteAddressController);
+router.delete("/:id", protect, asyncHandler(deleteAddress));
 
 export default router;

@@ -1,4 +1,5 @@
-import asyncHandler from "../middlewares/asyncHandler.js";
+// /backend/controllers/wishlistController.js
+
 import Wishlist from "../models/wishlistSchema.js";
 import Product from "../models/productSchema.js";
 import ApiError from "../utils/ApiError.js";
@@ -8,7 +9,7 @@ import { STATUS_CODES } from "../constants/statusCodes.js";
 // @desc    Create a new wishlist
 // @route   POST /api/wishlists
 // @access  Private
-export const createWishlistController = asyncHandler(async (req, res) => {
+export const createWishlist = async (req, res) => {
   const { name, isPublic, products } = req.body;
 
   const wishlist = await Wishlist.create({
@@ -27,12 +28,12 @@ export const createWishlistController = asyncHandler(async (req, res) => {
         "Wishlist created successfully."
       )
     );
-});
+};
 
 // @desc    Get all wishlists for the authenticated user
 // @route   GET /api/wishlists
 // @access  Private
-export const getUserWishlistController = asyncHandler(async (req, res) => {
+export const getUserWishlist = async (req, res) => {
   const wishlists = await Wishlist.find({
     user: req.user._id,
     deleted: false,
@@ -48,12 +49,12 @@ export const getUserWishlistController = asyncHandler(async (req, res) => {
       }
     )
   );
-});
+};
 
 // @desc    Get a single wishlist by ID
 // @route   GET /api/wishlists/:id
 // @access  Private
-export const getWishlistByIdController = asyncHandler(async (req, res) => {
+export const getWishlistById = async (req, res) => {
   const wishlist = await Wishlist.findOne({
     _id: req.params.id,
     user: req.user._id,
@@ -73,12 +74,12 @@ export const getWishlistByIdController = asyncHandler(async (req, res) => {
         "Wishlist retrieved successfully."
       )
     );
-});
+};
 
 // @desc    Add a product to a wishlist
 // @route   POST /api/wishlists/:id/add
 // @access  Private
-export const addProductToWishlistController = asyncHandler(async (req, res) => {
+export const addProductToWishlist = async (req, res) => {
   const { productId, selectedSize, selectedColor, notes } = req.body;
 
   const product = await Product.findById(productId);
@@ -117,52 +118,50 @@ export const addProductToWishlistController = asyncHandler(async (req, res) => {
     .json(
       new ApiResponse(STATUS_CODES.OK, wishlist, "Product added to wishlist.")
     );
-});
+};
 
 // @desc    Remove a product from a wishlist
 // @route   POST /api/wishlists/:id/remove
 // @access  Private
-export const removeProductFromWishlistController = asyncHandler(
-  async (req, res) => {
-    const { productId } = req.body;
+export const removeProductFromWishlist = async (req, res) => {
+  const { productId } = req.body;
 
-    const wishlist = await Wishlist.findOne({
-      _id: req.params.id,
-      user: req.user._id,
-      deleted: false,
-    });
+  const wishlist = await Wishlist.findOne({
+    _id: req.params.id,
+    user: req.user._id,
+    deleted: false,
+  });
 
-    if (!wishlist) {
-      throw ApiError.notFound("Wishlist");
-    }
-
-    const initialLength = wishlist.products.length;
-    wishlist.products = wishlist.products.filter(
-      (p) => !p.product.equals(productId)
-    );
-
-    if (wishlist.products.length === initialLength) {
-      throw ApiError.notFound("Product not found in wishlist.");
-    }
-
-    await wishlist.save();
-
-    res
-      .status(STATUS_CODES.OK)
-      .json(
-        new ApiResponse(
-          STATUS_CODES.OK,
-          wishlist,
-          "Product removed from wishlist."
-        )
-      );
+  if (!wishlist) {
+    throw ApiError.notFound("Wishlist");
   }
-);
+
+  const initialLength = wishlist.products.length;
+  wishlist.products = wishlist.products.filter(
+    (p) => !p.product.equals(productId)
+  );
+
+  if (wishlist.products.length === initialLength) {
+    throw ApiError.notFound("Product not found in wishlist.");
+  }
+
+  await wishlist.save();
+
+  res
+    .status(STATUS_CODES.OK)
+    .json(
+      new ApiResponse(
+        STATUS_CODES.OK,
+        wishlist,
+        "Product removed from wishlist."
+      )
+    );
+};
 
 // @desc    Update wishlist (name, isPublic)
 // @route   PUT /api/wishlists/:id
 // @access  Private
-export const updateWishlistController = asyncHandler(async (req, res) => {
+export const updateWishlist = async (req, res) => {
   const { name, isPublic } = req.body;
 
   const wishlist = await Wishlist.findOne({
@@ -189,12 +188,12 @@ export const updateWishlistController = asyncHandler(async (req, res) => {
         "Wishlist updated successfully."
       )
     );
-});
+};
 
 // @desc    Soft delete a wishlist
 // @route   DELETE /api/wishlists/:id
 // @access  Private
-export const deleteWishlistController = asyncHandler(async (req, res) => {
+export const deleteWishlist = async (req, res) => {
   const wishlist = await Wishlist.findOne({
     _id: req.params.id,
     user: req.user._id,
@@ -214,4 +213,4 @@ export const deleteWishlistController = asyncHandler(async (req, res) => {
     .json(
       new ApiResponse(STATUS_CODES.OK, null, "Wishlist deleted successfully.")
     );
-});
+};

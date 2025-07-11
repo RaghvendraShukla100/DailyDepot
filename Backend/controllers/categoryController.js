@@ -1,18 +1,16 @@
 // /backend/controllers/categoryController.js
 
 import Category from "../models/categorySchema.js";
-import asyncHandler from "../middlewares/asyncHandler.js";
 import ApiError from "../utils/ApiError.js";
 import ApiResponse from "../utils/ApiResponse.js";
 import { STATUS_CODES } from "../constants/statusCodes.js";
-import { MESSAGES } from "../constants/messages.js";
 
 /**
  * @desc    Create a new category
  * @route   POST /api/categories
  * @access  Private/Admin
  */
-export const createCategoryController = asyncHandler(async (req, res) => {
+export const createCategory = async (req, res) => {
   const category = await Category.create(req.body);
 
   res
@@ -24,14 +22,14 @@ export const createCategoryController = asyncHandler(async (req, res) => {
         "Category created successfully."
       )
     );
-});
+};
 
 /**
  * @desc    Get all categories
  * @route   GET /api/categories
  * @access  Public
  */
-export const getAllCategoriesController = asyncHandler(async (req, res) => {
+export const getAllCategories = async (req, res) => {
   const categories = await Category.find({ deleted: false }).populate(
     "parentCategory",
     "name slug"
@@ -46,14 +44,14 @@ export const getAllCategoriesController = asyncHandler(async (req, res) => {
         "Categories fetched successfully."
       )
     );
-});
+};
 
 /**
  * @desc    Get a single category by ID
  * @route   GET /api/categories/:id
  * @access  Public
  */
-export const getCategoryByIdController = asyncHandler(async (req, res) => {
+export const getCategoryById = async (req, res) => {
   const category = await Category.findById(req.params.id)
     .where({ deleted: false })
     .populate("parentCategory", "name slug");
@@ -71,14 +69,14 @@ export const getCategoryByIdController = asyncHandler(async (req, res) => {
         "Category fetched successfully."
       )
     );
-});
+};
 
 /**
  * @desc    Update a category by ID
  * @route   PUT /api/categories/:id
  * @access  Private/Admin
  */
-export const updateCategoryByIdController = asyncHandler(async (req, res) => {
+export const updateCategoryById = async (req, res) => {
   const category = await Category.findById(req.params.id).where({
     deleted: false,
   });
@@ -114,14 +112,14 @@ export const updateCategoryByIdController = asyncHandler(async (req, res) => {
         "Category updated successfully."
       )
     );
-});
+};
 
 /**
  * @desc    Soft delete a category by ID
  * @route   DELETE /api/categories/:id
  * @access  Private/Admin
  */
-export const deleteCategoryByIdController = asyncHandler(async (req, res) => {
+export const deleteCategoryById = async (req, res) => {
   const category = await Category.findById(req.params.id).where({
     deleted: false,
   });
@@ -139,4 +137,4 @@ export const deleteCategoryByIdController = asyncHandler(async (req, res) => {
     .json(
       new ApiResponse(STATUS_CODES.OK, null, "Category deleted successfully.")
     );
-});
+};

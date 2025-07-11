@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 // Order Schema for managing user orders with multi-seller and soft-delete support
 const orderSchema = new mongoose.Schema(
   {
-    user: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true }, // Reference to user placing the order
+    user: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
     items: [
       {
         product: {

@@ -54,6 +54,12 @@ const productSchema = new mongoose.Schema(
     isFeatured: { type: Boolean, default: false },
     deleted: { type: Boolean, default: false },
     deletedAt: { type: Date, default: null, index: { expireAfterSeconds: 0 } },
+
+    createdBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
   },
   { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } }
 );

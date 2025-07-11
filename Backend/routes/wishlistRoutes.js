@@ -1,13 +1,14 @@
 // /backend/routes/wishlistRoutes.js
 
 import express from "express";
+import asyncHandler from "../middlewares/asyncHandler.js";
 import {
-  createWishlistController,
-  getUserWishlistController,
-  updateWishlistController,
-  deleteWishlistController,
-  addProductToWishlistController,
-  removeProductFromWishlistController,
+  createWishlist,
+  getUserWishlist,
+  updateWishlist,
+  deleteWishlist,
+  addProductToWishlist,
+  removeProductFromWishlist,
 } from "../controllers/wishlistController.js";
 
 import { protect } from "../middlewares/authMiddleware.js";
@@ -15,9 +16,7 @@ import validateResource from "../middlewares/validateResource.js";
 import {
   createWishlistValidation,
   updateWishlistValidation,
-  addWishlistItemValidation,
-  updateWishlistItemValidation,
-  modifyWishlistProductValidation, // <-- ADD THIS LINE
+  modifyWishlistProductValidation,
 } from "../validations/wishlistValidation.js";
 
 const router = express.Router();
@@ -27,7 +26,7 @@ const router = express.Router();
  * @desc    Get logged-in user's wishlist
  * @access  User
  */
-router.get("/", protect, getUserWishlistController);
+router.get("/", protect, asyncHandler(getUserWishlist));
 
 /**
  * @route   POST /api/wishlists
@@ -38,7 +37,7 @@ router.post(
   "/",
   protect,
   validateResource(createWishlistValidation),
-  createWishlistController
+  asyncHandler(createWishlist)
 );
 
 /**
@@ -50,7 +49,7 @@ router.put(
   "/:id",
   protect,
   validateResource(updateWishlistValidation),
-  updateWishlistController
+  asyncHandler(updateWishlist)
 );
 
 /**
@@ -58,7 +57,7 @@ router.put(
  * @desc    Delete wishlist
  * @access  User
  */
-router.delete("/:id", protect, deleteWishlistController);
+router.delete("/:id", protect, asyncHandler(deleteWishlist));
 
 /**
  * @route   POST /api/wishlists/:id/add
@@ -69,7 +68,7 @@ router.post(
   "/:id/add",
   protect,
   validateResource(modifyWishlistProductValidation),
-  addProductToWishlistController
+  asyncHandler(addProductToWishlist)
 );
 
 /**
@@ -81,7 +80,7 @@ router.post(
   "/:id/remove",
   protect,
   validateResource(modifyWishlistProductValidation),
-  removeProductFromWishlistController
+  asyncHandler(removeProductFromWishlist)
 );
 
 export default router;

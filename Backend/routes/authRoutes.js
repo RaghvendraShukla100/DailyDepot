@@ -1,14 +1,17 @@
+// /backend/routes/authRoutes.js
+
 import express from "express";
+import asyncHandler from "../middlewares/asyncHandler.js";
 import {
-  registerUserController,
-  loginUserController,
-  logoutUserController,
-  requestPasswordResetController,
-  resetPasswordController,
-  verifyEmailController,
+  registerUser,
+  loginUser,
+  logoutUser,
+  requestPasswordReset,
+  resetPassword,
+  verifyEmail,
 } from "../controllers/authController.js";
 
-import validateResourceMiddleware from "../middlewares/validateResource.js";
+import validateRequest from "../middlewares/validateRequest.js";
 import {
   registerValidation,
   loginValidation,
@@ -17,42 +20,54 @@ import { protect } from "../middlewares/authMiddleware.js";
 
 const router = express.Router();
 
-// @route   POST /api/auth/register
-// @desc    Register user (user, seller, admin)
-// @access  Public
+/**
+ * @route   POST /api/auth/register
+ * @desc    Register user (user, seller, admin)
+ * @access  Public
+ */
 router.post(
   "/register",
-  validateResourceMiddleware(registerValidation),
-  registerUserController
+  validateRequest(registerValidation),
+  asyncHandler(registerUser)
 );
 
-// @route   POST /api/auth/login
-// @desc    Login user
-// @access  Public
+/**
+ * @route   POST /api/auth/login
+ * @desc    Login user
+ * @access  Public
+ */
 router.post(
   "/login",
-  validateResourceMiddleware(loginValidation),
-  loginUserController
+  validateRequest(loginValidation),
+  asyncHandler(loginUser)
 );
 
-// @route   POST /api/auth/logout
-// @desc    Logout user
-// @access  Private
-router.post("/logout", protect, logoutUserController);
+/**
+ * @route   POST /api/auth/logout
+ * @desc    Logout user
+ * @access  Private
+ */
+router.post("/logout", protect, asyncHandler(logoutUser));
 
-// @route   POST /api/auth/request-password-reset
-// @desc    Request password reset
-// @access  Public
-router.post("/request-password-reset", requestPasswordResetController);
+/**
+ * @route   POST /api/auth/request-password-reset
+ * @desc    Request password reset
+ * @access  Public
+ */
+router.post("/request-password-reset", asyncHandler(requestPasswordReset));
 
-// @route   POST /api/auth/reset-password/:token
-// @desc    Reset password using token
-// @access  Public
-router.post("/reset-password/:token", resetPasswordController);
+/**
+ * @route   POST /api/auth/reset-password/:token
+ * @desc    Reset password using token
+ * @access  Public
+ */
+router.post("/reset-password/:token", asyncHandler(resetPassword));
 
-// @route   GET /api/auth/verify-email/:token
-// @desc    Verify email using token
-// @access  Public
-router.get("/verify-email/:token", verifyEmailController);
+/**
+ * @route   GET /api/auth/verify-email/:token
+ * @desc    Verify email using token
+ * @access  Public
+ */
+router.get("/verify-email/:token", asyncHandler(verifyEmail));
 
 export default router;

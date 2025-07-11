@@ -10,7 +10,8 @@ import {
 } from "../controllers/productController.js";
 import { protect, authorizeRoles } from "../middlewares/authMiddleware.js";
 import upload from "../middlewares/uploadMiddleware.js";
-import validateResource from "../middlewares/validateResource.js";
+import validateRequest from "../middlewares/validateRequest.js";
+import asyncHandler from "../middlewares/asyncHandler.js";
 import {
   createProductValidation,
   updateProductValidation,
@@ -20,57 +21,57 @@ import { ROLES } from "../constants/roles.js";
 const router = express.Router();
 
 /**
- * @route POST /api/products
- * @desc Create a new product
- * @access Private (seller/admin)
+ * @route   POST /api/products
+ * @desc    Create a new product
+ * @access  Private (Seller/Admin)
  */
 router.post(
   "/",
   protect,
   authorizeRoles(ROLES.SELLER, ROLES.ADMIN),
-  upload.array("media", 10), // max 10 images/videos per product
-  validateResource(createProductValidation),
-  createProduct
+  upload.array("media", 10),
+  validateRequest(createProductValidation),
+  asyncHandler(createProduct)
 );
 
 /**
- * @route GET /api/products
- * @desc Get all products with filters, pagination, sorting
- * @access Public
+ * @route   GET /api/products
+ * @desc    Get all products with filters, pagination, sorting
+ * @access  Public
  */
-router.get("/", getProducts);
+router.get("/", asyncHandler(getProducts));
 
 /**
- * @route GET /api/products/:id
- * @desc Get product by ID
- * @access Public
+ * @route   GET /api/products/:id
+ * @desc    Get product by ID
+ * @access  Public
  */
-router.get("/:id", getProductById);
+router.get("/:id", asyncHandler(getProductById));
 
 /**
- * @route PUT /api/products/:id
- * @desc Update a product
- * @access Private (seller/admin)
+ * @route   PUT /api/products/:id
+ * @desc    Update a product
+ * @access  Private (Seller/Admin)
  */
 router.put(
   "/:id",
   protect,
   authorizeRoles(ROLES.SELLER, ROLES.ADMIN),
   upload.array("media", 10),
-  validateResource(updateProductValidation),
-  updateProduct
+  validateRequest(updateProductValidation),
+  asyncHandler(updateProduct)
 );
 
 /**
- * @route DELETE /api/products/:id
- * @desc Soft delete a product
- * @access Private (seller/admin)
+ * @route   DELETE /api/products/:id
+ * @desc    Soft delete a product
+ * @access  Private (Seller/Admin)
  */
 router.delete(
   "/:id",
   protect,
   authorizeRoles(ROLES.SELLER, ROLES.ADMIN),
-  deleteProduct
+  asyncHandler(deleteProduct)
 );
 
 export default router;

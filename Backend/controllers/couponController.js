@@ -1,7 +1,6 @@
 // Backend/controllers/couponController.js
 
 import Coupon from "../models/couponSchema.js";
-import asyncHandler from "../middlewares/asyncHandler.js";
 import ApiError from "../utils/ApiError.js";
 import ApiResponse from "../utils/ApiResponse.js";
 import { STATUS_CODES } from "../constants/statusCodes.js";
@@ -9,7 +8,7 @@ import { STATUS_CODES } from "../constants/statusCodes.js";
 // @desc    Create a new coupon
 // @route   POST /api/coupons
 // @access  Admin
-export const createCouponController = asyncHandler(async (req, res) => {
+export const createCoupon = async (req, res) => {
   const coupon = await Coupon.create(req.body);
 
   res
@@ -21,20 +20,20 @@ export const createCouponController = asyncHandler(async (req, res) => {
         "Coupon created successfully."
       )
     );
-});
+};
 
 // @desc    Get all coupons
 // @route   GET /api/coupons
 // @access  Public
-export const getAllCouponsController = asyncHandler(async (req, res) => {
+export const getAllCoupons = async (req, res) => {
   const coupons = await Coupon.find({ deleted: false });
   res.status(STATUS_CODES.OK).json(new ApiResponse(STATUS_CODES.OK, coupons));
-});
+};
 
 // @desc    Get a single coupon by ID
 // @route   GET /api/coupons/:id
 // @access  Public
-export const getCouponByIdController = asyncHandler(async (req, res) => {
+export const getCouponById = async (req, res) => {
   const coupon = await Coupon.findById(req.params.id).where({ deleted: false });
 
   if (!coupon) {
@@ -42,12 +41,12 @@ export const getCouponByIdController = asyncHandler(async (req, res) => {
   }
 
   res.status(STATUS_CODES.OK).json(new ApiResponse(STATUS_CODES.OK, coupon));
-});
+};
 
 // @desc    Update a coupon by ID
 // @route   PUT /api/coupons/:id
 // @access  Admin
-export const updateCouponByIdController = asyncHandler(async (req, res) => {
+export const updateCouponById = async (req, res) => {
   const coupon = await Coupon.findById(req.params.id).where({ deleted: false });
 
   if (!coupon) {
@@ -69,12 +68,12 @@ export const updateCouponByIdController = asyncHandler(async (req, res) => {
         "Coupon updated successfully."
       )
     );
-});
+};
 
 // @desc    Soft delete a coupon by ID
 // @route   DELETE /api/coupons/:id
 // @access  Admin
-export const deleteCouponByIdController = asyncHandler(async (req, res) => {
+export const deleteCouponById = async (req, res) => {
   const coupon = await Coupon.findById(req.params.id).where({ deleted: false });
 
   if (!coupon) {
@@ -90,4 +89,4 @@ export const deleteCouponByIdController = asyncHandler(async (req, res) => {
     .json(
       new ApiResponse(STATUS_CODES.OK, null, "Coupon deleted successfully.")
     );
-});
+};

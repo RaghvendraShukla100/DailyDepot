@@ -1,10 +1,13 @@
+// /backend/routes/categoryRoutes.js
+
 import express from "express";
+import asyncHandler from "../middlewares/asyncHandler.js";
 import {
-  createCategoryController,
-  getAllCategoriesController,
-  getCategoryByIdController,
-  updateCategoryByIdController,
-  deleteCategoryByIdController,
+  createCategory,
+  getAllCategories,
+  getCategoryById,
+  updateCategoryById,
+  deleteCategoryById,
 } from "../controllers/categoryController.js";
 import {
   protect,
@@ -19,39 +22,59 @@ import {
 
 const router = express.Router();
 
-// Public - Get all categories
-router.get("/", getAllCategoriesController);
+/**
+ * @route   GET /api/categories
+ * @desc    Retrieve all categories (public)
+ * @access  Public
+ */
+router.get("/", asyncHandler(getAllCategories));
 
-// Public - Get category by ID
-router.get("/:id", getCategoryByIdController);
+/**
+ * @route   GET /api/categories/:id
+ * @desc    Retrieve a single category by ID (public)
+ * @access  Public
+ */
+router.get("/:id", asyncHandler(getCategoryById));
 
-// Admin only - Create category
+/**
+ * @route   POST /api/categories
+ * @desc    Create a new category (admin only)
+ * @access  Private/Admin
+ */
 router.post(
   "/",
-  protect,
-  authorizeRoles("admin"),
-  attachAdminProfile,
-  validateResource(createCategoryValidation),
-  createCategoryController
+  protect, // Require authentication
+  authorizeRoles("admin"), // Require admin role
+  attachAdminProfile, // Attach admin profile if needed for auditing
+  validateResource(createCategoryValidation), // Validate request body
+  asyncHandler(createCategory)
 );
 
-// Admin only - Update category
+/**
+ * @route   PUT /api/categories/:id
+ * @desc    Update a category by ID (admin only)
+ * @access  Private/Admin
+ */
 router.put(
   "/:id",
   protect,
   authorizeRoles("admin"),
   attachAdminProfile,
   validateResource(updateCategoryValidation),
-  updateCategoryByIdController
+  asyncHandler(updateCategoryById)
 );
 
-// Admin only - Delete category
+/**
+ * @route   DELETE /api/categories/:id
+ * @desc    Soft delete a category by ID (admin only)
+ * @access  Private/Admin
+ */
 router.delete(
   "/:id",
   protect,
   authorizeRoles("admin"),
   attachAdminProfile,
-  deleteCategoryByIdController
+  asyncHandler(deleteCategoryById)
 );
 
 export default router;

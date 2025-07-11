@@ -1,4 +1,5 @@
-import asyncHandler from "../middlewares/asyncHandler.js";
+// /backend/controllers/orderController.js
+
 import Order from "../models/orderSchema.js";
 import Product from "../models/productSchema.js";
 import ApiError from "../utils/ApiError.js";
@@ -6,10 +7,12 @@ import ApiResponse from "../utils/ApiResponse.js";
 import { STATUS_CODES } from "../constants/statusCodes.js";
 import { sendOrderConfirmationEmail } from "../services/mailService.js"; // optional
 
-// @desc    Create a new order
-// @route   POST /api/orders
-// @access  Private (User)
-export const createOrderController = asyncHandler(async (req, res) => {
+/**
+ * @desc    Create a new order
+ * @route   POST /api/orders
+ * @access  Private (User)
+ */
+export const createOrder = async (req, res) => {
   const {
     items,
     shippingAddress,
@@ -54,7 +57,7 @@ export const createOrderController = asyncHandler(async (req, res) => {
     });
   }
 
-  // Send order confirmation email asynchronously (optional)
+  // Send confirmation email (optional, non-blocking)
   try {
     await sendOrderConfirmationEmail({
       userEmail: req.user.email,
@@ -63,7 +66,6 @@ export const createOrderController = asyncHandler(async (req, res) => {
       totalAmount: order.totalAmount,
     });
   } catch (err) {
-    // Log error but don't fail order creation
     console.error("Failed to send order confirmation email:", err);
   }
 
@@ -72,12 +74,14 @@ export const createOrderController = asyncHandler(async (req, res) => {
     .json(
       new ApiResponse(STATUS_CODES.CREATED, order, "Order placed successfully.")
     );
-});
+};
 
-// @desc    Get all orders (admin/user)
-// @route   GET /api/orders
-// @access  Private (User/Admin)
-export const getUserOrdersController = asyncHandler(async (req, res) => {
+/**
+ * @desc    Get all orders for user or admin
+ * @route   GET /api/orders
+ * @access  Private (User/Admin)
+ */
+export const getUserOrders = async (req, res) => {
   const page = parseInt(req.query.page) || 1;
   const limit = parseInt(req.query.limit) || 10;
   const skip = (page - 1) * limit;
@@ -93,7 +97,6 @@ export const getUserOrdersController = asyncHandler(async (req, res) => {
   }
 
   const total = await Order.countDocuments(queryObj);
-
   const orders = await Order.find(queryObj)
     .populate("user items.product shippingAddress appliedCoupon items.seller")
     .sort({ createdAt: -1 })
@@ -107,17 +110,21 @@ export const getUserOrdersController = asyncHandler(async (req, res) => {
       pages: Math.ceil(total / limit),
     })
   );
-});
+};
 
-// @desc    Get all orders (admin)
-// @route   GET /api/orders/all
-// @access  Private (Admin)
-export const getAllOrdersController = getUserOrdersController; // If behavior same, can reuse
+/**
+ * @desc    Get all orders (admin)
+ * @route   GET /api/orders/all
+ * @access  Private (Admin)
+ */
+export const getAllOrders = getUserOrders; // reuse if logic identical
 
-// @desc    Get a single order by ID
-// @route   GET /api/orders/:id
-// @access  Private (User/Admin)
-export const getOrderByIdController = asyncHandler(async (req, res) => {
+/**
+ * @desc    Get order by ID
+ * @route   GET /api/orders/:id
+ * @access  Private (User/Admin)
+ */
+export const getOrderById = async (req, res) => {
   const order = await Order.findById(req.params.id).populate(
     "user items.product shippingAddress appliedCoupon items.seller"
   );
@@ -135,12 +142,14 @@ export const getOrderByIdController = asyncHandler(async (req, res) => {
     .json(
       new ApiResponse(STATUS_CODES.OK, order, "Order retrieved successfully.")
     );
-});
+};
 
-// @desc    Update order status (Admin/Seller)
-// @route   PUT /api/orders/:id
-// @access  Private (Admin/Seller)
-export const updateOrderStatusController = asyncHandler(async (req, res) => {
+/**
+ * @desc    Update order status
+ * @route   PUT /api/orders/:id
+ * @access  Private (Admin/Seller)
+ */
+export const updateOrderStatus = async (req, res) => {
   const { orderStatus, deliveryDate, notes } = req.body;
 
   const order = await Order.findById(req.params.id);
@@ -148,9 +157,9 @@ export const updateOrderStatusController = asyncHandler(async (req, res) => {
     throw ApiError.notFound("Order");
   }
 
-  order.orderStatus = orderStatus || order.orderStatus;
-  order.deliveryDate = deliveryDate || order.deliveryDate;
-  order.notes = notes || order.notes;
+  order.orderStatus = orderStatus ?? order.orderStatus;
+  order.deliveryDate = deliveryDate ?? order.deliveryDate;
+  order.notes = notes ?? order.notes;
 
   await order.save();
 
@@ -163,12 +172,14 @@ export const updateOrderStatusController = asyncHandler(async (req, res) => {
         "Order status updated successfully."
       )
     );
-});
+};
 
-// @desc    Update payment status (Admin)
-// @route   PUT /api/orders/:id/payment-status
-// @access  Private (Admin)
-export const updatePaymentStatusController = asyncHandler(async (req, res) => {
+/**
+ * @desc    Update payment status
+ * @route   PUT /api/orders/:id/payment-status
+ * @access  Private (Admin)
+ */
+export const updatePaymentStatus = async (req, res) => {
   const { paymentStatus } = req.body;
 
   const order = await Order.findById(req.params.id);
@@ -176,7 +187,7 @@ export const updatePaymentStatusController = asyncHandler(async (req, res) => {
     throw ApiError.notFound("Order");
   }
 
-  order.paymentStatus = paymentStatus || order.paymentStatus;
+  order.paymentStatus = paymentStatus ?? order.paymentStatus;
 
   await order.save();
 
@@ -189,12 +200,14 @@ export const updatePaymentStatusController = asyncHandler(async (req, res) => {
         "Payment status updated successfully."
       )
     );
-});
+};
 
-// @desc    Soft delete order (User/Admin)
-// @route   DELETE /api/orders/:id
-// @access  Private (User/Admin)
-export const cancelOrderController = asyncHandler(async (req, res) => {
+/**
+ * @desc    Cancel (soft delete) an order
+ * @route   DELETE /api/orders/:id
+ * @access  Private (User/Admin)
+ */
+export const cancelOrder = async (req, res) => {
   const order = await Order.findById(req.params.id);
 
   if (!order || order.deleted) {
@@ -214,4 +227,4 @@ export const cancelOrderController = asyncHandler(async (req, res) => {
     .json(
       new ApiResponse(STATUS_CODES.OK, null, "Order deleted successfully.")
     );
-});
+};

@@ -1,16 +1,17 @@
 // /backend/routes/reviewRoutes.js
 
 import express from "express";
+import asyncHandler from "../middlewares/asyncHandler.js";
 import {
-  getReviewsController,
-  getReviewByIdController,
-  createReviewController,
-  updateReviewController,
-  softDeleteReviewController,
+  getReviews,
+  getReviewById,
+  createReview,
+  updateReview,
+  softDeleteReview,
 } from "../controllers/reviewController.js";
 
-import { protect, authorizeRoles } from "../middlewares/authMiddleware.js";
-import validateResource from "../middlewares/validateResource.js";
+import { protect } from "../middlewares/authMiddleware.js";
+import validateRequest from "../middlewares/validateRequest.js";
 import {
   createReviewValidation,
   updateReviewValidation,
@@ -20,47 +21,47 @@ const router = express.Router();
 
 /**
  * @route   GET /api/reviews
- * @desc    Get all reviews, optionally filter by product/user/rating
+ * @desc    Get all reviews with optional filtering
  * @access  Public
  */
-router.get("/", getReviewsController);
+router.get("/", asyncHandler(getReviews));
 
 /**
  * @route   GET /api/reviews/:id
- * @desc    Get a review by ID
+ * @desc    Get a single review by ID
  * @access  Public
  */
-router.get("/:id", getReviewByIdController);
+router.get("/:id", asyncHandler(getReviewById));
 
 /**
  * @route   POST /api/reviews
- * @desc    Create a review
- * @access  User
+ * @desc    Create a new review
+ * @access  Private (User)
  */
 router.post(
   "/",
   protect,
-  validateResource(createReviewValidation),
-  createReviewController
+  validateRequest(createReviewValidation),
+  asyncHandler(createReview)
 );
 
 /**
  * @route   PUT /api/reviews/:id
  * @desc    Update a review
- * @access  User/Admin
+ * @access  Private (User who wrote it or Admin)
  */
 router.put(
   "/:id",
   protect,
-  validateResource(updateReviewValidation),
-  updateReviewController
+  validateRequest(updateReviewValidation),
+  asyncHandler(updateReview)
 );
 
 /**
  * @route   DELETE /api/reviews/:id
  * @desc    Soft-delete a review
- * @access  User/Admin
+ * @access  Private (User who wrote it or Admin)
  */
-router.delete("/:id", protect, softDeleteReviewController);
+router.delete("/:id", protect, asyncHandler(softDeleteReview));
 
 export default router;

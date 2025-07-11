@@ -2,16 +2,16 @@
 
 import express from "express";
 import {
-  createOrderController,
-  getUserOrdersController,
-  getAllOrdersController,
-  getOrderByIdController,
-  updateOrderStatusController,
-  cancelOrderController,
+  createOrder,
+  getUserOrders,
+  getAllOrders,
+  getOrderById,
+  updateOrderStatus,
+  cancelOrder,
 } from "../controllers/orderController.js";
-
 import { protect, authorizeRoles } from "../middlewares/authMiddleware.js";
-import validateResource from "../middlewares/validateResource.js";
+import validateRequest from "../middlewares/validateRequest.js";
+import asyncHandler from "../middlewares/asyncHandler.js";
 import {
   createOrderValidation,
   updateOrderStatusValidation,
@@ -24,21 +24,26 @@ const router = express.Router();
  * @desc    Get logged-in user's orders
  * @access  User
  */
-router.get("/", protect, getUserOrdersController);
+router.get("/", protect, asyncHandler(getUserOrders));
 
 /**
  * @route   GET /api/orders/all
  * @desc    Get all orders (admin)
  * @access  Admin
  */
-router.get("/all", protect, authorizeRoles("admin"), getAllOrdersController);
+router.get(
+  "/all",
+  protect,
+  authorizeRoles("admin"),
+  asyncHandler(getAllOrders)
+);
 
 /**
  * @route   GET /api/orders/:id
  * @desc    Get order by ID
  * @access  User/Admin
  */
-router.get("/:id", protect, getOrderByIdController);
+router.get("/:id", protect, asyncHandler(getOrderById));
 
 /**
  * @route   POST /api/orders
@@ -48,8 +53,8 @@ router.get("/:id", protect, getOrderByIdController);
 router.post(
   "/",
   protect,
-  validateResource(createOrderValidation),
-  createOrderController
+  validateRequest(createOrderValidation),
+  asyncHandler(createOrder)
 );
 
 /**
@@ -61,8 +66,8 @@ router.put(
   "/:id",
   protect,
   authorizeRoles("admin"),
-  validateResource(updateOrderStatusValidation),
-  updateOrderStatusController
+  validateRequest(updateOrderStatusValidation),
+  asyncHandler(updateOrderStatus)
 );
 
 /**
@@ -70,6 +75,6 @@ router.put(
  * @desc    Cancel/Delete order (user/admin)
  * @access  User/Admin
  */
-router.delete("/:id", protect, cancelOrderController);
+router.delete("/:id", protect, asyncHandler(cancelOrder));
 
 export default router;

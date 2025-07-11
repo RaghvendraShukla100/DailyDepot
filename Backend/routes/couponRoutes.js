@@ -1,12 +1,13 @@
 // /backend/routes/couponRoutes.js
 
 import express from "express";
+import asyncHandler from "../middlewares/asyncHandler.js";
 import {
-  createCouponController,
-  getAllCouponsController,
-  getCouponByIdController,
-  updateCouponByIdController,
-  deleteCouponByIdController,
+  createCoupon,
+  getAllCoupons,
+  getCouponById,
+  updateCouponById,
+  deleteCouponById,
 } from "../controllers/couponController.js";
 
 import {
@@ -28,14 +29,14 @@ const router = express.Router();
  * @desc    Public - View all coupons
  * @access  Public
  */
-router.get("/", getAllCouponsController);
+router.get("/", asyncHandler(getAllCoupons));
 
 /**
  * @route   GET /api/coupons/:id
  * @desc    Public - View a single coupon by ID
  * @access  Public
  */
-router.get("/:id", getCouponByIdController);
+router.get("/:id", asyncHandler(getCouponById));
 
 /**
  * @route   POST /api/coupons
@@ -48,7 +49,7 @@ router.post(
   authorizeRoles("admin"),
   attachAdminProfile,
   validateResource(createCouponValidation),
-  createCouponController
+  asyncHandler(createCoupon)
 );
 
 /**
@@ -62,7 +63,7 @@ router.put(
   authorizeRoles("admin"),
   attachAdminProfile,
   validateResource(updateCouponValidation),
-  updateCouponByIdController
+  asyncHandler(updateCouponById)
 );
 
 /**
@@ -75,7 +76,7 @@ router.delete(
   protect,
   authorizeRoles("admin"),
   attachAdminProfile,
-  deleteCouponByIdController
+  asyncHandler(deleteCouponById)
 );
 
 export default router;

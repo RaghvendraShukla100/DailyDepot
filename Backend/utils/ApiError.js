@@ -1,14 +1,6 @@
 // /backend/utils/ApiError.js
 
 class ApiError extends Error {
-  /**
-   * Creates a structured API error.
-   * @param {number} statusCode - HTTP status code (e.g., 404, 500).
-   * @param {string} message - User-friendly error message.
-   * @param {Array|Object} errors - Optional validation or detailed errors.
-   * @param {string} stack - Optional stack trace for debugging.
-   * @param {string} code - Optional application-specific error code (e.g., 'USER_NOT_FOUND').
-   */
   constructor(statusCode, message, errors = [], stack = "", code = "") {
     super(message);
 

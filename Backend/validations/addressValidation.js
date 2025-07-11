@@ -1,5 +1,3 @@
-// /backend/validations/addressValidation.js
-
 import { z } from "zod";
 
 export const createAddressValidation = z.object({
@@ -11,19 +9,20 @@ export const createAddressValidation = z.object({
   phone: z
     .string()
     .trim()
-    .regex(/^[0-9]+$/, "Phone number must contain only digits")
-    .min(10, "Phone number must be at least 10 digits")
-    .max(15, "Phone number cannot exceed 15 digits"),
+    .regex(
+      /^\\+?[0-9]{10,15}$/,
+      "Phone number must be a valid format with 10-15 digits, optionally starting with +"
+    ),
   email: z.string().trim().email("Invalid email format").optional(),
   addressLine1: z
     .string()
     .trim()
-    .min(5, "Address line 1 must be at least 5 characters")
-    .max(200, "Address line 1 cannot exceed 200 characters"),
+    .min(5, "Address Line 1 must be at least 5 characters")
+    .max(200, "Address Line 1 cannot exceed 200 characters"),
   addressLine2: z
     .string()
     .trim()
-    .max(200, "Address line 2 cannot exceed 200 characters")
+    .max(200, "Address Line 2 cannot exceed 200 characters")
     .optional(),
   city: z
     .string()
@@ -38,7 +37,6 @@ export const createAddressValidation = z.object({
   postalCode: z
     .string()
     .trim()
-    .regex(/^[0-9A-Za-z -]+$/, "Postal code format is invalid")
     .min(4, "Postal code must be at least 4 characters")
     .max(20, "Postal code cannot exceed 20 characters"),
   country: z
@@ -52,9 +50,25 @@ export const createAddressValidation = z.object({
     .trim()
     .max(200, "Landmark cannot exceed 200 characters")
     .optional(),
-  addressType: z.enum(["home", "work", "other"]).optional().default("home"),
-  isDefault: z.boolean().optional(),
-  tag: z.enum(["primary", "secondary", "billing", "shipping"]).optional(),
+  addressType: z
+    .enum(["home", "work", "other"], {
+      errorMap: () => ({
+        message: "Address type must be one of: home, work, other",
+      }),
+    })
+    .default("home")
+    .optional(),
+  isDefault: z
+    .boolean({ invalid_type_error: "isDefault must be a boolean" })
+    .optional(),
+  tag: z
+    .enum(["primary", "secondary", "billing", "shipping"], {
+      errorMap: () => ({
+        message: "Tag must be one of: primary, secondary, billing, shipping",
+      }),
+    })
+    .default("shipping")
+    .optional(),
   notes: z
     .string()
     .trim()
@@ -62,9 +76,26 @@ export const createAddressValidation = z.object({
     .optional(),
   geoLocation: z
     .object({
-      lat: z.number().min(-90).max(90),
-      lng: z.number().min(-180).max(180),
-      accuracy: z.number().min(0).optional(),
+      type: z.literal("Point", {
+        errorMap: () => ({ message: "geoLocation.type must be 'Point'" }),
+      }),
+      coordinates: z.tuple(
+        [
+          z
+            .number()
+            .min(-180, "Longitude must be >= -180")
+            .max(180, "Longitude must be <= 180"),
+          z
+            .number()
+            .min(-90, "Latitude must be >= -90")
+            .max(90, "Latitude must be <= 90"),
+        ],
+        {
+          invalid_type_error:
+            "Coordinates must be a tuple of [longitude, latitude]",
+        }
+      ),
+      accuracy: z.number().min(0, "Accuracy cannot be negative").optional(),
     })
     .optional(),
 });

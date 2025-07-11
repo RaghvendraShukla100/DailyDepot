@@ -2,15 +2,17 @@
 
 import express from "express";
 import {
-  createBrandController,
-  getBrandsController,
-  getBrandByIdController,
-  updateBrandController,
-  deleteBrandController,
+  createBrand,
+  getBrands,
+  getBrandById,
+  updateBrand,
+  deleteBrand,
 } from "../controllers/brandController.js";
 
 import { protect, authorizeRoles } from "../middlewares/authMiddleware.js";
-import validateResource from "../middlewares/validateResource.js";
+import { ROLES } from "../constants/roles.js";
+import validateRequest from "../middlewares/validateRequest.js";
+import asyncHandler from "../middlewares/asyncHandler.js";
 import {
   createBrandValidation,
   updateBrandValidation,
@@ -20,49 +22,54 @@ const router = express.Router();
 
 /**
  * @route   GET /api/brands
- * @desc    Get all brands
+ * @desc    Retrieve all brands
  * @access  Public
  */
-router.get("/", getBrandsController);
+router.get("/", asyncHandler(getBrands));
 
 /**
  * @route   GET /api/brands/:id
- * @desc    Get brand by ID
+ * @desc    Retrieve a brand by ID
  * @access  Public
  */
-router.get("/:id", getBrandByIdController);
+router.get("/:id", asyncHandler(getBrandById));
 
 /**
  * @route   POST /api/brands
  * @desc    Create a new brand
- * @access  Admin Only
+ * @access  Private (Admin)
  */
 router.post(
   "/",
   protect,
-  authorizeRoles("admin"),
-  validateResource(createBrandValidation),
-  createBrandController
+  authorizeRoles(ROLES.ADMIN),
+  validateRequest(createBrandValidation),
+  asyncHandler(createBrand)
 );
 
 /**
  * @route   PUT /api/brands/:id
- * @desc    Update a brand
- * @access  Admin Only
+ * @desc    Update a brand by ID
+ * @access  Private (Admin)
  */
 router.put(
   "/:id",
   protect,
-  authorizeRoles("admin"),
-  validateResource(updateBrandValidation),
-  updateBrandController
+  authorizeRoles(ROLES.ADMIN),
+  validateRequest(updateBrandValidation),
+  asyncHandler(updateBrand)
 );
 
 /**
  * @route   DELETE /api/brands/:id
- * @desc    Delete (soft) a brand
- * @access  Admin Only
+ * @desc    Soft delete a brand by ID
+ * @access  Private (Admin)
  */
-router.delete("/:id", protect, authorizeRoles("admin"), deleteBrandController);
+router.delete(
+  "/:id",
+  protect,
+  authorizeRoles(ROLES.ADMIN),
+  asyncHandler(deleteBrand)
+);
 
 export default router;

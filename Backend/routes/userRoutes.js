@@ -14,6 +14,13 @@ import {
 import { protect, authorizeRoles } from "../middlewares/authMiddleware.js";
 import { ROLES } from "../constants/roles.js";
 import upload from "../middlewares/uploadMiddleware.js";
+import validateRequest from "../middlewares/validateRequest.js";
+import asyncHandler from "../middlewares/asyncHandler.js";
+import {
+  registerUserValidation,
+  loginUserValidation,
+  updateUserProfileValidation,
+} from "../validations/userValidation.js";
 
 const router = express.Router();
 
@@ -22,59 +29,84 @@ const router = express.Router();
  * @desc    Register a new user
  * @access  Public
  */
-router.post("/register", upload.single("profilePic"), registerUser);
-/**
- * @route   POST /api/users/login
- * @desc    Login user and get JWT
- * @access  Public
- */
-router.post("/login", loginUser);
-
-/**
- * @route   GET /api/users/profile
- * @desc    Get current user profile
- * @access  Private (User)
- */
-router.get("/profile", protect, authorizeRoles(ROLES.USER), getUserProfile);
-
-/**
- * @route   PUT /api/users/profile
- * @desc    Update current user profile
- * @access  Private (User)
- */
-router.put("/profile", protect, authorizeRoles(ROLES.USER), updateUserProfile);
-
-/**
- * @route   DELETE /api/users/profile
- * @desc    Soft delete current user account
- * @access  Private (User)
- */
-router.delete(
-  "/profile",
-  protect,
-  authorizeRoles(ROLES.USER),
-  deleteUserProfile
+router.post(
+  "/register",
+  upload.single("profilePic"),
+  validateRequest(registerUserValidation),
+  asyncHandler(registerUser)
 );
 
 /**
+ * @route   POST /api/users/login
+ * @desc    Authenticate user and return JWT
+ * @access  Public
+ */
+router.post(
+  "/login",
+  validateRequest(loginUserValidation),
+  asyncHandler(loginUser)
+);
+
+/**
+ * @route   GET /api/users/profile
+ * @desc    Retrieve the authenticated user's profile
+ * @access  Private
+ */
+router.get("/profile", protect, asyncHandler(getUserProfile));
+
+/**
+ * @route   PUT /api/users/profile
+ * @desc    Update the authenticated user's profile
+ * @access  Private
+ */
+router.put(
+  "/profile",
+  protect,
+  validateRequest(updateUserProfileValidation),
+  asyncHandler(updateUserProfile)
+);
+
+/**
+ * @route   DELETE /api/users/profile
+ * @desc    Soft delete the authenticated user's account
+ * @access  Private
+ */
+router.delete("/profile", protect, asyncHandler(deleteUserProfile));
+
+/**
  * @route   GET /api/users
- * @desc    Get all users (Admin only)
+ * @desc    Retrieve all users (Admin only)
  * @access  Private (Admin)
  */
-router.get("/", protect, authorizeRoles(ROLES.ADMIN), getAllUsers);
+router.get(
+  "/",
+  protect,
+  authorizeRoles(ROLES.ADMIN),
+  asyncHandler(getAllUsers)
+);
 
 /**
  * @route   GET /api/users/:id
- * @desc    Get user by ID (Admin only)
+ * @desc    Retrieve a user by ID (Admin only)
  * @access  Private (Admin)
  */
-router.get("/:id", protect, authorizeRoles(ROLES.ADMIN), getUserById);
+router.get(
+  "/:id",
+  protect,
+  authorizeRoles(ROLES.ADMIN),
+  asyncHandler(getUserById)
+);
 
 /**
  * @route   DELETE /api/users/:id
- * @desc    Soft delete user by ID (Admin only)
+ * @desc    Soft delete a user by ID (Admin only)
  * @access  Private (Admin)
  */
-router.delete("/:id", protect, authorizeRoles(ROLES.ADMIN), deleteUserById);
+router.delete(
+  "/:id",
+  protect,
+  authorizeRoles(ROLES.ADMIN),
+  asyncHandler(deleteUserById)
+);
 
 export default router;

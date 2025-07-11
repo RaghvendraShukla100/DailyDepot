@@ -1,128 +1,18 @@
-import bcrypt from "bcryptjs";
-import asyncHandler from "../middlewares/asyncHandler.js";
+// /backend/controllers/userController.js
+
 import ApiError from "../utils/ApiError.js";
 import ApiResponse from "../utils/ApiResponse.js";
 import User from "../models/userSchema.js";
 import { STATUS_CODES } from "../constants/statusCodes.js";
 import { MESSAGES } from "../constants/messages.js";
 import logger from "../utils/logger.js";
-import generateToken from "../utils/generateToken.js";
-
-import {
-  registerUserValidation,
-  updateUserProfileValidation,
-  loginUserValidation,
-} from "../validations/userValidation.js";
-
-/**
- * @desc    Register a new user
- * @route   POST /api/users/register
- * @access  Public
- */
-export const registerUser = asyncHandler(async (req, res) => {
-  // ✅ Validate request
-  const data = registerUserValidation.parse(req.body);
-
-  const existingUser = await User.findOne({ email: data.email });
-  if (existingUser) {
-    throw ApiError.conflict(MESSAGES.USER.ALREADY_EXISTS);
-  }
-
-  // Handle name splitting
-  const [first, ...last] = data.name.trim().split(" ");
-  const profilePicPath = req.file ? `/uploads/${req.file.filename}` : undefined;
-
-  const user = await User.create({
-    name: { first, last: last.join(" ") },
-    email: data.email,
-    password: data.password,
-    profilePic: profilePicPath,
-  });
-
-  const token = generateToken(user._id);
-
-  logger.info(`New user registered with email=${data.email}`);
-
-  res.status(STATUS_CODES.CREATED).json(
-    new ApiResponse(
-      STATUS_CODES.CREATED,
-      {
-        user: {
-          _id: user._id,
-          name: user.name,
-          email: user.email,
-          profilePic: user.profilePic,
-          role: user.role,
-          createdAt: user.createdAt,
-          updatedAt: user.updatedAt,
-        },
-        token,
-      },
-      MESSAGES.AUTH.REGISTER_SUCCESS
-    )
-  );
-});
-
-/**
- * @desc    Login user and get JWT
- * @route   POST /api/users/login
- * @access  Public
- */
-export const loginUser = asyncHandler(async (req, res) => {
-  // ✅ Validate request
-  const data = loginUserValidation.parse(req.body);
-
-  const user = await User.findOne({ email: data.email }).select(
-    "+password name email role status deleted"
-  );
-
-  if (!user) {
-    throw ApiError.unauthorized(MESSAGES.AUTH.LOGIN_FAIL);
-  }
-
-  if (user.deleted || user.status === "deleted") {
-    throw ApiError.unauthorized(MESSAGES.USER.NOT_FOUND);
-  }
-
-  if (!user.password) {
-    logger.error(`Login failed: Missing password in DB for user ${data.email}`);
-    throw ApiError.internal(MESSAGES.AUTH.PASSWORD_MISSING_IN_DB);
-  }
-
-  const isMatch = await bcrypt.compare(data.password, user.password);
-  if (!isMatch) {
-    throw ApiError.unauthorized(MESSAGES.AUTH.LOGIN_FAIL);
-  }
-
-  const token = generateToken(user._id);
-
-  logger.info(`User logged in with email=${data.email}`);
-
-  res.status(STATUS_CODES.OK).json(
-    new ApiResponse(
-      STATUS_CODES.OK,
-      {
-        user: {
-          _id: user._id,
-          name: user.name,
-          email: user.email,
-          role: user.role,
-          createdAt: user.createdAt,
-          updatedAt: user.updatedAt,
-        },
-        token,
-      },
-      MESSAGES.AUTH.LOGIN_SUCCESS
-    )
-  );
-});
 
 /**
  * @desc    Fetch the currently logged-in user's profile
  * @route   GET /api/users/profile
  * @access  Private
  */
-export const getUserProfile = asyncHandler(async (req, res) => {
+export const getUserProfile = async (req, res) => {
   const user = await User.findById(req.user._id).select("-password");
 
   if (!user) {
@@ -136,29 +26,27 @@ export const getUserProfile = asyncHandler(async (req, res) => {
     .json(
       new ApiResponse(STATUS_CODES.OK, user, MESSAGES.USER.PROFILE_FETCHED)
     );
-});
+};
 
 /**
  * @desc    Update the currently logged-in user's profile
  * @route   PUT /api/users/profile
  * @access  Private
  */
-export const updateUserProfile = asyncHandler(async (req, res) => {
-  const data = updateUserProfileValidation.parse(req.body);
-
+export const updateUserProfile = async (req, res) => {
   const user = await User.findById(req.user._id);
   if (!user) {
     throw ApiError.notFound(MESSAGES.USER.NOT_FOUND);
   }
 
-  if (data.name) {
-    const [first, ...last] = data.name.trim().split(" ");
+  if (req.body.name) {
+    const [first, ...last] = req.body.name.trim().split(" ");
     user.name.first = first || user.name.first;
     user.name.last = last.join(" ") || user.name.last;
   }
-  if (data.bio !== undefined) user.bio = data.bio;
-  if (data.phone !== undefined) user.phone = data.phone;
-  if (data.address !== undefined) user.addresses.push(data.address);
+  if (req.body.bio !== undefined) user.bio = req.body.bio;
+  if (req.body.phone !== undefined) user.phone = req.body.phone;
+  if (req.body.address !== undefined) user.addresses.push(req.body.address);
 
   await user.save();
 
@@ -169,14 +57,14 @@ export const updateUserProfile = asyncHandler(async (req, res) => {
     .json(
       new ApiResponse(STATUS_CODES.OK, user, MESSAGES.USER.PROFILE_UPDATED)
     );
-});
+};
 
 /**
  * @desc    Soft delete the currently logged-in user's account
  * @route   DELETE /api/users/profile
  * @access  Private
  */
-export const deleteUserProfile = asyncHandler(async (req, res) => {
+export const deleteUserProfile = async (req, res) => {
   const user = await User.findById(req.user._id);
 
   if (!user) {
@@ -195,14 +83,14 @@ export const deleteUserProfile = asyncHandler(async (req, res) => {
     .json(
       new ApiResponse(STATUS_CODES.OK, null, MESSAGES.USER.DELETED_SUCCESS)
     );
-});
+};
 
 /**
  * @desc    Fetch all non-deleted users (Admin only) with pagination
  * @route   GET /api/users
  * @access  Private/Admin
  */
-export const getAllUsers = asyncHandler(async (req, res) => {
+export const getAllUsers = async (req, res) => {
   const page = parseInt(req.query.page) || 1;
   const limit = parseInt(req.query.limit) || 20;
   const skip = (page - 1) * limit;
@@ -233,14 +121,14 @@ export const getAllUsers = asyncHandler(async (req, res) => {
       MESSAGES.USER.ALL_FETCHED
     )
   );
-});
+};
 
 /**
  * @desc    Fetch a specific user by ID (Admin only)
  * @route   GET /api/users/:id
  * @access  Private/Admin
  */
-export const getUserById = asyncHandler(async (req, res) => {
+export const getUserById = async (req, res) => {
   const user = await User.findById(req.params.id).select("-password");
 
   if (!user) {
@@ -252,14 +140,14 @@ export const getUserById = asyncHandler(async (req, res) => {
   res
     .status(STATUS_CODES.OK)
     .json(new ApiResponse(STATUS_CODES.OK, user, MESSAGES.USER.FETCHED));
-});
+};
 
 /**
  * @desc    Soft delete a specific user by ID (Admin only)
  * @route   DELETE /api/users/:id
  * @access  Private/Admin
  */
-export const deleteUserById = asyncHandler(async (req, res) => {
+export const deleteUserById = async (req, res) => {
   const user = await User.findById(req.params.id);
 
   if (!user) {
@@ -280,4 +168,4 @@ export const deleteUserById = asyncHandler(async (req, res) => {
     .json(
       new ApiResponse(STATUS_CODES.OK, null, MESSAGES.USER.DELETED_SUCCESS)
     );
-});
+};

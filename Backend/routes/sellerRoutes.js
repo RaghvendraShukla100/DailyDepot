@@ -10,58 +10,111 @@ import {
   getSellerById,
   removeSellerById,
 } from "../controllers/sellerController.js";
-import { protect, authorizeRoles } from "../middlewares/authMiddleware.js";
+import {
+  protect,
+  authorizeRoles,
+  attachSellerProfile,
+} from "../middlewares/authMiddleware.js";
 import { ROLES } from "../constants/roles.js";
+import validateRequest from "../middlewares/validateRequest.js";
+import upload from "../middlewares/uploadMiddleware.js";
+import asyncHandler from "../middlewares/asyncHandler.js";
+import {
+  createSellerValidation,
+  updateSellerValidation,
+} from "../validations/sellerValidation.js";
 
 const router = express.Router();
 
 /**
  * @route   POST /api/sellers
- * @desc    Create seller profile (must be protectd user)
+ * @desc    Create a seller profile for the authenticated user
  * @access  Private (User)
  */
-router.post("/", protect, authorizeRoles(ROLES.USER), createSeller);
+router.post(
+  "/",
+  protect,
+  authorizeRoles(ROLES.USER),
+  upload.single("shopLogo"),
+  validateRequest(createSellerValidation),
+  asyncHandler(createSeller)
+);
 
 /**
  * @route   GET /api/sellers/me
- * @desc    Get current seller profile
+ * @desc    Retrieve the authenticated seller's profile
  * @access  Private (Seller)
  */
-router.get("/me", protect, authorizeRoles(ROLES.SELLER), getSeller);
+router.get(
+  "/me",
+  protect,
+  authorizeRoles(ROLES.SELLER),
+  attachSellerProfile,
+  asyncHandler(getSeller)
+);
 
 /**
  * @route   PUT /api/sellers/me
- * @desc    Update current seller profile
+ * @desc    Update the authenticated seller's profile
  * @access  Private (Seller)
  */
-router.put("/me", protect, authorizeRoles(ROLES.SELLER), updateSeller);
+router.put(
+  "/me",
+  protect,
+  authorizeRoles(ROLES.SELLER),
+  attachSellerProfile,
+  upload.single("shopLogo"),
+  validateRequest(updateSellerValidation),
+  asyncHandler(updateSeller)
+);
 
 /**
  * @route   DELETE /api/sellers/me
- * @desc    Soft delete current seller profile
+ * @desc    Soft delete the authenticated seller's profile
  * @access  Private (Seller)
  */
-router.delete("/me", protect, authorizeRoles(ROLES.SELLER), removeSeller);
+router.delete(
+  "/me",
+  protect,
+  authorizeRoles(ROLES.SELLER),
+  attachSellerProfile,
+  asyncHandler(removeSeller)
+);
 
 /**
  * @route   GET /api/sellers
- * @desc    Get all sellers
+ * @desc    Retrieve all sellers (Admin only)
  * @access  Private (Admin)
  */
-router.get("/", protect, authorizeRoles(ROLES.ADMIN), getAllSellers);
+router.get(
+  "/",
+  protect,
+  authorizeRoles(ROLES.ADMIN),
+  asyncHandler(getAllSellers)
+);
 
 /**
  * @route   GET /api/sellers/:id
- * @desc    Get seller by ID
+ * @desc    Retrieve a seller by ID (Admin only)
  * @access  Private (Admin)
  */
-router.get("/:id", protect, authorizeRoles(ROLES.ADMIN), getSellerById);
+router.get(
+  "/:id",
+  protect,
+  authorizeRoles(ROLES.ADMIN),
+  asyncHandler(getSellerById)
+);
 
 /**
  * @route   DELETE /api/sellers/:id
- * @desc    Soft delete seller by ID
+ * @desc    Soft delete a seller by ID (Admin only)
  * @access  Private (Admin)
  */
-router.delete("/:id", protect, authorizeRoles(ROLES.ADMIN), removeSellerById);
+router.delete(
+  "/:id",
+  protect,
+  authorizeRoles(ROLES.ADMIN),
+  asyncHandler(removeSellerById)
+);
 
 export default router;

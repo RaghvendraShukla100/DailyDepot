@@ -1,4 +1,5 @@
-import asyncHandler from "../middlewares/asyncHandler.js";
+// /backend/controllers/sellerController.js
+
 import ApiError from "../utils/ApiError.js";
 import ApiResponse from "../utils/ApiResponse.js";
 import Seller from "../models/sellerSchema.js";
@@ -6,28 +7,27 @@ import User from "../models/userSchema.js";
 import { STATUS_CODES } from "../constants/statusCodes.js";
 import { MESSAGES } from "../constants/messages.js";
 import logger from "../utils/logger.js";
-import {
-  createSellerValidation,
-  updateSellerValidation,
-} from "../validations/sellerValidation.js";
+import { ROLES } from "../constants/roles.js";
 
 /**
  * @desc    Create seller profile (user must exist)
  * @route   POST /api/sellers
  * @access  Private
  */
-export const createSeller = asyncHandler(async (req, res) => {
-  const validatedData = createSellerValidation.parse(req.body);
-
+export const createSeller = async (req, res) => {
   const user = await User.findById(req.user._id);
   if (!user) throw ApiError.notFound(MESSAGES.USER.NOT_FOUND);
 
   const existingSeller = await Seller.findOne({ user: user._id });
   if (existingSeller) throw ApiError.conflict(MESSAGES.SELLER.ALREADY_EXISTS);
 
+  // Promote user to seller role
+  user.role = ROLES.SELLER;
+  await user.save();
+
   const seller = await Seller.create({
     user: user._id,
-    ...validatedData,
+    ...req.body,
   });
 
   logger.info(`Seller profile created for userId=${req.user._id}`);
@@ -41,14 +41,14 @@ export const createSeller = asyncHandler(async (req, res) => {
         MESSAGES.SELLER.CREATED_SUCCESS
       )
     );
-});
+};
 
 /**
  * @desc    Get current seller profile
  * @route   GET /api/sellers/me
  * @access  Private (Seller)
  */
-export const getSeller = asyncHandler(async (req, res) => {
+export const getSeller = async (req, res) => {
   const seller = await Seller.findOne({ user: req.user._id }).populate(
     "user",
     "-password"
@@ -63,19 +63,17 @@ export const getSeller = asyncHandler(async (req, res) => {
     .json(
       new ApiResponse(STATUS_CODES.OK, seller, MESSAGES.SELLER.FETCHED_SUCCESS)
     );
-});
+};
 
 /**
  * @desc    Update current seller profile
  * @route   PUT /api/sellers/me
  * @access  Private (Seller)
  */
-export const updateSeller = asyncHandler(async (req, res) => {
-  const validatedData = updateSellerValidation.parse(req.body);
-
+export const updateSeller = async (req, res) => {
   const seller = await Seller.findOneAndUpdate(
     { user: req.user._id },
-    validatedData,
+    req.body,
     { new: true, runValidators: true }
   );
 
@@ -88,14 +86,14 @@ export const updateSeller = asyncHandler(async (req, res) => {
     .json(
       new ApiResponse(STATUS_CODES.OK, seller, MESSAGES.SELLER.UPDATED_SUCCESS)
     );
-});
+};
 
 /**
  * @desc    Soft delete current seller profile
  * @route   DELETE /api/sellers/me
  * @access  Private (Seller)
  */
-export const removeSeller = asyncHandler(async (req, res) => {
+export const removeSeller = async (req, res) => {
   const seller = await Seller.findOneAndUpdate(
     { user: req.user._id },
     { status: "deleted", deleted: true, deletedAt: new Date() },
@@ -106,19 +104,27 @@ export const removeSeller = asyncHandler(async (req, res) => {
 
   logger.info(`Seller profile soft-deleted for userId=${req.user._id}`);
 
+  // Downgrade user role back to USER
+  const user = await User.findById(req.user._id);
+  if (user) {
+    user.role = ROLES.USER;
+    await user.save();
+    logger.info(`User role downgraded to USER for userId=${req.user._id}`);
+  }
+
   res
     .status(STATUS_CODES.OK)
     .json(
       new ApiResponse(STATUS_CODES.OK, seller, MESSAGES.SELLER.DELETED_SUCCESS)
     );
-});
+};
 
 /**
  * @desc    Get all sellers (Admin) with pagination
  * @route   GET /api/sellers
  * @access  Private (Admin)
  */
-export const getAllSellers = asyncHandler(async (req, res) => {
+export const getAllSellers = async (req, res) => {
   const page = parseInt(req.query.page) || 1;
   const limit = parseInt(req.query.limit) || 20;
   const skip = (page - 1) * limit;
@@ -149,14 +155,14 @@ export const getAllSellers = asyncHandler(async (req, res) => {
       MESSAGES.SELLER.ALL_FETCHED
     )
   );
-});
+};
 
 /**
  * @desc    Get seller by ID (Admin)
  * @route   GET /api/sellers/:id
  * @access  Private (Admin)
  */
-export const getSellerById = asyncHandler(async (req, res) => {
+export const getSellerById = async (req, res) => {
   const seller = await Seller.findById(req.params.id).populate(
     "user",
     "-password"
@@ -171,14 +177,14 @@ export const getSellerById = asyncHandler(async (req, res) => {
     .json(
       new ApiResponse(STATUS_CODES.OK, seller, MESSAGES.SELLER.FETCHED_SUCCESS)
     );
-});
+};
 
 /**
  * @desc    Delete seller by ID (Admin - soft delete)
  * @route   DELETE /api/sellers/:id
  * @access  Private (Admin)
  */
-export const removeSellerById = asyncHandler(async (req, res) => {
+export const removeSellerById = async (req, res) => {
   const seller = await Seller.findByIdAndUpdate(
     req.params.id,
     { status: "deleted", deleted: true, deletedAt: new Date() },
@@ -196,4 +202,4 @@ export const removeSellerById = asyncHandler(async (req, res) => {
     .json(
       new ApiResponse(STATUS_CODES.OK, seller, MESSAGES.SELLER.DELETED_SUCCESS)
     );
-});
+};

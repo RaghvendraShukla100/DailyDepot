@@ -2,8 +2,6 @@
 
 import express from "express";
 import {
-  registerUser,
-  loginUser,
   getUserProfile,
   updateUserProfile,
   deleteUserProfile,
@@ -11,6 +9,11 @@ import {
   getUserById,
   deleteUserById,
 } from "../controllers/userController.js";
+import {
+  registerUser,
+  loginUser,
+  logoutUser,
+} from "../controllers/authController.js";
 import { protect, authorizeRoles } from "../middlewares/authMiddleware.js";
 import { ROLES } from "../constants/roles.js";
 import upload from "../middlewares/uploadMiddleware.js";
@@ -25,7 +28,7 @@ import {
 const router = express.Router();
 
 /**
- * @route   POST /api/users/register
+ * @route   POST /api/auth/register
  * @desc    Register a new user
  * @access  Public
  */
@@ -37,7 +40,7 @@ router.post(
 );
 
 /**
- * @route   POST /api/users/login
+ * @route   POST /api/auth/login
  * @desc    Authenticate user and return JWT
  * @access  Public
  */

@@ -17,4 +17,4 @@ export const createAdminValidation = z.object({
 });
 
 // Update Admin Validation (partial for PATCH/PUT flexibility)
-export const updateAdminProfileValidation = createAdminValidation.partial();
+export const updateAdminValidation = createAdminValidation.partial();

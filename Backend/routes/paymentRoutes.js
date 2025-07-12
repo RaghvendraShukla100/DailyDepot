@@ -2,11 +2,11 @@
 
 import express from "express";
 import {
-  createPaymentController,
-  getPaymentsController,
-  getPaymentByIdController,
-  updatePaymentController,
-  softDeletePaymentController,
+  createPayment,
+  getPayments,
+  getPaymentById,
+  updatePayment,
+  softDeletePayment,
 } from "../controllers/paymentController.js";
 
 import { protect, authorizeRoles } from "../middlewares/authMiddleware.js";
@@ -27,7 +27,7 @@ router.post(
   "/",
   protect,
   validateResource(createPaymentValidation),
-  createPaymentController
+  createPayment
 );
 
 /**
@@ -35,14 +35,14 @@ router.post(
  * @desc    Get all payments (Admin sees all, User sees own)
  * @access  Auth (User/Admin)
  */
-router.get("/", protect, getPaymentsController);
+router.get("/", protect, getPayments);
 
 /**
  * @route   GET /api/payments/:id
  * @desc    Get payment by ID
  * @access  Auth (User/Admin)
  */
-router.get("/:id", protect, getPaymentByIdController);
+router.get("/:id", protect, getPaymentById);
 
 /**
  * @route   PUT /api/payments/:id
@@ -54,7 +54,7 @@ router.put(
   protect,
   authorizeRoles("admin"),
   validateResource(updatePaymentValidation),
-  updatePaymentController
+  updatePayment
 );
 
 /**
@@ -62,11 +62,6 @@ router.put(
  * @desc    Soft-delete a payment
  * @access  Admin
  */
-router.delete(
-  "/:id",
-  protect,
-  authorizeRoles("admin"),
-  softDeletePaymentController
-);
+router.delete("/:id", protect, authorizeRoles("admin"), softDeletePayment);
 
 export default router;

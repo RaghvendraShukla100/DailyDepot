@@ -2,9 +2,9 @@
 
 import express from "express";
 import {
-  createAnalyticsController,
-  getAnalyticsController,
-  deleteAnalyticsController,
+  createAnalytics,
+  getAnalytics,
+  deleteAnalytics,
 } from "../controllers/analyticsController.js";
 import { protect, authorizeRoles } from "../middlewares/authMiddleware.js";
 
@@ -18,7 +18,7 @@ const router = express.Router();
  * Allows the frontend to send analytics data for tracking user interactions,
  * device information, or behavioral events.
  */
-router.post("/", createAnalyticsController);
+router.post("/", createAnalytics);
 
 /**
  * @route   GET /api/analytics
@@ -27,7 +27,7 @@ router.post("/", createAnalyticsController);
  *
  * Enables admins to view collected analytics data for insights and monitoring.
  */
-router.get("/", protect, authorizeRoles("admin"), getAnalyticsController);
+router.get("/", protect, authorizeRoles("admin"), getAnalytics);
 
 /**
  * @route   DELETE /api/analytics/:id
@@ -36,11 +36,6 @@ router.get("/", protect, authorizeRoles("admin"), getAnalyticsController);
  *
  * Soft deletes an analytics entry while preserving its data for audit trails.
  */
-router.delete(
-  "/:id",
-  protect,
-  authorizeRoles("admin"),
-  deleteAnalyticsController
-);
+router.delete("/:id", protect, authorizeRoles("admin"), deleteAnalytics);
 
 export default router;

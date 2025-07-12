@@ -1,10 +1,10 @@
 import express from "express";
 import {
-  createInventoryController,
-  getInventoriesController,
-  getInventoryByIdController,
-  updateInventoryController,
-  deleteInventoryController,
+  createInventory,
+  getInventories,
+  getInventoryById,
+  updateInventory,
+  deleteInventory,
 } from "../controllers/inventoryController.js";
 
 import { protect, authorizeRoles } from "../middlewares/authMiddleware.js";
@@ -27,7 +27,7 @@ router.post(
   protect,
   authorizeRoles("admin", "seller"),
   validateResource(createInventoryValidation),
-  asyncHandler(createInventoryController)
+  asyncHandler(createInventory)
 );
 
 /**
@@ -39,7 +39,7 @@ router.get(
   "/",
   protect,
   authorizeRoles("admin", "seller"),
-  asyncHandler(getInventoriesController)
+  asyncHandler(getInventories)
 );
 
 /**
@@ -51,7 +51,7 @@ router.get(
   "/:id",
   protect,
   authorizeRoles("admin", "seller"),
-  asyncHandler(getInventoryByIdController)
+  asyncHandler(getInventoryById)
 );
 
 /**
@@ -64,7 +64,7 @@ router.put(
   protect,
   authorizeRoles("admin", "seller"),
   validateResource(updateInventoryValidation),
-  asyncHandler(updateInventoryController)
+  asyncHandler(updateInventory)
 );
 
 /**
@@ -76,7 +76,7 @@ router.delete(
   "/:id",
   protect,
   authorizeRoles("admin", "seller"),
-  asyncHandler(deleteInventoryController)
+  asyncHandler(deleteInventory)
 );
 
 export default router;

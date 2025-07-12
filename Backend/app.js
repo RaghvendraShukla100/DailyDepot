@@ -24,11 +24,11 @@ import orderRoutes from "./routes/orderRoutes.js";
 import wishlistRoutes from "./routes/wishlistRoutes.js";
 import cartRoutes from "./routes/cartRoutes.js";
 import reviewRoutes from "./routes/reviewRoutes.js";
-import notificationRoutes from "./routes/notificationRoutes.js";
 import paymentRoutes from "./routes/paymentRoutes.js";
 import analyticsRoutes from "./routes/analyticsRoutes.js";
 import couponRoutes from "./routes/couponRoutes.js";
 import categoryRoutes from "./routes/categoryRoutes.js";
+import notificationRoutes from "./routes/notificationRoutes.js";
 
 // ✅ Correctly define __dirname in ESM
 const __filename = fileURLToPath(import.meta.url);

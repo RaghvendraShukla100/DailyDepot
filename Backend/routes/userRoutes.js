@@ -9,46 +9,13 @@ import {
   getUserById,
   deleteUserById,
 } from "../controllers/userController.js";
-import {
-  registerUser,
-  loginUser,
-  logoutUser,
-} from "../controllers/authController.js";
 import { protect, authorizeRoles } from "../middlewares/authMiddleware.js";
 import { ROLES } from "../constants/roles.js";
-import upload from "../middlewares/uploadMiddleware.js";
 import validateRequest from "../middlewares/validateRequest.js";
 import asyncHandler from "../middlewares/asyncHandler.js";
-import {
-  registerUserValidation,
-  loginUserValidation,
-  updateUserProfileValidation,
-} from "../validations/userValidation.js";
+import { updateUserProfileValidation } from "../validations/userValidation.js";
 
 const router = express.Router();
-
-/**
- * @route   POST /api/auth/register
- * @desc    Register a new user
- * @access  Public
- */
-router.post(
-  "/register",
-  upload.single("profilePic"),
-  validateRequest(registerUserValidation),
-  asyncHandler(registerUser)
-);
-
-/**
- * @route   POST /api/auth/login
- * @desc    Authenticate user and return JWT
- * @access  Public
- */
-router.post(
-  "/login",
-  validateRequest(loginUserValidation),
-  asyncHandler(loginUser)
-);
 
 /**
  * @route   GET /api/users/profile

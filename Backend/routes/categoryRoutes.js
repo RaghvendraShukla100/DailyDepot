@@ -19,6 +19,7 @@ import {
   createCategoryValidation,
   updateCategoryValidation,
 } from "../validations/categoryValidation.js";
+import { ROLES } from "../constants/roles.js";
 
 const router = express.Router();
 
@@ -43,10 +44,10 @@ router.get("/:id", asyncHandler(getCategoryById));
  */
 router.post(
   "/",
-  protect, // Require authentication
-  authorizeRoles("admin"), // Require admin role
-  attachAdminProfile, // Attach admin profile if needed for auditing
-  validateResource(createCategoryValidation), // Validate request body
+  protect,
+  authorizeRoles(ROLES.ADMIN),
+  attachAdminProfile,
+  validateResource(createCategoryValidation),
   asyncHandler(createCategory)
 );
 
@@ -58,7 +59,7 @@ router.post(
 router.put(
   "/:id",
   protect,
-  authorizeRoles("admin"),
+  authorizeRoles(ROLES.ADMIN),
   attachAdminProfile,
   validateResource(updateCategoryValidation),
   asyncHandler(updateCategoryById)
@@ -72,7 +73,7 @@ router.put(
 router.delete(
   "/:id",
   protect,
-  authorizeRoles("admin"),
+  authorizeRoles(ROLES.ADMIN),
   attachAdminProfile,
   asyncHandler(deleteCategoryById)
 );

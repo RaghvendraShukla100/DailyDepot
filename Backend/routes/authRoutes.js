@@ -10,13 +10,13 @@ import {
   resetPassword,
   verifyEmail,
 } from "../controllers/authController.js";
-
 import validateRequest from "../middlewares/validateRequest.js";
 import {
   registerValidation,
   loginValidation,
 } from "../validations/authValidation.js";
 import { protect } from "../middlewares/authMiddleware.js";
+import { authLimiter } from "../middlewares/rateLimiter.js";
 
 const router = express.Router();
 
@@ -27,6 +27,7 @@ const router = express.Router();
  */
 router.post(
   "/register",
+  authLimiter,
   validateRequest(registerValidation),
   asyncHandler(registerUser)
 );
@@ -38,6 +39,7 @@ router.post(
  */
 router.post(
   "/login",
+  authLimiter,
   validateRequest(loginValidation),
   asyncHandler(loginUser)
 );
@@ -54,7 +56,11 @@ router.post("/logout", protect, asyncHandler(logoutUser));
  * @desc    Request password reset
  * @access  Public
  */
-router.post("/request-password-reset", asyncHandler(requestPasswordReset));
+router.post(
+  "/request-password-reset",
+  authLimiter,
+  asyncHandler(requestPasswordReset)
+);
 
 /**
  * @route   POST /api/auth/reset-password/:token

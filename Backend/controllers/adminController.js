@@ -1,12 +1,9 @@
 // /backend/controllers/adminController.js
 
-import ApiError from "../utils/ApiError.js";
+import * as adminService from "../services/adminService.js";
 import ApiResponse from "../utils/ApiResponse.js";
-import Admin from "../models/adminSchema.js";
-import User from "../models/userSchema.js";
 import { STATUS_CODES } from "../constants/statusCodes.js";
 import { MESSAGES } from "../constants/messages.js";
-import { ROLES } from "../constants/roles.js";
 import logger from "../utils/logger.js";
 
 /**
@@ -15,27 +12,9 @@ import logger from "../utils/logger.js";
  * @access  Private (User creating admin profile)
  */
 export const createAdmin = async (req, res) => {
-  const validatedData = req.validatedData;
+  const admin = await adminService.createAdmin(req.user._id, req.validatedData);
 
-  const user = await User.findById(req.user._id);
-  if (!user) throw ApiError.notFound(MESSAGES.USER.NOT_FOUND);
-
-  const existingAdmin = await Admin.findOne({ user: user._id });
-  if (existingAdmin) throw ApiError.conflict(MESSAGES.ADMIN.ALREADY_EXISTS);
-
-  // Update user role to ADMIN
-  user.role = ROLES.ADMIN;
-  await user.save();
-
-  const admin = await Admin.create({
-    user: user._id,
-    ...validatedData,
-    role: ROLES.ADMIN,
-  });
-
-  logger.info(
-    `Admin profile created for userId=${req.user._id}, role updated to ADMIN`
-  );
+  logger.info(`Admin profile created for userId=${req.user._id}`);
 
   res
     .status(STATUS_CODES.CREATED)
@@ -54,12 +33,7 @@ export const createAdmin = async (req, res) => {
  * @access  Private (Admin)
  */
 export const getAdmin = async (req, res) => {
-  const admin = await Admin.findOne({ user: req.user._id }).populate(
-    "user",
-    "-password"
-  );
-
-  if (!admin) throw ApiError.notFound(MESSAGES.ADMIN.NOT_FOUND);
+  const admin = await adminService.getAdminProfile(req.user._id);
 
   logger.info(`Admin profile fetched for userId=${req.user._id}`);
 
@@ -76,15 +50,10 @@ export const getAdmin = async (req, res) => {
  * @access  Private (Admin)
  */
 export const updateAdmin = async (req, res) => {
-  const validatedData = req.validatedData;
-
-  const admin = await Admin.findOneAndUpdate(
-    { user: req.user._id },
-    validatedData,
-    { new: true, runValidators: true }
+  const admin = await adminService.updateAdminProfile(
+    req.user._id,
+    req.validatedData
   );
-
-  if (!admin) throw ApiError.notFound(MESSAGES.ADMIN.NOT_FOUND);
 
   logger.info(`Admin profile updated for userId=${req.user._id}`);
 
@@ -101,18 +70,10 @@ export const updateAdmin = async (req, res) => {
  * @access  Private (Admin)
  */
 export const removeAdmin = async (req, res) => {
-  const admin = await Admin.findOneAndUpdate(
-    { user: req.user._id },
-    { status: "deleted", deleted: true, deletedAt: new Date() },
-    { new: true }
-  );
-
-  if (!admin) throw ApiError.notFound(MESSAGES.ADMIN.NOT_FOUND);
-
-  await User.findByIdAndUpdate(req.user._id, { role: ROLES.USER });
+  await adminService.softDeleteAdmin(req.user._id);
 
   logger.info(
-    `Admin profile soft-deleted and role reset to USER for userId=${req.user._id}`
+    `Admin profile soft-deleted and role reset for userId=${req.user._id}`
   );
 
   res
@@ -128,21 +89,13 @@ export const removeAdmin = async (req, res) => {
  * @access  Private/Admin
  */
 export const getAllAdmins = async (req, res) => {
-  const page = parseInt(req.query.page) || 1;
-  const limit = parseInt(req.query.limit) || 20;
-  const skip = (page - 1) * limit;
-
-  const [admins, total] = await Promise.all([
-    Admin.find({ deleted: { $ne: true } })
-      .populate("user", "-password")
-      .skip(skip)
-      .limit(limit)
-      .sort({ createdAt: -1 }),
-    Admin.countDocuments({ deleted: { $ne: true } }),
-  ]);
+  const { admins, page, limit, total } = await adminService.getAllAdmins(
+    req.query.page,
+    req.query.limit
+  );
 
   logger.info(
-    `Admin userId=${req.user._id} fetched admins page=${page} limit=${limit}`
+    `Admin userId=${req.user._id} fetched all admins page=${page} limit=${limit}`
   );
 
   res.status(STATUS_CODES.OK).json(
@@ -166,12 +119,7 @@ export const getAllAdmins = async (req, res) => {
  * @access  Private/Admin
  */
 export const getAdminById = async (req, res) => {
-  const admin = await Admin.findById(req.params.id).populate(
-    "user",
-    "-password"
-  );
-
-  if (!admin) throw ApiError.notFound(MESSAGES.ADMIN.NOT_FOUND);
+  const admin = await adminService.getAdminById(req.params.id);
 
   logger.info(`Admin userId=${req.user._id} fetched adminId=${req.params.id}`);
 
@@ -188,18 +136,10 @@ export const getAdminById = async (req, res) => {
  * @access  Private/Admin
  */
 export const removeAdminById = async (req, res) => {
-  const admin = await Admin.findByIdAndUpdate(
-    req.params.id,
-    { status: "deleted", deleted: true, deletedAt: new Date() },
-    { new: true }
-  );
-
-  if (!admin) throw ApiError.notFound(MESSAGES.ADMIN.NOT_FOUND);
-
-  await User.findByIdAndUpdate(admin.user, { role: ROLES.USER });
+  await adminService.softDeleteAdminById(req.params.id);
 
   logger.info(
-    `Admin userId=${req.user._id} soft-deleted adminId=${req.params.id} and role reset to USER`
+    `Admin userId=${req.user._id} soft-deleted adminId=${req.params.id}`
   );
 
   res

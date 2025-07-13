@@ -14,14 +14,16 @@ import { MESSAGES } from "../constants/messages.js";
 export const registerUser = async (req, res) => {
   const { userData, sellerData, adminData } = req.body;
 
+  let effectiveUserData = userData || req.body; // allow fallback
+
   let result;
 
-  if (userData && sellerData) {
-    result = await authService.registerSeller(userData, sellerData);
-  } else if (userData && adminData) {
-    result = await authService.registerAdmin(userData, adminData);
-  } else if (userData) {
-    result = await authService.registerUser(userData);
+  if (effectiveUserData && sellerData) {
+    result = await authService.registerSeller(effectiveUserData, sellerData);
+  } else if (effectiveUserData && adminData) {
+    result = await authService.registerAdmin(effectiveUserData, adminData);
+  } else if (effectiveUserData) {
+    result = await authService.registerUser(effectiveUserData);
   } else {
     throw new ApiError(STATUS_CODES.BAD_REQUEST, MESSAGES.GENERAL.BAD_REQUEST);
   }

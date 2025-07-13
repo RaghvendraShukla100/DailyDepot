@@ -114,3 +114,54 @@ export const removeSellerById = async (req, res) => {
       new ApiResponse(STATUS_CODES.OK, seller, MESSAGES.SELLER.DELETED_SUCCESS)
     );
 };
+
+/**
+ * @desc Fetch all orders for the seller
+ * @route GET /api/sellers/orders
+ * @access Private (Admin)
+ */
+
+export const getSellerOrders = async (req, res) => {
+  const orders = await sellerService.getSellerOrders(req.user._id);
+  res
+    .status(STATUS_CODES.OK)
+    .json(
+      new ApiResponse(STATUS_CODES.OK, orders, MESSAGES.ORDER.FETCHED_SUCCESS)
+    );
+};
+/**
+ * @desc Fetch all orders for the seller
+ * @route GET /api/sellers/products
+ * @access Private (Admin)
+ */
+
+export const getSellerProducts = async (req, res) => {
+  const products = await sellerService.getSellerProducts(req.user._id);
+  res
+    .status(STATUS_CODES.OK)
+    .json(
+      new ApiResponse(
+        STATUS_CODES.OK,
+        products,
+        MESSAGES.PRODUCT.FETCHED_SUCCESS
+      )
+    );
+};
+/**
+ * @desc Fetch all the sellers analytics for the seller
+ * @route GET /api/sellers/analytics
+ * @access Private (Admin)
+ */
+
+export const getSellerAnalytics = async (req, res) => {
+  const analytics = await sellerService.getSellerOrders(req.user._id);
+  res
+    .status(STATUS_CODES.OK)
+    .json(
+      new ApiResponse(
+        STATUS_CODES.OK,
+        analytics,
+        MESSAGES.ANALYTICS.FETCHED_SUCCESS
+      )
+    );
+};

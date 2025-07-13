@@ -9,6 +9,9 @@ import {
   getAllSellers,
   getSellerById,
   removeSellerById,
+  getSellerAnalytics,
+  getSellerOrders,
+  getSellerProducts,
 } from "../controllers/sellerController.js";
 import {
   protect,
@@ -115,6 +118,45 @@ router.delete(
   protect,
   authorizeRoles(ROLES.ADMIN),
   asyncHandler(removeSellerById)
+);
+
+/**
+ * @route   GET /api/sellers/me/orders
+ * @desc    Retrieve all the seller's orders
+ * @access  Private (Seller)
+ */
+router.get(
+  "/me/orders",
+  protect,
+  authorizeRoles(ROLES.SELLER),
+  attachSellerProfile,
+  asyncHandler(getSellerOrders)
+);
+
+/**
+ * @route   GET /api/sellers/me/products
+ * @desc    Retrieve all the seller's products
+ * @access  Private (Seller)
+ */
+router.get(
+  "/me/products",
+  protect,
+  authorizeRoles(ROLES.SELLER),
+  attachSellerProfile,
+  asyncHandler(getSellerProducts)
+);
+
+/**
+ * @route   GET /api/sellers/me/analytics
+ * @desc    Retrieve all the seller's analytics
+ * @access  Private (Seller)
+ */
+router.get(
+  "/me/analytics",
+  protect,
+  authorizeRoles(ROLES.SELLER),
+  attachSellerProfile,
+  asyncHandler(getSellerAnalytics)
 );
 
 export default router;

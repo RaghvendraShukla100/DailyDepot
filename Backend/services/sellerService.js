@@ -1,4 +1,6 @@
 import Seller from "../models/sellerSchema.js";
+import Order from "../models/orderSchema.js";
+import Product from "../models/productSchema.js";
 import User from "../models/userSchema.js";
 import ApiError from "../utils/ApiError.js";
 import { MESSAGES } from "../constants/messages.js";
@@ -129,4 +131,39 @@ export const softDeleteSellerById = async (sellerId) => {
   if (!seller) throw ApiError.notFound(MESSAGES.SELLER.NOT_FOUND);
   logger.info(`Seller profile soft-deleted for sellerId=${sellerId}`);
   return seller;
+};
+
+/**
+ * Fetch all orders for the seller
+ */
+export const getSellerOrders = async (sellerId) => {
+  const orders = await Order.find({ seller: sellerId });
+  return orders;
+};
+
+/**
+ * Fetch all products for the seller
+ */
+export const getSellerProducts = async (sellerId) => {
+  const products = await Product.find({ seller: sellerId });
+  return products;
+};
+
+/**
+ * Fetch seller analytics
+ */
+export const getSellerAnalytics = async (sellerId) => {
+  const ordersCount = await Order.countDocuments({ seller: sellerId });
+  const productsCount = await Product.countDocuments({ seller: sellerId });
+  const totalSalesAgg = await Order.aggregate([
+    { $match: { seller: sellerId } },
+    { $group: { _id: null, total: { $sum: "$totalPrice" } } },
+  ]);
+  const totalSales = totalSalesAgg[0]?.total || 0;
+
+  return {
+    ordersCount,
+    productsCount,
+    totalSales,
+  };
 };

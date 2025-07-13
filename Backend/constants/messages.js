@@ -92,6 +92,7 @@ export const MESSAGES = Object.freeze({
   PRODUCT: {
     NOT_FOUND: "Product not found.",
     OUT_OF_STOCK: "Insufficient stock for product.",
+    FETCHED_SUCCESS: "Products data retrieved successfully.",
   },
 
   ANALYTICS: {

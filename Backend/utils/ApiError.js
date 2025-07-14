@@ -21,7 +21,7 @@ class ApiError extends Error {
    * @param {Array|Object|string} validationErrors - Validation error(s).
    */
   static validationError(validationErrors) {
-    return new ApiError(400, "Validation Failed", validationErrors);
+    return new ApiError(400, "Validation failed", validationErrors);
   }
 
   /**
@@ -45,7 +45,7 @@ class ApiError extends Error {
    * @param {string} resource - The name of the missing resource.
    */
   static notFound(resource = "Resource") {
-    return new ApiError(404, `${resource} not found.`);
+    return new ApiError(404, `${resource} not found`);
   }
 
   /**
@@ -60,7 +60,7 @@ class ApiError extends Error {
    * Factory method for internal server errors.
    * @param {string} message - Optional custom message.
    */
-  static internal(message = "Internal Server Error") {
+  static internal(message = "Internal server error") {
     return new ApiError(500, message);
   }
 }

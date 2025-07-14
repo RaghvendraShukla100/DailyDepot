@@ -31,7 +31,13 @@ export const MESSAGES = Object.freeze({
   ADMIN: {
     NOT_FOUND: "Admin not found.",
   },
-
+  ADDRESS: {
+    ALL_FETCHED: "All addresses fetched successfully",
+    FETCHED: "Address fetched successfully",
+    CREATED: "Address created successfully",
+    UPDATED: "Address updated successfully",
+    DELETED: "Address deleted successfully",
+  },
   PAYMENT: {
     CREATED_SUCCESS: "Payment recorded successfully.",
     FETCHED_SUCCESS: "Payments fetched successfully.",

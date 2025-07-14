@@ -12,8 +12,18 @@ const validateRequest = (schema) => (req, res, next) => {
     next();
   } catch (error) {
     if (error instanceof ZodError) {
-      const message = error.errors.map((err) => err.message).join(", ");
-      return next(new ApiError(message, STATUS_CODES.BAD_REQUEST));
+      const formattedErrors = error.errors.map((err) => ({
+        path: err.path.join("."),
+        message: err.message,
+      }));
+
+      return next(
+        new ApiError(
+          STATUS_CODES.BAD_REQUEST,
+          "Validation failed",
+          formattedErrors
+        )
+      );
     }
     next(error);
   }

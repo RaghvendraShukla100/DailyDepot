@@ -1,7 +1,4 @@
-// /backend/controllers/addressController.js
-
-import Address from "../models/addressSchema.js";
-import ApiError from "../utils/ApiError.js";
+import * as addressService from "../services/addressService.js";
 import ApiResponse from "../utils/ApiResponse.js";
 import { STATUS_CODES } from "../constants/statusCodes.js";
 import { MESSAGES } from "../constants/messages.js";
@@ -10,11 +7,7 @@ import { MESSAGES } from "../constants/messages.js";
 // @route   POST /api/addresses
 // @access  Private
 export const createAddress = async (req, res) => {
-  const address = await Address.create({
-    ...req.body,
-    user: req.user._id,
-  });
-
+  const address = await addressService.createAddress(req.user._id, req.body);
   res
     .status(STATUS_CODES.CREATED)
     .json(
@@ -26,11 +19,7 @@ export const createAddress = async (req, res) => {
 // @route   GET /api/addresses
 // @access  Private
 export const getAddresses = async (req, res) => {
-  const addresses = await Address.find({
-    user: req.user._id,
-    deleted: false,
-  });
-
+  const addresses = await addressService.getAddresses(req.user._id);
   res
     .status(STATUS_CODES.OK)
     .json(
@@ -42,16 +31,10 @@ export const getAddresses = async (req, res) => {
 // @route   GET /api/addresses/:id
 // @access  Private
 export const getAddressById = async (req, res) => {
-  const address = await Address.findOne({
-    _id: req.params.id,
-    user: req.user._id,
-    deleted: false,
-  });
-
-  if (!address) {
-    throw ApiError.notFound(MESSAGES.ADDRESS.NOT_FOUND);
-  }
-
+  const address = await addressService.getAddressById(
+    req.user._id,
+    req.params.id
+  );
   res
     .status(STATUS_CODES.OK)
     .json(new ApiResponse(STATUS_CODES.OK, address, MESSAGES.ADDRESS.FETCHED));
@@ -61,16 +44,11 @@ export const getAddressById = async (req, res) => {
 // @route   PUT /api/addresses/:id
 // @access  Private
 export const updateAddress = async (req, res) => {
-  const address = await Address.findOneAndUpdate(
-    { _id: req.params.id, user: req.user._id, deleted: false },
-    req.body,
-    { new: true, runValidators: true }
+  const address = await addressService.updateAddress(
+    req.user._id,
+    req.params.id,
+    req.body
   );
-
-  if (!address) {
-    throw ApiError.notFound(MESSAGES.ADDRESS.NOT_FOUND);
-  }
-
   res
     .status(STATUS_CODES.OK)
     .json(new ApiResponse(STATUS_CODES.OK, address, MESSAGES.ADDRESS.UPDATED));
@@ -80,16 +58,7 @@ export const updateAddress = async (req, res) => {
 // @route   DELETE /api/addresses/:id
 // @access  Private
 export const deleteAddress = async (req, res) => {
-  const address = await Address.findOneAndUpdate(
-    { _id: req.params.id, user: req.user._id, deleted: false },
-    { deleted: true, deletedAt: new Date() },
-    { new: true }
-  );
-
-  if (!address) {
-    throw ApiError.notFound(MESSAGES.ADDRESS.NOT_FOUND);
-  }
-
+  await addressService.deleteAddress(req.user._id, req.params.id);
   res
     .status(STATUS_CODES.OK)
     .json(new ApiResponse(STATUS_CODES.OK, null, MESSAGES.ADDRESS.DELETED));

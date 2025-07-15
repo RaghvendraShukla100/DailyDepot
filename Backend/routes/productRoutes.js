@@ -1,5 +1,3 @@
-// /backend/routes/productRoutes.js
-
 import express from "express";
 import {
   createProduct,
@@ -10,7 +8,7 @@ import {
 } from "../controllers/productController.js";
 import { protect, authorizeRoles } from "../middlewares/authMiddleware.js";
 import upload from "../middlewares/uploadMiddleware.js";
-import validateRequest from "../middlewares/validateRequest.js";
+import validateResource from "../middlewares/validateResource.js";
 import asyncHandler from "../middlewares/asyncHandler.js";
 import {
   createProductValidation,
@@ -30,7 +28,7 @@ router.post(
   protect,
   authorizeRoles(ROLES.SELLER, ROLES.ADMIN),
   upload.array("media", 10),
-  validateRequest(createProductValidation),
+  validateResource(createProductValidation),
   asyncHandler(createProduct)
 );
 
@@ -58,7 +56,7 @@ router.put(
   protect,
   authorizeRoles(ROLES.SELLER, ROLES.ADMIN),
   upload.array("media", 10),
-  validateRequest(updateProductValidation),
+  validateResource(updateProductValidation),
   asyncHandler(updateProduct)
 );
 

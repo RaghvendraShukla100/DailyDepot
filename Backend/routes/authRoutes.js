@@ -1,5 +1,3 @@
-// /backend/routes/authRoutes.js
-
 import express from "express";
 import asyncHandler from "../middlewares/asyncHandler.js";
 import {
@@ -10,7 +8,7 @@ import {
   resetPassword,
   verifyEmail,
 } from "../controllers/authController.js";
-import validateRequest from "../middlewares/validateRequest.js";
+import validateResource from "../middlewares/validateResource.js";
 import {
   registerValidation,
   loginValidation,
@@ -28,7 +26,7 @@ const router = express.Router();
 router.post(
   "/register",
   authLimiter,
-  validateRequest(registerValidation),
+  validateResource(registerValidation),
   asyncHandler(registerUser)
 );
 
@@ -40,7 +38,7 @@ router.post(
 router.post(
   "/login",
   authLimiter,
-  validateRequest(loginValidation),
+  validateResource(loginValidation),
   asyncHandler(loginUser)
 );
 

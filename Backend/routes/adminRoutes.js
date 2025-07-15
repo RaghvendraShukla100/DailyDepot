@@ -1,5 +1,3 @@
-// /backend/routes/adminRoutes.js
-
 import express from "express";
 import {
   createAdmin,
@@ -16,9 +14,10 @@ import {
   attachAdminProfile,
 } from "../middlewares/authMiddleware.js";
 import { ROLES } from "../constants/roles.js";
-import validateRequest from "../middlewares/validateRequest.js";
+import validateResource from "../middlewares/validateResource.js";
 import upload from "../middlewares/uploadMiddleware.js";
 import asyncHandler from "../middlewares/asyncHandler.js";
+import checkPermissions from "../middlewares/checkPermissions.js";
 import {
   createAdminValidation,
   updateAdminValidation,
@@ -30,13 +29,15 @@ const router = express.Router();
  * @route   POST /api/admins
  * @desc    Create an admin profile for the authenticated user
  * @access  Private (User)
+ * @permission manage_admins
  */
 router.post(
   "/",
   protect,
   authorizeRoles(ROLES.USER),
+  checkPermissions("manage_admins"),
   upload.single("profilePic"),
-  validateRequest(createAdminValidation),
+  validateResource(createAdminValidation),
   asyncHandler(createAdmin)
 );
 
@@ -44,11 +45,13 @@ router.post(
  * @route   GET /api/admins/me
  * @desc    Retrieve the authenticated admin's profile
  * @access  Private (Admin)
+ * @permission read_admins
  */
 router.get(
   "/me",
   protect,
-  authorizeRoles(ROLES.ADMIN),
+  authorizeRoles(ROLES.ADMIN, ROLES.SUPERADMIN),
+  checkPermissions("read_admins"),
   attachAdminProfile,
   asyncHandler(getAdmin)
 );
@@ -57,14 +60,16 @@ router.get(
  * @route   PUT /api/admins/me
  * @desc    Update the authenticated admin's profile
  * @access  Private (Admin)
+ * @permission manage_admins
  */
 router.put(
   "/me",
   protect,
-  authorizeRoles(ROLES.ADMIN),
+  authorizeRoles(ROLES.ADMIN, ROLES.SUPERADMIN),
+  checkPermissions("manage_admins"),
   attachAdminProfile,
   upload.single("profilePic"),
-  validateRequest(updateAdminValidation),
+  validateResource(updateAdminValidation),
   asyncHandler(updateAdmin)
 );
 
@@ -72,48 +77,56 @@ router.put(
  * @route   DELETE /api/admins/me
  * @desc    Soft delete the authenticated admin's profile
  * @access  Private (Admin)
+ * @permission manage_admins
  */
 router.delete(
   "/me",
   protect,
-  authorizeRoles(ROLES.ADMIN),
+  authorizeRoles(ROLES.ADMIN, ROLES.SUPERADMIN),
+  checkPermissions("manage_admins"),
   attachAdminProfile,
   asyncHandler(removeAdmin)
 );
 
 /**
  * @route   GET /api/admins
- * @desc    Retrieve all admins (Admin only)
- * @access  Private (Admin)
+ * @desc    Retrieve all admins
+ * @access  Private (Superadmin)
+ * @permission manage_admins
  */
 router.get(
   "/",
   protect,
-  authorizeRoles(ROLES.ADMIN),
+  authorizeRoles(ROLES.SUPERADMIN),
+  checkPermissions("manage_admins"),
   asyncHandler(getAllAdmins)
 );
 
 /**
  * @route   GET /api/admins/:id
- * @desc    Retrieve an admin by ID (Admin only)
- * @access  Private (Admin)
+ * @desc    Retrieve an admin by ID
+ * @access  Private (Superadmin)
+ * @permission manage_admins
  */
 router.get(
   "/:id",
   protect,
-  authorizeRoles(ROLES.ADMIN),
+  authorizeRoles(ROLES.SUPERADMIN),
+  checkPermissions("manage_admins"),
   asyncHandler(getAdminById)
 );
 
 /**
  * @route   DELETE /api/admins/:id
- * @desc    Soft delete an admin by ID (Admin only)
- * @access  Private (Admin)
+ * @desc    Soft delete an admin by ID
+ * @access  Private (Superadmin)
+ * @permission manage_admins
  */
 router.delete(
   "/:id",
   protect,
-  authorizeRoles(ROLES.ADMIN),
+  authorizeRoles(ROLES.SUPERADMIN),
+  checkPermissions("manage_admins"),
   asyncHandler(removeAdminById)
 );
 

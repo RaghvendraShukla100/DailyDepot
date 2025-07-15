@@ -1,5 +1,3 @@
-// /backend/routes/sellerRoutes.js
-
 import express from "express";
 import {
   createSeller,
@@ -19,7 +17,7 @@ import {
   attachSellerProfile,
 } from "../middlewares/authMiddleware.js";
 import { ROLES } from "../constants/roles.js";
-import validateRequest from "../middlewares/validateRequest.js";
+import validateResource from "../middlewares/validateResource.js";
 import upload from "../middlewares/uploadMiddleware.js";
 import asyncHandler from "../middlewares/asyncHandler.js";
 import {
@@ -39,7 +37,7 @@ router.post(
   protect,
   authorizeRoles(ROLES.USER),
   upload.single("shopLogo"),
-  validateRequest(createSellerValidation),
+  validateResource(createSellerValidation),
   asyncHandler(createSeller)
 );
 
@@ -67,7 +65,7 @@ router.put(
   authorizeRoles(ROLES.SELLER),
   attachSellerProfile,
   upload.single("shopLogo"),
-  validateRequest(updateSellerValidation),
+  validateResource(updateSellerValidation),
   asyncHandler(updateSeller)
 );
 

@@ -1,82 +1,72 @@
-// /backend/routes/couponRoutes.js
-
 import express from "express";
 import asyncHandler from "../middlewares/asyncHandler.js";
 import {
-  createCoupon,
-  getAllCoupons,
-  getCouponById,
-  updateCouponById,
-  deleteCouponById,
-} from "../controllers/couponController.js";
-
-import {
-  protect,
-  authorizeRoles,
-  attachAdminProfile,
-} from "../middlewares/authMiddleware.js";
-
+  createBrand,
+  getBrands,
+  getBrandById,
+  updateBrand,
+  deleteBrand,
+} from "../controllers/brandController.js";
+import { protect, authorizeRoles } from "../middlewares/authMiddleware.js";
+import { ROLES } from "../constants/roles.js";
 import validateResource from "../middlewares/validateResource.js";
 import {
-  createCouponValidation,
-  updateCouponValidation,
-} from "../validations/couponValidation.js";
+  createBrandValidation,
+  updateBrandValidation,
+} from "../validations/brandValidation.js";
 
 const router = express.Router();
 
 /**
- * @route   GET /api/coupons
- * @desc    Public - View all coupons
+ * @route   GET /api/brands
+ * @desc    Retrieve all brands
  * @access  Public
  */
-router.get("/", asyncHandler(getAllCoupons));
+router.get("/", asyncHandler(getBrands));
 
 /**
- * @route   GET /api/coupons/:id
- * @desc    Public - View a single coupon by ID
+ * @route   GET /api/brands/:id
+ * @desc    Retrieve a brand by ID
  * @access  Public
  */
-router.get("/:id", asyncHandler(getCouponById));
+router.get("/:id", asyncHandler(getBrandById));
 
 /**
- * @route   POST /api/coupons
- * @desc    Admin - Create a new coupon
- * @access  Private/Admin
+ * @route   POST /api/brands
+ * @desc    Create a new brand
+ * @access  Private (Admin)
  */
 router.post(
   "/",
   protect,
-  authorizeRoles("admin"),
-  attachAdminProfile,
-  validateResource(createCouponValidation),
-  asyncHandler(createCoupon)
+  authorizeRoles(ROLES.ADMIN),
+  validateResource(createBrandValidation),
+  asyncHandler(createBrand)
 );
 
 /**
- * @route   PUT /api/coupons/:id
- * @desc    Admin - Update a coupon by ID
- * @access  Private/Admin
+ * @route   PUT /api/brands/:id
+ * @desc    Update a brand by ID
+ * @access  Private (Admin)
  */
 router.put(
   "/:id",
   protect,
-  authorizeRoles("admin"),
-  attachAdminProfile,
-  validateResource(updateCouponValidation),
-  asyncHandler(updateCouponById)
+  authorizeRoles(ROLES.ADMIN),
+  validateResource(updateBrandValidation),
+  asyncHandler(updateBrand)
 );
 
 /**
- * @route   DELETE /api/coupons/:id
- * @desc    Admin - Soft delete a coupon by ID
- * @access  Private/Admin
+ * @route   DELETE /api/brands/:id
+ * @desc    Soft delete a brand by ID
+ * @access  Private (Admin)
  */
 router.delete(
   "/:id",
   protect,
-  authorizeRoles("admin"),
-  attachAdminProfile,
-  asyncHandler(deleteCouponById)
+  authorizeRoles(ROLES.ADMIN),
+  asyncHandler(deleteBrand)
 );
 
 export default router;

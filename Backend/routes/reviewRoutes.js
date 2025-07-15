@@ -1,5 +1,3 @@
-// /backend/routes/reviewRoutes.js
-
 import express from "express";
 import asyncHandler from "../middlewares/asyncHandler.js";
 import {
@@ -11,7 +9,7 @@ import {
 } from "../controllers/reviewController.js";
 
 import { protect } from "../middlewares/authMiddleware.js";
-import validateRequest from "../middlewares/validateRequest.js";
+import validateResource from "../middlewares/validateResource.js";
 import {
   createReviewValidation,
   updateReviewValidation,
@@ -41,7 +39,7 @@ router.get("/:id", asyncHandler(getReviewById));
 router.post(
   "/",
   protect,
-  validateRequest(createReviewValidation),
+  validateResource(createReviewValidation),
   asyncHandler(createReview)
 );
 
@@ -53,7 +51,7 @@ router.post(
 router.put(
   "/:id",
   protect,
-  validateRequest(updateReviewValidation),
+  validateResource(updateReviewValidation),
   asyncHandler(updateReview)
 );
 

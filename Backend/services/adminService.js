@@ -1,22 +1,32 @@
-// /backend/services/adminService.js
-
 import User from "../models/userSchema.js";
 import Seller from "../models/sellerSchema.js";
 import Admin from "../models/adminSchema.js";
 import ApiError from "../utils/ApiError.js";
 import { MESSAGES } from "../constants/messages.js";
 import logger from "../utils/logger.js";
+import mongoose from "mongoose";
 
 /**
  * Fetches all admin profiles with user details.
  */
-export const getAllAdmins = async () => {
-  const admins = await Admin.find({ deleted: { $ne: true } }).populate(
-    "user",
-    "-password"
-  );
-  logger.info(`All admins fetched`, { count: admins.length });
-  return admins;
+export const getAllAdmins = async (page = 1, limit = 10) => {
+  page = parseInt(page) || 1;
+  limit = parseInt(limit) || 10;
+
+  const skip = (page - 1) * limit;
+
+  const [admins, total] = await Promise.all([
+    Admin.find({ deleted: { $ne: true } })
+      .populate("user", "-password")
+      .skip(skip)
+      .limit(limit)
+      .sort({ createdAt: -1 }),
+    Admin.countDocuments({ deleted: { $ne: true } }),
+  ]);
+
+  logger.info(`Admins fetched`, { count: admins.length, page, limit, total });
+
+  return { admins, page, limit, total };
 };
 
 /**
@@ -33,7 +43,8 @@ export const createAdmin = async (userId, adminData) => {
   await user.save();
 
   const admin = await Admin.create({ user: user._id, ...adminData });
-  logger.info(`Admin created for userId=${userId}`);
+  logger.info(`Admin created for user`, { userId, adminId: admin._id });
+
   return admin;
 };
 
@@ -41,12 +52,12 @@ export const createAdmin = async (userId, adminData) => {
  * Fetches an admin profile by userId.
  */
 export const getAdminByUserId = async (userId) => {
-  const admin = await Admin.findOne({ user: userId }).populate(
-    "user",
-    "-password"
-  );
+  const admin = await Admin.findOne({
+    user: userId,
+    deleted: { $ne: true },
+  }).populate("user", "-password");
   if (!admin) throw ApiError.notFound(MESSAGES.ADMIN.NOT_FOUND);
-  logger.info(`Admin fetched for userId=${userId}`);
+  logger.info(`Admin fetched`, { userId });
   return admin;
 };
 
@@ -54,53 +65,82 @@ export const getAdminByUserId = async (userId) => {
  * Updates an admin profile by userId.
  */
 export const updateAdminByUserId = async (userId, updateData) => {
-  const admin = await Admin.findOneAndUpdate({ user: userId }, updateData, {
-    new: true,
-    runValidators: true,
-  });
+  const admin = await Admin.findOneAndUpdate(
+    { user: userId, deleted: { $ne: true } },
+    updateData,
+    {
+      new: true,
+      runValidators: true,
+    }
+  );
   if (!admin) throw ApiError.notFound(MESSAGES.ADMIN.NOT_FOUND);
-  logger.info(`Admin updated for userId=${userId}`);
+  logger.info(`Admin updated`, { userId, updateData });
   return admin;
 };
 
 /**
- * Soft deletes an admin profile by userId and resets user role to USER.
+ * Soft deletes an admin profile by userId and resets user role to USER using transaction.
  */
 export const softDeleteAdminByUserId = async (userId) => {
-  const admin = await Admin.findOneAndUpdate(
-    { user: userId },
-    { status: "deleted", deleted: true, deletedAt: new Date() },
-    { new: true }
-  );
-  if (!admin) throw ApiError.notFound(MESSAGES.ADMIN.NOT_FOUND);
+  const session = await mongoose.startSession();
+  session.startTransaction();
+  try {
+    const admin = await Admin.findOneAndUpdate(
+      { user: userId, deleted: { $ne: true } },
+      { deleted: true, deletedAt: new Date() },
+      { new: true, session }
+    );
+    if (!admin) throw ApiError.notFound(MESSAGES.ADMIN.NOT_FOUND);
 
-  await User.findByIdAndUpdate(userId, { role: "user" });
-  logger.info(`Admin soft-deleted and user role reset for userId=${userId}`);
-  return admin;
+    await User.findByIdAndUpdate(userId, { role: "user" }, { session });
+    await session.commitTransaction();
+
+    logger.info(`Admin soft-deleted and user role reset`, { userId });
+    return admin;
+  } catch (error) {
+    await session.abortTransaction();
+    throw error;
+  } finally {
+    session.endSession();
+  }
 };
 
 /**
  * Fetches an admin by adminId.
  */
 export const getAdminById = async (adminId) => {
-  const admin = await Admin.findById(adminId).populate("user", "-password");
+  const admin = await Admin.findOne({
+    _id: adminId,
+    deleted: { $ne: true },
+  }).populate("user", "-password");
   if (!admin) throw ApiError.notFound(MESSAGES.ADMIN.NOT_FOUND);
-  logger.info(`Admin fetched for adminId=${adminId}`);
+  logger.info(`Admin fetched`, { adminId });
   return admin;
 };
 
 /**
- * Soft deletes an admin by adminId and resets user role to USER.
+ * Soft deletes an admin by adminId and resets user role to USER using transaction.
  */
 export const softDeleteAdminById = async (adminId) => {
-  const admin = await Admin.findByIdAndUpdate(
-    adminId,
-    { status: "deleted", deleted: true, deletedAt: new Date() },
-    { new: true }
-  );
-  if (!admin) throw ApiError.notFound(MESSAGES.ADMIN.NOT_FOUND);
+  const session = await mongoose.startSession();
+  session.startTransaction();
+  try {
+    const admin = await Admin.findOneAndUpdate(
+      { _id: adminId, deleted: { $ne: true } },
+      { deleted: true, deletedAt: new Date() },
+      { new: true, session }
+    );
+    if (!admin) throw ApiError.notFound(MESSAGES.ADMIN.NOT_FOUND);
 
-  await User.findByIdAndUpdate(admin.user, { role: "user" });
-  logger.info(`Admin soft-deleted for adminId=${adminId} and user role reset`);
-  return admin;
+    await User.findByIdAndUpdate(admin.user, { role: "user" }, { session });
+    await session.commitTransaction();
+
+    logger.info(`Admin soft-deleted and user role reset`, { adminId });
+    return admin;
+  } catch (error) {
+    await session.abortTransaction();
+    throw error;
+  } finally {
+    session.endSession();
+  }
 };

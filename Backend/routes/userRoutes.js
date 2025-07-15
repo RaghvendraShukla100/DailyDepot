@@ -1,5 +1,3 @@
-// /backend/routes/userRoutes.js
-
 import express from "express";
 import {
   getUserProfile,
@@ -11,7 +9,7 @@ import {
 } from "../controllers/userController.js";
 import { protect, authorizeRoles } from "../middlewares/authMiddleware.js";
 import { ROLES } from "../constants/roles.js";
-import validateRequest from "../middlewares/validateRequest.js";
+import validateResource from "../middlewares/validateResource.js";
 import asyncHandler from "../middlewares/asyncHandler.js";
 import { updateUserProfileValidation } from "../validations/userValidation.js";
 
@@ -32,7 +30,7 @@ router.get("/profile", protect, asyncHandler(getUserProfile));
 router.put(
   "/profile",
   protect,
-  validateRequest(updateUserProfileValidation),
+  validateResource(updateUserProfileValidation),
   asyncHandler(updateUserProfile)
 );
 

@@ -84,9 +84,9 @@ export const removeAdmin = async (req, res) => {
 };
 
 /**
- * @desc    Get all admins (Admin only) with pagination
+ * @desc    Get all admins (Supradmin only) with pagination
  * @route   GET /api/admins
- * @access  Private/Admin
+ * @access  Private/Supradmin
  */
 export const getAllAdmins = async (req, res) => {
   const { admins, page, limit, total } = await adminService.getAllAdmins(
@@ -94,9 +94,10 @@ export const getAllAdmins = async (req, res) => {
     req.query.limit
   );
 
-  logger.info(
-    `Admin userId=${req.user._id} fetched all admins page=${page} limit=${limit}`
-  );
+  logger.info(`Admin userId=${req.user._id} fetched all admins`, {
+    page,
+    limit,
+  });
 
   res.status(STATUS_CODES.OK).json(
     new ApiResponse(
@@ -106,7 +107,7 @@ export const getAllAdmins = async (req, res) => {
         page,
         limit,
         total,
-        totalPages: Math.ceil(total / limit),
+        totalPages: limit ? Math.ceil(total / limit) : 1,
       },
       MESSAGES.ADMIN.ALL_FETCHED
     )
@@ -114,9 +115,9 @@ export const getAllAdmins = async (req, res) => {
 };
 
 /**
- * @desc    Get admin by ID (Admin only)
+ * @desc    Get admin by ID (Supradmin only)
  * @route   GET /api/admins/:id
- * @access  Private/Admin
+ * @access  Private/Supradmin
  */
 export const getAdminById = async (req, res) => {
   const admin = await adminService.getAdminById(req.params.id);
@@ -131,9 +132,9 @@ export const getAdminById = async (req, res) => {
 };
 
 /**
- * @desc    Soft delete admin by ID (Admin only) and reset user role to USER
+ * @desc    Soft delete admin by ID (Supradmin only)  and reset user role to USER
  * @route   DELETE /api/admins/:id
- * @access  Private/Admin
+ * @access  Private/Supradmin
  */
 export const removeAdminById = async (req, res) => {
   await adminService.softDeleteAdminById(req.params.id);

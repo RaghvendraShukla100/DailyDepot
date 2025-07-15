@@ -1,6 +1,5 @@
-// /backend/routes/brandRoutes.js
-
 import express from "express";
+import asyncHandler from "../middlewares/asyncHandler.js";
 import {
   createBrand,
   getBrands,
@@ -8,11 +7,9 @@ import {
   updateBrand,
   deleteBrand,
 } from "../controllers/brandController.js";
-
 import { protect, authorizeRoles } from "../middlewares/authMiddleware.js";
 import { ROLES } from "../constants/roles.js";
-import validateRequest from "../middlewares/validateRequest.js";
-import asyncHandler from "../middlewares/asyncHandler.js";
+import validateResource from "../middlewares/validateResource.js";
 import {
   createBrandValidation,
   updateBrandValidation,
@@ -43,7 +40,7 @@ router.post(
   "/",
   protect,
   authorizeRoles(ROLES.ADMIN),
-  validateRequest(createBrandValidation),
+  validateResource(createBrandValidation),
   asyncHandler(createBrand)
 );
 
@@ -56,7 +53,7 @@ router.put(
   "/:id",
   protect,
   authorizeRoles(ROLES.ADMIN),
-  validateRequest(updateBrandValidation),
+  validateResource(updateBrandValidation),
   asyncHandler(updateBrand)
 );
 

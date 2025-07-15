@@ -1,5 +1,3 @@
-// /backend/routes/addressRoutes.js
-
 import express from "express";
 import {
   createAddress,
@@ -9,7 +7,7 @@ import {
   deleteAddress,
 } from "../controllers/addressController.js";
 import { protect } from "../middlewares/authMiddleware.js";
-import validateRequest from "../middlewares/validateRequest.js";
+import validateResource from "../middlewares/validateResource.js";
 import asyncHandler from "../middlewares/asyncHandler.js";
 import {
   createAddressValidation,
@@ -40,7 +38,7 @@ router.get("/:id", protect, asyncHandler(getAddressById));
 router.post(
   "/",
   protect,
-  validateRequest(createAddressValidation),
+  validateResource(createAddressValidation),
   asyncHandler(createAddress)
 );
 
@@ -52,7 +50,7 @@ router.post(
 router.put(
   "/:id",
   protect,
-  validateRequest(updateAddressValidation),
+  validateResource(updateAddressValidation),
   asyncHandler(updateAddress)
 );
 

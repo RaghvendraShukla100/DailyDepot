@@ -1,6 +1,5 @@
-// /backend/models/categorySchema.js
-
 import mongoose from "mongoose";
+import slugify from "slugify"; // recommended for consistent slug generation
 
 const categorySchema = new mongoose.Schema(
   {
@@ -27,12 +26,12 @@ const categorySchema = new mongoose.Schema(
     parentCategory: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Category",
-      default: null, // Enables nested categories if needed
+      default: null,
     },
     image: {
       url: { type: String, trim: true },
       alt: { type: String, trim: true, default: "" },
-      public_id: { type: String, trim: true }, // If using Cloudinary/S3
+      public_id: { type: String, trim: true },
     },
     isFeatured: {
       type: Boolean,
@@ -60,18 +59,38 @@ const categorySchema = new mongoose.Schema(
       default: null,
     },
   },
-  { timestamps: true }
+  { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } }
 );
 
-// Auto-generate slug from name if not provided (optional helper)
+// Auto-generate slug from name if not provided or name changed
 categorySchema.pre("validate", function (next) {
   if (!this.slug && this.name) {
-    this.slug = this.name.toLowerCase().replace(/[\s]+/g, "-");
+    this.slug = slugify(this.name, { lower: true, strict: true });
   }
   next();
 });
 
-// Compound indexes for efficient filtering and sorting
+// Ensure slug update during findOneAndUpdate if name changes
+categorySchema.pre("findOneAndUpdate", async function (next) {
+  const update = this.getUpdate();
+  if (update.name) {
+    update.slug = slugify(update.name, { lower: true, strict: true });
+    this.setUpdate(update);
+  }
+  next();
+});
+
+// Clean JSON output
+categorySchema.set("toJSON", {
+  virtuals: true,
+  versionKey: false,
+  transform: (_doc, ret) => {
+    ret.id = ret._id;
+    delete ret._id;
+  },
+});
+
+// Compound indexes for filtering and sorting
 categorySchema.index({ isFeatured: 1, isPublished: 1 });
 categorySchema.index({ status: 1, deleted: 1 });
 

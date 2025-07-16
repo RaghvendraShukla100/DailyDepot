@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import slugify from "slugify";
 
 const brandSchema = new mongoose.Schema(
   {
@@ -17,12 +18,12 @@ const brandSchema = new mongoose.Schema(
       lowercase: true,
       index: true,
     },
-    description: { type: String, trim: true },
+    description: { type: String, trim: true, default: "" },
     logo: {
-      url: { type: String },
-      public_id: { type: String },
+      url: { type: String, trim: true },
+      public_id: { type: String, trim: true },
     },
-    website: { type: String, trim: true },
+    website: { type: String, trim: true, default: "" },
     isFeatured: { type: Boolean, default: false, index: true },
     status: {
       type: String,
@@ -33,22 +34,40 @@ const brandSchema = new mongoose.Schema(
     deleted: { type: Boolean, default: false, index: true },
     deletedAt: { type: Date, default: null },
   },
-  { timestamps: true }
+  { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } }
 );
 
-// Compound indexes for frequent filters
-brandSchema.index({ isFeatured: 1, status: 1 });
-brandSchema.index({ deleted: 1, status: 1 });
+// Auto-generate slug if not provided
+brandSchema.pre("validate", function (next) {
+  if (!this.slug && this.name) {
+    this.slug = slugify(this.name, { lower: true, strict: true });
+  }
+  next();
+});
+
+// Ensure slug updates during findOneAndUpdate if name changes
+brandSchema.pre("findOneAndUpdate", async function (next) {
+  const update = this.getUpdate();
+  if (update.name) {
+    update.slug = slugify(update.name, { lower: true, strict: true });
+    this.setUpdate(update);
+  }
+  next();
+});
 
 // Clean JSON output for frontend
-mongoose.set("toJSON", {
+brandSchema.set("toJSON", {
   virtuals: true,
   versionKey: false,
-  transform: (doc, ret) => {
+  transform: (_doc, ret) => {
     ret.id = ret._id;
     delete ret._id;
   },
 });
+
+// Compound indexes for frequent filters
+brandSchema.index({ isFeatured: 1, status: 1 });
+brandSchema.index({ deleted: 1, status: 1 });
 
 const Brand = mongoose.model("Brand", brandSchema);
 export default Brand;

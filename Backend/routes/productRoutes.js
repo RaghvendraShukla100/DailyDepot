@@ -1,3 +1,5 @@
+// /backend/routes/productsRouter.js
+
 import express from "express";
 import {
   createProduct,
@@ -7,7 +9,7 @@ import {
   deleteProduct,
 } from "../controllers/productController.js";
 import { protect, authorizeRoles } from "../middlewares/authMiddleware.js";
-import upload from "../middlewares/uploadMiddleware.js";
+import productUpload from "../middlewares/uploadMiddleware.js";
 import validateResource from "../middlewares/validateResource.js";
 import asyncHandler from "../middlewares/asyncHandler.js";
 import {
@@ -15,6 +17,7 @@ import {
   updateProductValidation,
 } from "../validations/productValidation.js";
 import { ROLES } from "../constants/roles.js";
+import { publicLimiter } from "../middlewares/rateLimiter.js";
 
 const router = express.Router();
 
@@ -27,7 +30,10 @@ router.post(
   "/",
   protect,
   authorizeRoles(ROLES.SELLER, ROLES.ADMIN),
-  upload.array("media", 10),
+  productUpload.fields([
+    { name: "images", maxCount: 15 },
+    { name: "videos", maxCount: 5 },
+  ]),
   validateResource(createProductValidation),
   asyncHandler(createProduct)
 );
@@ -37,7 +43,7 @@ router.post(
  * @desc    Get all products with filters, pagination, sorting
  * @access  Public
  */
-router.get("/", asyncHandler(getProducts));
+router.get("/", publicLimiter, asyncHandler(getProducts));
 
 /**
  * @route   GET /api/products/:id
@@ -55,7 +61,10 @@ router.put(
   "/:id",
   protect,
   authorizeRoles(ROLES.SELLER, ROLES.ADMIN),
-  upload.array("media", 10),
+  productUpload.fields([
+    { name: "images", maxCount: 5 },
+    { name: "videos", maxCount: 2 },
+  ]),
   validateResource(updateProductValidation),
   asyncHandler(updateProduct)
 );

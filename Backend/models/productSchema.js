@@ -1,8 +1,17 @@
 import mongoose from "mongoose";
+import slugify from "slugify";
+import crypto from "crypto"; // for fallback SKU generation
 
 const productSchema = new mongoose.Schema(
   {
     name: { type: String, required: true, trim: true, index: true },
+    slug: {
+      type: String,
+      trim: true,
+      unique: true,
+      lowercase: true,
+      index: true,
+    },
     description: { type: String, required: true, trim: true },
     category: {
       type: mongoose.Schema.Types.ObjectId,
@@ -53,7 +62,7 @@ const productSchema = new mongoose.Schema(
     isPublished: { type: Boolean, default: true },
     isFeatured: { type: Boolean, default: false },
     deleted: { type: Boolean, default: false },
-    deletedAt: { type: Date, default: null, index: { expireAfterSeconds: 0 } },
+    deletedAt: { type: Date, default: null },
 
     createdBy: {
       type: mongoose.Schema.Types.ObjectId,
@@ -75,13 +84,33 @@ productSchema.pre("save", function (next) {
   next();
 });
 
+// Auto-generate slug from name if not provided
+productSchema.pre("validate", function (next) {
+  if (!this.slug && this.name) {
+    this.slug = slugify(this.name, { lower: true, strict: true });
+  }
+
+  if (!this.sku) {
+    this.sku = crypto.randomBytes(6).toString("hex").toUpperCase(); // fallback SKU
+  }
+  next();
+});
+
 // Virtual field for final price after discount
 productSchema.virtual("finalPrice").get(function () {
   return this.price - (this.price * this.discount) / 100;
 });
 
-// Clean JSON output
-mongoose.set("toJSON", {
+// Optionally enforce sold <= stock
+// productSchema.pre("save", function (next) {
+//   if (this.sold > this.stock) {
+//     return next(new Error("Sold quantity cannot exceed stock."));
+//   }
+//   next();
+// });
+
+// Clean JSON output for API responses
+productSchema.set("toJSON", {
   virtuals: true,
   versionKey: false,
   transform: (doc, ret) => {
@@ -90,7 +119,7 @@ mongoose.set("toJSON", {
   },
 });
 
-// Compound index for filter and sorting performance
+// Compound indexes
 productSchema.index({ category: 1, price: 1 });
 productSchema.index({ brand: 1, price: 1 });
 productSchema.index({ tags: 1 });

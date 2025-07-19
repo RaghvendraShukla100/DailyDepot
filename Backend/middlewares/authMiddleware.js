@@ -12,36 +12,66 @@ import { MESSAGES } from "../constants/messages.js";
  * @route   Middleware
  * @access  Private
  */
+
 export const protect = asyncHandler(async (req, res, next) => {
-  const token = req.headers.authorization?.split(" ")[1];
+  // 1️⃣ Extract token from Authorization header
+
+  const authHeader = req.headers.authorization;
+  const token = authHeader?.startsWith("Bearer ")
+    ? authHeader.split(" ")[1]
+    : null;
 
   if (!token) {
     throw new ApiError(401, MESSAGES.AUTH.TOKEN_MISSING);
   }
 
-  const decoded = jwt.verify(token, process.env.JWT_SECRET);
-  const user = await User.findById(decoded.id).select("-password");
+  // 2️⃣ Verify token with expiration handling
+  let decoded;
+  try {
+    decoded = jwt.verify(token, process.env.JWT_SECRET);
+  } catch (error) {
+    throw new ApiError(401, MESSAGES.AUTH.INVALID_TOKEN);
+  }
 
+  // 3️⃣ Fetch user without password
+  const user = await User.findById(decoded.id).select("-password");
   if (!user) {
     throw new ApiError(401, MESSAGES.USER.NOT_FOUND);
   }
 
+  // Optional: block check for suspended users
+  if (user.isBlocked) {
+    throw new ApiError(403, MESSAGES.USER.BLOCKED);
+  }
+
   req.user = user;
+
+  // 4️⃣ If user is an admin, fetch admin profile and attach designation
+  if (user.role === "admin") {
+    const admin = await Admin.findOne({ user: user._id });
+    if (!admin) {
+      throw ApiError.forbidden("Admin profile not found.");
+    }
+    req.admin = admin;
+    req.user.designation = admin.designation;
+  }
+
+  // 5️⃣ Continue to next middleware
   next();
 });
 
 /**
- * @desc    Authorize user based on allowed roles
- * @param   {...string} roles - Allowed roles
+ * @desc    Authorize user based on allowed roles or bypass if superadmin
+ * @param   {...string} roles
  * @route   Middleware
  * @access  Private
  */
 export const authorizeRoles =
   (...roles) =>
   (req, res, next) => {
-    if (!roles.includes(req.user.role)) {
+    if (req.admin && req.admin.designation === "superadmin") return next();
+    if (!roles.includes(req.user.role))
       throw new ApiError(403, MESSAGES.AUTH.UNAUTHORIZED);
-    }
     next();
   };
 
@@ -51,36 +81,25 @@ export const authorizeRoles =
  * @access  Private (Seller only)
  */
 export const attachSellerProfile = asyncHandler(async (req, res, next) => {
-  if (req.user.role !== ROLES.SELLER) {
+  if (req.user.role !== ROLES.SELLER)
     throw new ApiError(403, MESSAGES.AUTH.UNAUTHORIZED);
-  }
-
   const seller = await Seller.findOne({ user: req.user._id });
-
-  if (!seller) {
-    throw new ApiError(404, MESSAGES.SELLER.NOT_FOUND);
-  }
-
+  if (!seller) throw new ApiError(404, MESSAGES.SELLER.NOT_FOUND);
   req.seller = seller;
   next();
 });
 
 /**
- * @desc    Attach admin profile to req if user is an admin
+ * @desc    Attach admin profile to req if user is an admin or superadmin
  * @route   Middleware
  * @access  Private (Admin only)
  */
 export const attachAdminProfile = asyncHandler(async (req, res, next) => {
-  if (req.user.role !== ROLES.ADMIN) {
+  if (req.user.role !== ROLES.ADMIN && req.user.role !== ROLES.SUPERADMIN) {
     throw new ApiError(403, MESSAGES.AUTH.UNAUTHORIZED);
   }
-
   const admin = await Admin.findOne({ user: req.user._id });
-
-  if (!admin) {
-    throw new ApiError(404, MESSAGES.ADMIN.NOT_FOUND);
-  }
-
+  if (!admin) throw new ApiError(404, MESSAGES.ADMIN.NOT_FOUND);
   req.admin = admin;
   next();
 });

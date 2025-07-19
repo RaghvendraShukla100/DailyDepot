@@ -1,8 +1,8 @@
-import * as adminService from "../services/adminService.js";
-import ApiResponse from "../utils/apiResponse.js";
-import { STATUS_CODES } from "../constants/statusCodes.js";
-import { MESSAGES } from "../constants/messages.js";
-import logger from "../utils/logger.js";
+import * as adminService from '../services/adminService.js';
+import ApiResponse from '../utils/apiResponse.js';
+import { STATUS_CODES } from '../constants/statusCodes.js';
+import { MESSAGES } from '../constants/messages.js';
+import logger from '../utils/logger.js';
 
 /**
  * @desc    Create a new admin/support/finance profile for an existing user
@@ -20,7 +20,9 @@ export const createAdmin = async (req, res, next) => {
 
     res
       .status(STATUS_CODES.CREATED)
-      .json(new ApiResponse(STATUS_CODES.CREATED, admin, MESSAGES.ADMIN.CREATED));
+      .json(
+        new ApiResponse(STATUS_CODES.CREATED, admin, MESSAGES.ADMIN.CREATED),
+      );
   } catch (error) {
     logger.error(`Error creating admin: ${error.message}`);
     next(error);
@@ -37,11 +39,16 @@ export const getAdmins = async (req, res, next) => {
     const { page = 1, limit = 20, ...filters } = req.query;
     const skip = (page - 1) * limit;
 
-    const admins = await adminService.getAdminsService(filters, { limit, skip });
+    const admins = await adminService.getAdminsService(filters, {
+      limit,
+      skip,
+    });
 
     res
       .status(STATUS_CODES.OK)
-      .json(new ApiResponse(STATUS_CODES.OK, admins, MESSAGES.ADMIN.FETCHED_ALL));
+      .json(
+        new ApiResponse(STATUS_CODES.OK, admins, MESSAGES.ADMIN.FETCHED_ALL),
+      );
   } catch (error) {
     logger.error(`Error fetching admins: ${error.message}`);
     next(error);
@@ -61,9 +68,13 @@ export const getAdminById = async (req, res, next) => {
 
     res
       .status(STATUS_CODES.OK)
-      .json(new ApiResponse(STATUS_CODES.OK, admin, MESSAGES.ADMIN.FETCHED_SINGLE));
+      .json(
+        new ApiResponse(STATUS_CODES.OK, admin, MESSAGES.ADMIN.FETCHED_SINGLE),
+      );
   } catch (error) {
-    logger.error(`Error fetching admin ${req.params.adminId}: ${error.message}`);
+    logger.error(
+      `Error fetching admin ${req.params.adminId}: ${error.message}`,
+    );
     next(error);
   }
 };
@@ -79,15 +90,23 @@ export const updateAdmin = async (req, res, next) => {
     const updater = req.admin;
     const data = req.body;
 
-    const updatedAdmin = await adminService.updateAdminService(adminId, updater, data);
+    const updatedAdmin = await adminService.updateAdminService(
+      adminId,
+      updater,
+      data,
+    );
 
     logger.info(`Admin ${adminId} updated by ${updater._id}`);
 
     res
       .status(STATUS_CODES.OK)
-      .json(new ApiResponse(STATUS_CODES.OK, updatedAdmin, MESSAGES.ADMIN.UPDATED));
+      .json(
+        new ApiResponse(STATUS_CODES.OK, updatedAdmin, MESSAGES.ADMIN.UPDATED),
+      );
   } catch (error) {
-    logger.error(`Error updating admin ${req.params.adminId}: ${error.message}`);
+    logger.error(
+      `Error updating admin ${req.params.adminId}: ${error.message}`,
+    );
     next(error);
   }
 };
@@ -107,9 +126,13 @@ export const deleteAdmin = async (req, res, next) => {
 
     res
       .status(STATUS_CODES.OK)
-      .json(new ApiResponse(STATUS_CODES.OK, deletedAdmin, MESSAGES.ADMIN.DELETED));
+      .json(
+        new ApiResponse(STATUS_CODES.OK, deletedAdmin, MESSAGES.ADMIN.DELETED),
+      );
   } catch (error) {
-    logger.error(`Error deleting admin ${req.params.adminId}: ${error.message}`);
+    logger.error(
+      `Error deleting admin ${req.params.adminId}: ${error.message}`,
+    );
     next(error);
   }
 };
@@ -129,7 +152,13 @@ export const getSuperAdmin = async (req, res, next) => {
 
     res
       .status(STATUS_CODES.OK)
-      .json(new ApiResponse(STATUS_CODES.OK, superadmin, MESSAGES.ADMIN.FETCHED_SINGLE));
+      .json(
+        new ApiResponse(
+          STATUS_CODES.OK,
+          superadmin,
+          MESSAGES.ADMIN.FETCHED_SINGLE,
+        ),
+      );
   } catch (error) {
     logger.error(`Error fetching superadmin profile: ${error.message}`);
     next(error);
@@ -146,13 +175,22 @@ export const updateSuperAdmin = async (req, res, next) => {
     const userId = req.user._id;
     const data = req.body;
 
-    const updatedSuperadmin = await adminService.updateSuperAdminService(userId, data);
+    const updatedSuperadmin = await adminService.updateSuperAdminService(
+      userId,
+      data,
+    );
 
     logger.info(`Superadmin profile updated by ${userId}`);
 
     res
       .status(STATUS_CODES.OK)
-      .json(new ApiResponse(STATUS_CODES.OK, updatedSuperadmin, MESSAGES.ADMIN.UPDATED));
+      .json(
+        new ApiResponse(
+          STATUS_CODES.OK,
+          updatedSuperadmin,
+          MESSAGES.ADMIN.UPDATED,
+        ),
+      );
   } catch (error) {
     logger.error(`Error updating superadmin profile: ${error.message}`);
     next(error);
@@ -168,13 +206,21 @@ export const deleteSuperAdmin = async (req, res, next) => {
   try {
     const userId = req.user._id;
 
-    const deletedSuperadmin = await adminService.deleteSuperAdminService(userId);
+    const deletedSuperadmin = await adminService.deleteSuperAdminService(
+      userId,
+    );
 
     logger.info(`Superadmin profile soft deleted by ${userId}`);
 
     res
       .status(STATUS_CODES.OK)
-      .json(new ApiResponse(STATUS_CODES.OK, deletedSuperadmin, MESSAGES.ADMIN.DELETED));
+      .json(
+        new ApiResponse(
+          STATUS_CODES.OK,
+          deletedSuperadmin,
+          MESSAGES.ADMIN.DELETED,
+        ),
+      );
   } catch (error) {
     logger.error(`Error deleting superadmin profile: ${error.message}`);
     next(error);

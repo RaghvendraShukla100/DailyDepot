@@ -1,4 +1,4 @@
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
 
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const phoneRegex = /^\+?[0-9]{10,15}$/;
@@ -7,43 +7,44 @@ const adminSchema = new mongoose.Schema(
   {
     user: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'User',
+      ref: "User",
       required: true,
       unique: true,
     },
-     designation: {
+    designation: {
       type: String,
-      enum: ['superadmin', 'admin', 'support', 'finance'],
-      default: 'support',
+      enum: ["superadmin", "admin", "support", "finance"],
+      default: "support",
     },
 
     permissions: {
       type: [String],
-     enum: [
-  'manage_users',
-  'manage_orders',
-  'view_reports',
-  'edit_settings',
-  'manage_products',
-  'manage_payments',
-  'manage_admins',
-  'manage_support',
-  'manage_finance',
-  'read_admins',
-],
+      enum: [
+        "manage_users",
+        "manage_orders",
+        "view_reports",
+        "edit_settings",
+        "manage_products",
+        "manage_payments",
+        "manage_admins",
+        "manage_support",
+        "manage_finance",
+        "read_admins",
+        "manage_superadmin",
+      ],
 
-      default: ['manage_orders'],
+      default: ["manage_orders"],
     },
 
     contactEmail: {
       type: String,
       trim: true,
-      match: [emailRegex, 'Invalid contact email format.'],
+      match: [emailRegex, "Invalid contact email format."],
     },
     contactPhone: {
       type: String,
       trim: true,
-      match: [phoneRegex, 'Invalid contact phone format.'],
+      match: [phoneRegex, "Invalid contact phone format."],
     },
     profilePic: { type: String, trim: true },
     lastLoginAt: { type: Date },
@@ -53,13 +54,13 @@ const adminSchema = new mongoose.Schema(
     deleted: { type: Boolean, default: false },
     deletedAt: { type: Date, default: null },
   },
-  { timestamps: true },
+  { timestamps: true }
 );
 
-adminSchema.pre('save', function (next) {
+adminSchema.pre("save", function (next) {
   this.deletedAt = this.deleted ? this.deletedAt || new Date() : null;
   next();
 });
 
-const Admin = mongoose.model('Admin', adminSchema);
+const Admin = mongoose.model("Admin", adminSchema);
 export default Admin;

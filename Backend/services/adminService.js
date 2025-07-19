@@ -8,14 +8,21 @@ import { ROLES } from "../constants/roles.js";
 // Utility: check if creator can create the requested designation
 const canCreatorCreateDesignation = (creatorDesignation, targetDesignation) => {
   if (creatorDesignation === "superadmin") return true;
-  if (creatorDesignation === "admin" && ["support", "finance"].includes(targetDesignation)) return true;
+  if (
+    creatorDesignation === "admin" &&
+    ["support", "finance"].includes(targetDesignation)
+  )
+    return true;
   return false;
 };
 
 // Utility: ensure permissions are within creator's authority
 const validatePermissionsWithinCreator = (creator, requestedPermissions) => {
-  const creatorPermissions = creator.permissions || ROLE_PERMISSIONS[creator.designation]?.can || [];
-  const canAssignAll = requestedPermissions.every(perm => creatorPermissions.includes(perm));
+  const creatorPermissions =
+    creator.permissions || ROLE_PERMISSIONS[creator.designation]?.can || [];
+  const canAssignAll = requestedPermissions.every((perm) =>
+    creatorPermissions.includes(perm)
+  );
   if (!canAssignAll) {
     throw ApiError.forbidden("Cannot assign permissions you do not possess.");
   }
@@ -23,10 +30,20 @@ const validatePermissionsWithinCreator = (creator, requestedPermissions) => {
 
 // ✅ CREATE Admin / Support / Finance
 export const createAdminService = async (creator, data) => {
-  const { userId, designation, permissions, contactEmail, contactPhone, profilePic, notes } = data;
+  const {
+    userId,
+    designation,
+    permissions,
+    contactEmail,
+    contactPhone,
+    profilePic,
+    notes,
+  } = data;
 
   if (!canCreatorCreateDesignation(creator.designation, designation)) {
-    throw ApiError.forbidden("You are not authorized to create this designation.");
+    throw ApiError.forbidden(
+      "You are not authorized to create this designation."
+    );
   }
 
   if (!mongoose.Types.ObjectId.isValid(userId)) {
@@ -37,7 +54,8 @@ export const createAdminService = async (creator, data) => {
   if (!user) throw ApiError.notFound("User not found.");
 
   const existingAdmin = await Admin.findOne({ user: user._id });
-  if (existingAdmin) throw ApiError.badRequest("This user is already an admin/support/finance.");
+  if (existingAdmin)
+    throw ApiError.badRequest("This user is already an admin/support/finance.");
 
   // Update user role to ADMIN
   user.role = ROLES.ADMIN;
@@ -45,7 +63,8 @@ export const createAdminService = async (creator, data) => {
 
   // Determine effective permissions
   const defaultPermissions = ROLE_PERMISSIONS[designation]?.can || [];
-  const effectivePermissions = permissions?.length > 0 ? permissions : defaultPermissions;
+  const effectivePermissions =
+    permissions?.length > 0 ? permissions : defaultPermissions;
   validatePermissionsWithinCreator(creator, effectivePermissions);
 
   // Create admin
@@ -78,6 +97,12 @@ export const getAdminsService = async (filter = {}, options = {}) => {
 
 // ✅ READ single admin by ID
 export const getAdminByIdService = async (adminId) => {
+  console.log("============== DEBUG SERVICE ==============");
+  console.log("adminId received:", adminId);
+  console.log("Type of adminId:", typeof adminId);
+  console.log("Is valid ObjectId:", mongoose.Types.ObjectId.isValid(adminId));
+  console.log("===========================================");
+
   if (!mongoose.Types.ObjectId.isValid(adminId)) {
     throw ApiError.badRequest("Invalid admin ID.");
   }
@@ -151,11 +176,14 @@ export const deleteAdminService = async (adminId) => {
 
 // ✅ READ superadmin profile
 export const getSuperAdminService = async (userId) => {
-  const admin = await Admin.findOne({ user: userId, designation: "superadmin", deleted: false })
-    .populate({
-      path: "user",
-      select: "name email phone role",
-    });
+  const admin = await Admin.findOne({
+    user: userId,
+    designation: "superadmin",
+    deleted: false,
+  }).populate({
+    path: "user",
+    select: "name email phone role",
+  });
 
   if (!admin) throw ApiError.notFound("Superadmin profile not found.");
   return admin;
@@ -163,7 +191,11 @@ export const getSuperAdminService = async (userId) => {
 
 // ✅ UPDATE superadmin profile
 export const updateSuperAdminService = async (userId, data) => {
-  const admin = await Admin.findOne({ user: userId, designation: "superadmin", deleted: false });
+  const admin = await Admin.findOne({
+    user: userId,
+    designation: "superadmin",
+    deleted: false,
+  });
   if (!admin) throw ApiError.notFound("Superadmin profile not found.");
 
   if (data.contactEmail !== undefined) admin.contactEmail = data.contactEmail;
@@ -184,10 +216,16 @@ export const deleteSuperAdminService = async (userId) => {
   });
 
   if (activeSuperadmins <= 1) {
-    throw ApiError.forbidden("Cannot delete the last active superadmin for system safety.");
+    throw ApiError.forbidden(
+      "Cannot delete the last active superadmin for system safety."
+    );
   }
 
-  const admin = await Admin.findOne({ user: userId, designation: "superadmin", deleted: false });
+  const admin = await Admin.findOne({
+    user: userId,
+    designation: "superadmin",
+    deleted: false,
+  });
   if (!admin) throw ApiError.notFound("Superadmin profile not found.");
 
   admin.deleted = true;

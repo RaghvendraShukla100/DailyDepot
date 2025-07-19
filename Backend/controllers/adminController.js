@@ -1,8 +1,8 @@
-import * as adminService from '../services/adminService.js';
-import ApiResponse from '../utils/apiResponse.js';
-import { STATUS_CODES } from '../constants/statusCodes.js';
-import { MESSAGES } from '../constants/messages.js';
-import logger from '../utils/logger.js';
+import * as adminService from "../services/adminService.js";
+import ApiResponse from "../utils/apiResponse.js";
+import { STATUS_CODES } from "../constants/statusCodes.js";
+import { MESSAGES } from "../constants/messages.js";
+import logger from "../utils/logger.js";
 
 /**
  * @desc    Create a new admin/support/finance profile for an existing user
@@ -21,7 +21,7 @@ export const createAdmin = async (req, res, next) => {
     res
       .status(STATUS_CODES.CREATED)
       .json(
-        new ApiResponse(STATUS_CODES.CREATED, admin, MESSAGES.ADMIN.CREATED),
+        new ApiResponse(STATUS_CODES.CREATED, admin, MESSAGES.ADMIN.CREATED)
       );
   } catch (error) {
     logger.error(`Error creating admin: ${error.message}`);
@@ -47,7 +47,7 @@ export const getAdmins = async (req, res, next) => {
     res
       .status(STATUS_CODES.OK)
       .json(
-        new ApiResponse(STATUS_CODES.OK, admins, MESSAGES.ADMIN.FETCHED_ALL),
+        new ApiResponse(STATUS_CODES.OK, admins, MESSAGES.ADMIN.FETCHED_ALL)
       );
   } catch (error) {
     logger.error(`Error fetching admins: ${error.message}`);
@@ -60,21 +60,29 @@ export const getAdmins = async (req, res, next) => {
  * @route   GET /api/admins/:adminId
  * @access  Private (Superadmin/Admin with proper permissions)
  */
+/**
+ * @desc    Get a single admin by ID
+ * @route   GET /api/admins/:adminId
+ * @access  Private (Superadmin/Admin with proper permissions)
+ */
 export const getAdminById = async (req, res, next) => {
   try {
-    const { adminId } = req.params;
+    console.log("============== DEBUG CONTROLLER==============");
+    console.log("req.params:", req.params);
+    console.log("req.params.id:", req.params.id);
+    console.log("Type of req.params.id:", typeof req.params.id);
+    console.log("===================================");
 
-    const admin = await adminService.getAdminByIdService(adminId);
+    const admin = await adminService.getAdminByIdService(req.params.id);
 
-    res
-      .status(STATUS_CODES.OK)
-      .json(
-        new ApiResponse(STATUS_CODES.OK, admin, MESSAGES.ADMIN.FETCHED_SINGLE),
-      );
+    res.status(200).json({
+      statusCode: 200,
+      data: admin,
+      message: "Success",
+      success: true,
+    });
   } catch (error) {
-    logger.error(
-      `Error fetching admin ${req.params.adminId}: ${error.message}`,
-    );
+    logger.error(`Error fetching admin by ID: ${error.message}`);
     next(error);
   }
 };
@@ -93,7 +101,7 @@ export const updateAdmin = async (req, res, next) => {
     const updatedAdmin = await adminService.updateAdminService(
       adminId,
       updater,
-      data,
+      data
     );
 
     logger.info(`Admin ${adminId} updated by ${updater._id}`);
@@ -101,11 +109,11 @@ export const updateAdmin = async (req, res, next) => {
     res
       .status(STATUS_CODES.OK)
       .json(
-        new ApiResponse(STATUS_CODES.OK, updatedAdmin, MESSAGES.ADMIN.UPDATED),
+        new ApiResponse(STATUS_CODES.OK, updatedAdmin, MESSAGES.ADMIN.UPDATED)
       );
   } catch (error) {
     logger.error(
-      `Error updating admin ${req.params.adminId}: ${error.message}`,
+      `Error updating admin ${req.params.adminId}: ${error.message}`
     );
     next(error);
   }
@@ -127,11 +135,11 @@ export const deleteAdmin = async (req, res, next) => {
     res
       .status(STATUS_CODES.OK)
       .json(
-        new ApiResponse(STATUS_CODES.OK, deletedAdmin, MESSAGES.ADMIN.DELETED),
+        new ApiResponse(STATUS_CODES.OK, deletedAdmin, MESSAGES.ADMIN.DELETED)
       );
   } catch (error) {
     logger.error(
-      `Error deleting admin ${req.params.adminId}: ${error.message}`,
+      `Error deleting admin ${req.params.adminId}: ${error.message}`
     );
     next(error);
   }
@@ -156,8 +164,8 @@ export const getSuperAdmin = async (req, res, next) => {
         new ApiResponse(
           STATUS_CODES.OK,
           superadmin,
-          MESSAGES.ADMIN.FETCHED_SINGLE,
-        ),
+          MESSAGES.ADMIN.FETCHED_SINGLE
+        )
       );
   } catch (error) {
     logger.error(`Error fetching superadmin profile: ${error.message}`);
@@ -177,7 +185,7 @@ export const updateSuperAdmin = async (req, res, next) => {
 
     const updatedSuperadmin = await adminService.updateSuperAdminService(
       userId,
-      data,
+      data
     );
 
     logger.info(`Superadmin profile updated by ${userId}`);
@@ -188,8 +196,8 @@ export const updateSuperAdmin = async (req, res, next) => {
         new ApiResponse(
           STATUS_CODES.OK,
           updatedSuperadmin,
-          MESSAGES.ADMIN.UPDATED,
-        ),
+          MESSAGES.ADMIN.UPDATED
+        )
       );
   } catch (error) {
     logger.error(`Error updating superadmin profile: ${error.message}`);
@@ -207,7 +215,7 @@ export const deleteSuperAdmin = async (req, res, next) => {
     const userId = req.user._id;
 
     const deletedSuperadmin = await adminService.deleteSuperAdminService(
-      userId,
+      userId
     );
 
     logger.info(`Superadmin profile soft deleted by ${userId}`);
@@ -218,8 +226,8 @@ export const deleteSuperAdmin = async (req, res, next) => {
         new ApiResponse(
           STATUS_CODES.OK,
           deletedSuperadmin,
-          MESSAGES.ADMIN.DELETED,
-        ),
+          MESSAGES.ADMIN.DELETED
+        )
       );
   } catch (error) {
     logger.error(`Error deleting superadmin profile: ${error.message}`);

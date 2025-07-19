@@ -1,9 +1,15 @@
-// /backend/validations/adminValidation.js
-
 import { z } from "zod";
 
-// Create Admin Validation
 export const createAdminValidation = z.object({
+  userId: z
+    .string()
+    .length(24, "User ID must be a valid 24-character ObjectId")
+    .regex(/^[0-9a-fA-F]{24}$/, "User ID must be a valid ObjectId"),
+
+  designation: z.enum(["superadmin", "admin", "support", "finance"], {
+    required_error: "Designation is required",
+  }),
+
   department: z
     .string()
     .trim()
@@ -12,9 +18,22 @@ export const createAdminValidation = z.object({
     .optional(),
 
   permissions: z
-    .array(z.string().trim().min(1, "Permission cannot be empty"))
+    .preprocess(
+      (val) => (typeof val === "string" ? JSON.parse(val) : val),
+      z.array(z.string().trim().min(1, "Permission cannot be empty"))
+    )
     .optional(),
+
+  contactEmail: z.string().email("Invalid contact email").optional(),
+
+  contactPhone: z
+    .string()
+    .regex(/^\+?[0-9]{10,15}$/, "Invalid contact phone")
+    .optional(),
+
+  profilePic: z.string().optional(),
+
+  notes: z.string().optional(),
 });
 
-// Update Admin Validation (partial for PATCH/PUT flexibility)
 export const updateAdminValidation = createAdminValidation.partial();

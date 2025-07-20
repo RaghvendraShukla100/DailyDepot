@@ -115,6 +115,13 @@ export const MESSAGES = Object.freeze({
     DELETED_SUCCESS: "Inventory deleted successfully.",
     NOT_FOUND: "Inventory not found.",
   },
+  SUPPORT: {
+    CREATED: "Support profile created successfully.",
+    FETCHED_ALL: "Support profiles fetched successfully.",
+    FETCHED_SINGLE: "Support profile fetched successfully.",
+    UPDATED: "Support profile updated successfully.",
+    DELETED: "Support profile deleted successfully.",
+  },
 
   GENERAL: {
     SERVER_ERROR: "Something went wrong, please try again later.",

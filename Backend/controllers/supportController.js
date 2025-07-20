@@ -22,7 +22,9 @@ export const createSupport = async (req, res, next) => {
 
     res
       .status(STATUS_CODES.CREATED)
-      .json(new ApiResponse(STATUS_CODES.CREATED, support, MESSAGES.SUPPORT.CREATED));
+      .json(
+        new ApiResponse(STATUS_CODES.CREATED, support, MESSAGES.SUPPORT.CREATED)
+      );
   } catch (error) {
     logger.error(`Error creating support: ${error.message}`);
     next(error);
@@ -39,11 +41,16 @@ export const getSupports = async (req, res, next) => {
     const { page = 1, limit = 20, ...filters } = req.query;
     const skip = (page - 1) * limit;
 
-    const supports = await supportService.getSupportsService(filters, { limit, skip });
+    const supports = await supportService.getSupportsService(filters, {
+      limit,
+      skip,
+    });
 
     res
       .status(STATUS_CODES.OK)
-      .json(new ApiResponse(STATUS_CODES.OK, supports, MESSAGES.SUPPORT.FETCHED_ALL));
+      .json(
+        new ApiResponse(STATUS_CODES.OK, supports, MESSAGES.SUPPORT.FETCHED_ALL)
+      );
   } catch (error) {
     logger.error(`Error fetching supports: ${error.message}`);
     next(error);
@@ -63,33 +70,51 @@ export const getSupportById = async (req, res, next) => {
 
     res
       .status(STATUS_CODES.OK)
-      .json(new ApiResponse(STATUS_CODES.OK, support, MESSAGES.SUPPORT.FETCHED_SINGLE));
+      .json(
+        new ApiResponse(
+          STATUS_CODES.OK,
+          support,
+          MESSAGES.SUPPORT.FETCHED_SINGLE
+        )
+      );
   } catch (error) {
-    logger.error(`Error fetching support ${req.params.supportId}: ${error.message}`);
+    logger.error(
+      `Error fetching support ${req.params.supportId}: ${error.message}`
+    );
     next(error);
   }
 };
 
 /**
- * @desc    Update a support's contact info and permissions
- * @route   PUT /api/supports/:supportId
- * @access  Private (Superadmin/Admin with permissions)
+ * @desc    Update the authenticated support's own profile
+ * @route   PUT /api/supports/:id
+ * @access  Private (Support)
  */
-export const updateSupport = async (req, res, next) => {
+export const updateSupportById = async (req, res, next) => {
   try {
-    const { supportId } = req.params;
+    const admin = req.admin; // authenticated admin document
     const updater = req.admin;
     const data = req.body;
 
-    const updatedSupport = await supportService.updateSupportService(supportId, updater, data);
+    const updatedSupport = await supportService.updateSupportService(
+      admin._id,
+      updater,
+      data
+    );
 
-    logger.info(`Support ${supportId} updated by ${updater._id}`);
+    logger.info(`Support ${admin._id} updated their own profile`);
 
     res
       .status(STATUS_CODES.OK)
-      .json(new ApiResponse(STATUS_CODES.OK, updatedSupport, MESSAGES.SUPPORT.UPDATED));
+      .json(
+        new ApiResponse(
+          STATUS_CODES.OK,
+          updatedSupport,
+          MESSAGES.SUPPORT.UPDATED
+        )
+      );
   } catch (error) {
-    logger.error(`Error updating support ${req.params.supportId}: ${error.message}`);
+    logger.error(`Error updating own support profile: ${error.message}`);
     next(error);
   }
 };
@@ -99,7 +124,7 @@ export const updateSupport = async (req, res, next) => {
  * @route   DELETE /api/supports/:supportId
  * @access  Private (Superadmin/Admin with permissions)
  */
-export const deleteSupport = async (req, res, next) => {
+export const deleteSupportById = async (req, res, next) => {
   try {
     const { supportId } = req.params;
 
@@ -109,9 +134,75 @@ export const deleteSupport = async (req, res, next) => {
 
     res
       .status(STATUS_CODES.OK)
-      .json(new ApiResponse(STATUS_CODES.OK, deletedSupport, MESSAGES.SUPPORT.DELETED));
+      .json(
+        new ApiResponse(
+          STATUS_CODES.OK,
+          deletedSupport,
+          MESSAGES.SUPPORT.DELETED
+        )
+      );
   } catch (error) {
-    logger.error(`Error deleting support ${req.params.supportId}: ${error.message}`);
+    logger.error(
+      `Error deleting support ${req.params.supportId}: ${error.message}`
+    );
+    next(error);
+  }
+};
+
+//=========================================================================================
+//                      supports ownn controller
+//=========================================================================================
+
+/**
+ * @desc    Get the authenticated support's own profile
+ * @route   GET /api/supports/me
+ * @access  Private (Support)
+ */
+export const getSupport = async (req, res, next) => {
+  try {
+    const admin = req.admin; // attached by attachAdminProfile middleware
+
+    res
+      .status(STATUS_CODES.OK)
+      .json(
+        new ApiResponse(STATUS_CODES.OK, admin, MESSAGES.SUPPORT.FETCHED_SINGLE)
+      );
+  } catch (error) {
+    logger.error(`Error fetching own support profile: ${error.message}`);
+    next(error);
+  }
+};
+
+/**
+ * @desc    Update the authenticated support's own profile
+ * @route   PUT /api/supports/me
+ * @access  Private (Support)
+ */
+export const updateSupport = async (req, res, next) => {
+  try {
+    const admin = req.admin; // authenticated admin document
+    const updater = req.admin;
+    const data = req.body;
+
+    const updatedSupport = await supportService.updateSupportService(
+      admin._id,
+      updater,
+      data
+    );
+
+    logger.info(`Support ${admin._id} updated their own profile`);
+
+    res
+      .status(STATUS_CODES.OK)
+      .json(
+        new ApiResponse(
+          STATUS_CODES.OK,
+          updatedSupport,
+          MESSAGES.SUPPORT.UPDATED
+        )
+      );
+  } catch (error) {
+    logger.error(`Error updating own support profile: ${error.message}`);
     next(error);
   }
 };

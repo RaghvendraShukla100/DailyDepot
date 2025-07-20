@@ -1,7 +1,7 @@
 // /backend/models/userSchema.js
 
-import mongoose from 'mongoose';
-import bcrypt from 'bcryptjs';
+import mongoose from "mongoose";
+import bcrypt from "bcryptjs";
 
 // Email regex for basic structure validation
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -14,18 +14,18 @@ const userSchema = new mongoose.Schema(
     name: {
       first: {
         type: String,
-        required: [true, 'First name is required.'],
+        required: [true, "First name is required."],
         trim: true,
       },
       last: {
         type: String,
-        required: [true, 'Last name is required.'],
+        required: [true, "Last name is required."],
         trim: true,
       },
     },
     email: {
       type: String,
-      required: [true, 'Email is required.'],
+      required: [true, "Email is required."],
       unique: true,
       lowercase: true,
       trim: true,
@@ -33,7 +33,7 @@ const userSchema = new mongoose.Schema(
         validator: function (v) {
           return emailRegex.test(v);
         },
-        message: 'Please enter a valid email address.',
+        message: "Please enter a valid email address.",
       },
     },
     phone: {
@@ -46,38 +46,38 @@ const userSchema = new mongoose.Schema(
           if (!v) return true; // allow empty if not provided
           return phoneRegex.test(v);
         },
-        message: 'Please enter a valid phone number.',
+        message: "Please enter a valid phone number.",
       },
     },
     password: {
       type: String,
-      required: [true, 'Password is required.'],
+      required: [true, "Password is required."],
       select: false,
     },
 
     gender: {
       type: String,
-      enum: ['male', 'female', 'other'],
-      default: 'other',
+      enum: ["male", "female", "other"],
+      default: "other",
     },
     dob: { type: Date },
     profilePic: { type: String, trim: true },
     bio: { type: String, trim: true },
-    role: { type: String, enum: ['user', 'seller', 'admin'], default: 'user' },
+    role: { type: String, enum: ["user", "seller", "admin"], default: "user" },
     isEmailVerified: { type: Boolean, default: false },
     isPhoneVerified: { type: Boolean, default: false },
     status: {
       type: String,
-      enum: ['active', 'blocked', 'deleted'],
-      default: 'active',
+      enum: ["active", "blocked", "deleted"],
+      default: "active",
     },
     lastLoginAt: { type: Date },
     lastLoginIP: { type: String },
     loginCount: { type: Number, default: 0 },
     deviceTokens: [{ type: String }],
     preferences: {
-      theme: { type: String, enum: ['light', 'dark'], default: 'light' },
-      language: { type: String, default: 'en' },
+      theme: { type: String, enum: ["light", "dark"], default: "light" },
+      language: { type: String, default: "en" },
     },
     resetPasswordToken: { type: String },
     resetPasswordExpire: { type: Date },
@@ -92,12 +92,12 @@ const userSchema = new mongoose.Schema(
     timestamps: true,
     toJSON: { virtuals: true },
     toObject: { virtuals: true },
-  },
+  }
 );
 
 // Hash password before saving if modified
-userSchema.pre('save', async function (next) {
-  if (this.isModified('password')) {
+userSchema.pre("save", async function (next) {
+  if (this.isModified("password")) {
     const salt = await bcrypt.genSalt(12);
     this.password = await bcrypt.hash(this.password, salt);
   }
@@ -116,9 +116,9 @@ userSchema.methods.comparePassword = async function (enteredPassword) {
 };
 
 // Virtual field for user's full name
-userSchema.virtual('fullName').get(function () {
+userSchema.virtual("fullName").get(function () {
   return `${this.name.first} ${this.name.last}`;
 });
 
-const User = mongoose.model('User', userSchema);
+const User = mongoose.model("User", userSchema);
 export default User;

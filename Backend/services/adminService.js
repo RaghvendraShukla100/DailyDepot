@@ -28,15 +28,15 @@ const validatePermissionsWithinCreator = (creator, requestedPermissions) => {
   }
 };
 
-// ✅ CREATE Admin / Support / Finance
-export const createAdminService = async (creator, data) => {
+// ✅ CREATE Admin
+export const createAdminService = async (creator, data, file) => {
   const {
     userId,
     designation,
     permissions,
     contactEmail,
     contactPhone,
-    profilePic,
+    profilePic, // optional fallback if needed
     notes,
   } = data;
 
@@ -54,8 +54,9 @@ export const createAdminService = async (creator, data) => {
   if (!user) throw ApiError.notFound("User not found.");
 
   const existingAdmin = await Admin.findOne({ user: user._id });
-  if (existingAdmin)
+  if (existingAdmin) {
     throw ApiError.badRequest("This user is already an admin/support/finance.");
+  }
 
   // Update user role to ADMIN
   user.role = ROLES.ADMIN;
@@ -67,6 +68,14 @@ export const createAdminService = async (creator, data) => {
     permissions?.length > 0 ? permissions : defaultPermissions;
   validatePermissionsWithinCreator(creator, effectivePermissions);
 
+  // ✅ Determine profilePic value:
+  let profilePicPath = null;
+  if (file) {
+    profilePicPath = file.path; // multer local path or your upload URL if using cloud
+  } else if (profilePic) {
+    profilePicPath = profilePic; // fallback if provided via body (e.g., URL)
+  }
+
   // Create admin
   const admin = await Admin.create({
     user: user._id,
@@ -74,7 +83,7 @@ export const createAdminService = async (creator, data) => {
     permissions: effectivePermissions,
     contactEmail: contactEmail || user.email,
     contactPhone: contactPhone || user.phone,
-    profilePic,
+    profilePic: profilePicPath,
     notes,
   });
 
@@ -97,12 +106,6 @@ export const getAdminsService = async (filter = {}, options = {}) => {
 
 // ✅ READ single admin by ID
 export const getAdminByIdService = async (adminId) => {
-  console.log("============== DEBUG SERVICE ==============");
-  console.log("adminId received:", adminId);
-  console.log("Type of adminId:", typeof adminId);
-  console.log("Is valid ObjectId:", mongoose.Types.ObjectId.isValid(adminId));
-  console.log("===========================================");
-
   if (!mongoose.Types.ObjectId.isValid(adminId)) {
     throw ApiError.badRequest("Invalid admin ID.");
   }
@@ -118,7 +121,12 @@ export const getAdminByIdService = async (adminId) => {
 };
 
 // ✅ UPDATE admin profile
-export const updateAdminService = async (adminId, updater, data) => {
+export const updateAdminService = async (adminId, updater, data, file) => {
+  console.log("ADMIN ID:", adminId);
+  console.log("UPDATER:", updater);
+  console.log("DATA:", data);
+  console.log("FILE:", file);
+
   if (!mongoose.Types.ObjectId.isValid(adminId)) {
     throw ApiError.badRequest("Invalid admin ID.");
   }
@@ -126,12 +134,12 @@ export const updateAdminService = async (adminId, updater, data) => {
   const admin = await Admin.findById(adminId);
   if (!admin) throw ApiError.notFound("Admin not found.");
 
-  // Only superadmin/admin can update
+  // Prevent admins from updating other admins if not allowed
   if (updater.designation === "admin" && admin.designation === "admin") {
     throw ApiError.forbidden("Admins cannot update other admins.");
   }
 
-  // If updating permissions, check within updater's authority
+  // Permissions update within updater's authority
   if (data.permissions) {
     validatePermissionsWithinCreator(updater, data.permissions);
     admin.permissions = data.permissions;
@@ -139,9 +147,13 @@ export const updateAdminService = async (adminId, updater, data) => {
 
   if (data.contactEmail !== undefined) admin.contactEmail = data.contactEmail;
   if (data.contactPhone !== undefined) admin.contactPhone = data.contactPhone;
-  if (data.profilePic !== undefined) admin.profilePic = data.profilePic;
   if (data.notes !== undefined) admin.notes = data.notes;
   if (data.isActive !== undefined) admin.isActive = data.isActive;
+
+  // ✅ Handle uploaded profilePic correctly:
+  if (file) {
+    admin.profilePic = file.path; // or your S3/Cloudinary URL logic
+  }
 
   await admin.save();
 
@@ -190,7 +202,7 @@ export const getSuperAdminService = async (userId) => {
 };
 
 // ✅ UPDATE superadmin profile
-export const updateSuperAdminService = async (userId, data) => {
+export const updateSuperAdminService = async (userId, data, file) => {
   const admin = await Admin.findOne({
     user: userId,
     designation: "superadmin",
@@ -198,11 +210,17 @@ export const updateSuperAdminService = async (userId, data) => {
   });
   if (!admin) throw ApiError.notFound("Superadmin profile not found.");
 
-  if (data.contactEmail !== undefined) admin.contactEmail = data.contactEmail;
-  if (data.contactPhone !== undefined) admin.contactPhone = data.contactPhone;
-  if (data.profilePic !== undefined) admin.profilePic = data.profilePic;
-  if (data.notes !== undefined) admin.notes = data.notes;
-  if (data.isActive !== undefined) admin.isActive = data.isActive;
+  admin.contactEmail = data.contactEmail ?? admin.contactEmail;
+  admin.contactPhone = data.contactPhone ?? admin.contactPhone;
+  admin.notes = data.notes ?? admin.notes;
+  admin.isActive = data.isActive ?? admin.isActive;
+
+  // ✅ Handle uploaded profilePic via multer
+  if (file) {
+    admin.profilePic = file.path; // or use your Cloudinary/S3 URL if applicable
+  } else if (data.profilePic !== undefined) {
+    admin.profilePic = data.profilePic; // fallback for direct URL update if needed
+  }
 
   await admin.save();
   return admin;

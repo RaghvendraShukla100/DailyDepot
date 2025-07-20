@@ -1,5 +1,3 @@
-// /backend/services/supportService.js
-
 import User from "../models/userSchema.js";
 import Admin from "../models/adminSchema.js";
 import ApiError from "../utils/apiError.js";
@@ -10,45 +8,52 @@ import { ROLES } from "../constants/roles.js";
 /**
  * Create a support admin profile for an existing user
  */
-export const createSupportService = async (creator, { userId, contactEmail, contactPhone, permissions }) => {
-  // Check if user exists
+
+export const createSupportService = async (
+  creator,
+  { userId, contactEmail, contactPhone, permissions }
+) => {
+  // console.log("------------------------------------------------------------");
+  // console.log("error debugging");
+  // console.log("------------------------------------------------------------");
+  // console.log("CREATOR : ", creator);
+  // console.log("PERMISSIONS PROVIDED : ", permissions);
+  // console.log("DEFAULT PERMISSION : ", ROLE_PERMISSIONS.SUPPORT);
+  // console.log("FINAL PERMISSION : ", permissions || ROLE_PERMISSIONS.SUPPORT);
+  // console.log("------------------------------------------------------------");
+  // console.log("error debugging");
+  // console.log("------------------------------------------------------------");
+
   const user = await User.findById(userId);
   if (!user) {
     throw new ApiError(STATUS_CODES.NOT_FOUND, "User not found.");
   }
 
-  // Check if already linked to an admin profile
-  const existingAdmin = await Admin.findOne({ user: userId });
+  const existingAdmin = await Admin.findOne({
+    user: userId,
+    deleted: { $ne: true },
+  });
   if (existingAdmin) {
-    throw new ApiError(STATUS_CODES.BAD_REQUEST, "This user is already an admin/support/finance.");
+    throw new ApiError(
+      STATUS_CODES.BAD_REQUEST,
+      "This user is already an admin/support/finance."
+    );
   }
 
-  // Only superadmin or admin can create support
   if (!["superadmin", "admin"].includes(creator.designation)) {
-    throw new ApiError(STATUS_CODES.FORBIDDEN, "You are not authorized to create support.");
+    throw new ApiError(
+      STATUS_CODES.FORBIDDEN,
+      "You are not authorized to create support."
+    );
   }
 
-  // Set user's role to ADMIN (since support managed under admin)
   user.role = ROLES.ADMIN;
   await user.save();
 
-  // Prepare permissions (default + custom within limits)
-  const defaultPermissions = ROLE_PERMISSIONS.support.can;
-  let finalPermissions = defaultPermissions;
-
-  if (permissions) {
-    const invalidPermissions = permissions.filter(p => !defaultPermissions.includes(p));
-    if (invalidPermissions.length > 0) {
-      throw new ApiError(STATUS_CODES.BAD_REQUEST, `Invalid permissions: ${invalidPermissions.join(", ")}`);
-    }
-    finalPermissions = permissions;
-  }
-
-  // Create Admin record with designation = "support"
   const support = await Admin.create({
     user: user._id,
     designation: "support",
-    permissions: finalPermissions,
+    permissions: permissions || ROLE_PERMISSIONS.SUPPORT,
     contactEmail,
     contactPhone,
   });
@@ -60,11 +65,17 @@ export const createSupportService = async (creator, { userId, contactEmail, cont
  * Get all supports with optional filters and pagination
  */
 export const getSupportsService = async (filters = {}, options = {}) => {
-  const { limit = 20, skip = 0 } = options;
-  const supports = await Admin.find({ designation: "support", ...filters })
+  const limitNumber = parseInt(options.limit, 10) || 20;
+  const skipNumber = parseInt(options.skip, 10) || 0;
+
+  const supports = await Admin.find({
+    designation: "support",
+    deleted: { $ne: true },
+    ...filters,
+  })
     .populate("user", "name email phone")
-    .limit(limit)
-    .skip(skip)
+    .limit(limitNumber)
+    .skip(skipNumber)
     .lean();
 
   return supports;
@@ -74,7 +85,11 @@ export const getSupportsService = async (filters = {}, options = {}) => {
  * Get a single support by adminId
  */
 export const getSupportByIdService = async (adminId) => {
-  const support = await Admin.findOne({ _id: adminId, designation: "support" })
+  const support = await Admin.findOne({
+    _id: adminId,
+    designation: "support",
+    deleted: { $ne: true },
+  })
     .populate("user", "name email phone")
     .lean();
 
@@ -89,12 +104,15 @@ export const getSupportByIdService = async (adminId) => {
  * Update a support's contact info and permissions
  */
 export const updateSupportService = async (adminId, updater, updates) => {
-  const support = await Admin.findOne({ _id: adminId, designation: "support" });
+  const support = await Admin.findOne({
+    _id: adminId,
+    designation: "support",
+    deleted: { $ne: true },
+  });
   if (!support) {
     throw new ApiError(STATUS_CODES.NOT_FOUND, "Support not found.");
   }
 
-  // Allow updating contact info and permissions
   if (updates.contactEmail !== undefined) {
     support.contactEmail = updates.contactEmail;
   }
@@ -102,11 +120,16 @@ export const updateSupportService = async (adminId, updater, updates) => {
     support.contactPhone = updates.contactPhone;
   }
 
-  if (updates.permissions) {
-    const allowedPermissions = ROLE_PERMISSIONS.support.can;
-    const invalidPermissions = updates.permissions.filter(p => !allowedPermissions.includes(p));
+  if (Array.isArray(updates.permissions)) {
+    const allowedPermissions = ROLE_PERMISSIONS.SUPPORT; // fixed: no .can
+    const invalidPermissions = updates.permissions.filter(
+      (p) => !allowedPermissions.includes(p)
+    );
     if (invalidPermissions.length > 0) {
-      throw new ApiError(STATUS_CODES.BAD_REQUEST, `Invalid permissions: ${invalidPermissions.join(", ")}`);
+      throw new ApiError(
+        STATUS_CODES.BAD_REQUEST,
+        `Invalid permissions: ${invalidPermissions.join(", ")}`
+      );
     }
     support.permissions = updates.permissions;
   }
@@ -119,17 +142,19 @@ export const updateSupportService = async (adminId, updater, updates) => {
  * Soft delete support and downgrade user's role
  */
 export const deleteSupportService = async (adminId) => {
-  const support = await Admin.findOne({ _id: adminId, designation: "support" });
+  const support = await Admin.findOne({
+    _id: adminId,
+    designation: "support",
+    deleted: { $ne: true },
+  });
   if (!support) {
     throw new ApiError(STATUS_CODES.NOT_FOUND, "Support not found.");
   }
 
-  // Soft delete admin
   support.deleted = true;
   support.deletedAt = new Date();
   await support.save();
 
-  // Downgrade linked user's role back to "user"
   const user = await User.findById(support.user);
   if (user) {
     user.role = ROLES.USER;

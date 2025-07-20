@@ -69,6 +69,10 @@ export const protect = asyncHandler(async (req, res, next) => {
 export const authorizeRoles =
   (...roles) =>
   (req, res, next) => {
+    // console.log("REQUIRED ROLES : ", roles);
+    // console.log("USER DATA : ", req.user);
+    // console.log("ADMIN DATA : ", req.admin);
+
     if (req.admin && req.admin.designation === "superadmin") return next();
     if (!roles.includes(req.user.role))
       throw new ApiError(403, MESSAGES.AUTH.UNAUTHORIZED);
@@ -95,11 +99,12 @@ export const attachSellerProfile = asyncHandler(async (req, res, next) => {
  * @access  Private (Admin only)
  */
 export const attachAdminProfile = asyncHandler(async (req, res, next) => {
-  if (req.user.role !== ROLES.ADMIN && req.user.role !== ROLES.SUPERADMIN) {
+  if (req.user.role !== ROLES.ADMIN) {
     throw new ApiError(403, MESSAGES.AUTH.UNAUTHORIZED);
   }
   const admin = await Admin.findOne({ user: req.user._id });
   if (!admin) throw new ApiError(404, MESSAGES.ADMIN.NOT_FOUND);
   req.admin = admin;
+
   next();
 });

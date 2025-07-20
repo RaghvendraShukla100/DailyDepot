@@ -52,7 +52,7 @@ router.put(
   protect,
   authorizeRoles(ROLES.ADMIN),
   checkDesignation(ADMIN_DESIGNATIONS.SUPERADMIN),
-  checkPermissions("manage_admins"),
+  checkPermissions("manage_superadmin"),
   upload.single("profilePic"),
   validateResource(updateAdminValidation),
   asyncHandler(updateSuperAdmin)

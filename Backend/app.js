@@ -29,6 +29,8 @@ import analyticsRoutes from "./routes/analyticsRoutes.js";
 import couponRoutes from "./routes/couponRoutes.js";
 import categoryRoutes from "./routes/categoryRoutes.js";
 import notificationRoutes from "./routes/notificationRoutes.js";
+import supportRoutes from "./routes/supportRoutes.js";
+// import financeRoutes from "./routes/financeRoutes.js";
 
 // ✅ Correctly define __dirname in ESM
 const __filename = fileURLToPath(import.meta.url);
@@ -79,6 +81,8 @@ app.use("/api/payments", paymentRoutes);
 app.use("/api/analytics", analyticsRoutes);
 app.use("/api/coupons", couponRoutes);
 app.use("/api/categories", categoryRoutes);
+app.use("/api/supports", supportRoutes);
+// app.use("/api/finance", financeRoutes);
 
 // 7️⃣ Health Check Endpoint
 app.get("/api/health", (req, res) => {

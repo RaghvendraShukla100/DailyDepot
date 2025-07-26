@@ -4,6 +4,7 @@ import User from "../models/userSchema.js";
 import ApiError from "../utils/ApiError.js";
 import { MESSAGES } from "../constants/messages.js";
 import logger from "../utils/logger.js";
+import { paginate } from "../utils/paginate.js";
 
 /**
  * Fetch a user's profile by ID, excluding the password field.
@@ -46,32 +47,32 @@ export const softDeleteUser = async (userId) => {
   logger.info(`User soft-deleted`, { userId });
   return user;
 };
-
 /**
  * Get all non-deleted users with pagination.
  * Returns { users, page, limit, total, totalPages }
  */
-export const getAllUsers = async ({ page = 1, limit = 20 }) => {
-  page = parseInt(page);
-  limit = parseInt(limit);
-  const skip = (page - 1) * limit;
+
+export const getAllUsers = async ({ page = 1, limit = 10 }) => {
+  const { skip, limit: parsedLimit } = paginate(page, limit);
 
   const [users, total] = await Promise.all([
-    User.find({ deleted: { $ne: true } })
+    User.find({ deleted: { $ne: true }, role: { $eq: "user" } })
       .select("-password")
       .skip(skip)
-      .limit(limit)
+      .limit(parsedLimit)
       .sort({ createdAt: -1 }),
-    User.countDocuments({ deleted: { $ne: true } }),
+
+    User.countDocuments({ deleted: { $ne: true }, role: { $eq: "user" } }),
   ]);
 
-  logger.info(`Fetched users page=${page}, limit=${limit}`);
+  logger.info(`Fetched users page=${page}, limit=${parsedLimit}`);
+
   return {
     users,
     page,
-    limit,
+    limit: parsedLimit,
     total,
-    totalPages: Math.ceil(total / limit),
+    totalPages: Math.ceil(total / parsedLimit),
   };
 };
 

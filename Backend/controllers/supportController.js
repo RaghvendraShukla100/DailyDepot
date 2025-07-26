@@ -1,7 +1,7 @@
 // /backend/controllers/supportController.js
 
 import * as supportService from "../services/supportService.js";
-import ApiResponse from "../utils/apiResponse.js";
+import ApiResponse from "../utils/ApiResponse.js";
 import { STATUS_CODES } from "../constants/statusCodes.js";
 import { MESSAGES } from "../constants/messages.js";
 import logger from "../utils/logger.js";
@@ -12,23 +12,18 @@ import logger from "../utils/logger.js";
  * @access  Private (Superadmin/Admin with permissions)
  */
 export const createSupport = async (req, res, next) => {
-  try {
-    const creator = req.admin; // injected via protect middleware
-    const data = req.body;
+  const creator = req.admin; // injected via protect middleware
+  const data = req.body;
 
-    const support = await supportService.createSupportService(creator, data);
+  const support = await supportService.createSupportService(creator, data);
 
-    logger.info(`Support created by ${creator._id} for user ${data.userId}`);
+  logger.info(`Support created by ${creator._id} for user ${data.userId}`);
 
-    res
-      .status(STATUS_CODES.CREATED)
-      .json(
-        new ApiResponse(STATUS_CODES.CREATED, support, MESSAGES.SUPPORT.CREATED)
-      );
-  } catch (error) {
-    logger.error(`Error creating support: ${error.message}`);
-    next(error);
-  }
+  res
+    .status(STATUS_CODES.CREATED)
+    .json(
+      new ApiResponse(STATUS_CODES.CREATED, support, MESSAGES.SUPPORT.CREATED)
+    );
 };
 
 /**
@@ -37,24 +32,19 @@ export const createSupport = async (req, res, next) => {
  * @access  Private (Superadmin/Admin with permissions)
  */
 export const getSupports = async (req, res, next) => {
-  try {
-    const { page = 1, limit = 20, ...filters } = req.query;
-    const skip = (page - 1) * limit;
+  const { page = 1, limit = 20, ...filters } = req.query;
+  const skip = (page - 1) * limit;
 
-    const supports = await supportService.getSupportsService(filters, {
-      limit,
-      skip,
-    });
+  const supports = await supportService.getSupportsService(filters, {
+    limit,
+    skip,
+  });
 
-    res
-      .status(STATUS_CODES.OK)
-      .json(
-        new ApiResponse(STATUS_CODES.OK, supports, MESSAGES.SUPPORT.FETCHED_ALL)
-      );
-  } catch (error) {
-    logger.error(`Error fetching supports: ${error.message}`);
-    next(error);
-  }
+  res
+    .status(STATUS_CODES.OK)
+    .json(
+      new ApiResponse(STATUS_CODES.OK, supports, MESSAGES.SUPPORT.FETCHED_ALL)
+    );
 };
 
 /**
@@ -63,26 +53,15 @@ export const getSupports = async (req, res, next) => {
  * @access  Private (Superadmin/Admin with permissions)
  */
 export const getSupportById = async (req, res, next) => {
-  try {
-    const { supportId } = req.params;
+  const { supportId } = req.params;
 
-    const support = await supportService.getSupportByIdService(supportId);
+  const support = await supportService.getSupportByIdService(supportId);
 
-    res
-      .status(STATUS_CODES.OK)
-      .json(
-        new ApiResponse(
-          STATUS_CODES.OK,
-          support,
-          MESSAGES.SUPPORT.FETCHED_SINGLE
-        )
-      );
-  } catch (error) {
-    logger.error(
-      `Error fetching support ${req.params.supportId}: ${error.message}`
+  res
+    .status(STATUS_CODES.OK)
+    .json(
+      new ApiResponse(STATUS_CODES.OK, support, MESSAGES.SUPPORT.FETCHED_SINGLE)
     );
-    next(error);
-  }
 };
 
 /**
@@ -91,32 +70,23 @@ export const getSupportById = async (req, res, next) => {
  * @access  Private (Support)
  */
 export const updateSupportById = async (req, res, next) => {
-  try {
-    const admin = req.admin; // authenticated admin document
-    const updater = req.admin;
-    const data = req.body;
+  const admin = req.admin; // authenticated admin document
+  const updater = req.admin;
+  const data = req.body;
 
-    const updatedSupport = await supportService.updateSupportService(
-      admin._id,
-      updater,
-      data
+  const updatedSupport = await supportService.updateSupportService(
+    admin._id,
+    updater,
+    data
+  );
+
+  logger.info(`Support ${admin._id} updated their own profile`);
+
+  res
+    .status(STATUS_CODES.OK)
+    .json(
+      new ApiResponse(STATUS_CODES.OK, updatedSupport, MESSAGES.SUPPORT.UPDATED)
     );
-
-    logger.info(`Support ${admin._id} updated their own profile`);
-
-    res
-      .status(STATUS_CODES.OK)
-      .json(
-        new ApiResponse(
-          STATUS_CODES.OK,
-          updatedSupport,
-          MESSAGES.SUPPORT.UPDATED
-        )
-      );
-  } catch (error) {
-    logger.error(`Error updating own support profile: ${error.message}`);
-    next(error);
-  }
 };
 
 /**
@@ -125,28 +95,17 @@ export const updateSupportById = async (req, res, next) => {
  * @access  Private (Superadmin/Admin with permissions)
  */
 export const deleteSupportById = async (req, res, next) => {
-  try {
-    const { supportId } = req.params;
+  const { supportId } = req.params;
 
-    const deletedSupport = await supportService.deleteSupportService(supportId);
+  const deletedSupport = await supportService.deleteSupportService(supportId);
 
-    logger.info(`Support ${supportId} soft deleted.`);
+  logger.info(`Support ${supportId} soft deleted.`);
 
-    res
-      .status(STATUS_CODES.OK)
-      .json(
-        new ApiResponse(
-          STATUS_CODES.OK,
-          deletedSupport,
-          MESSAGES.SUPPORT.DELETED
-        )
-      );
-  } catch (error) {
-    logger.error(
-      `Error deleting support ${req.params.supportId}: ${error.message}`
+  res
+    .status(STATUS_CODES.OK)
+    .json(
+      new ApiResponse(STATUS_CODES.OK, deletedSupport, MESSAGES.SUPPORT.DELETED)
     );
-    next(error);
-  }
 };
 
 //=========================================================================================
@@ -159,18 +118,14 @@ export const deleteSupportById = async (req, res, next) => {
  * @access  Private (Support)
  */
 export const getSupport = async (req, res, next) => {
-  try {
-    const admin = req.admin; // attached by attachAdminProfile middleware
+  const admin = req.admin; // attached by attachAdminProfile middleware
+  console.log(admin);
 
-    res
-      .status(STATUS_CODES.OK)
-      .json(
-        new ApiResponse(STATUS_CODES.OK, admin, MESSAGES.SUPPORT.FETCHED_SINGLE)
-      );
-  } catch (error) {
-    logger.error(`Error fetching own support profile: ${error.message}`);
-    next(error);
-  }
+  res
+    .status(STATUS_CODES.OK)
+    .json(
+      new ApiResponse(STATUS_CODES.OK, admin, MESSAGES.SUPPORT.FETCHED_SINGLE)
+    );
 };
 
 /**

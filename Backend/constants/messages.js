@@ -24,20 +24,21 @@ export const MESSAGES = Object.freeze({
     CREATED_SUCCESS: "Seller created successfully.",
     UPDATED_SUCCESS: "Seller updated successfully.",
     DELETED_SUCCESS: "Seller deleted successfully.",
-    FETCHED_SUCCESS: "Seller fetched successfully.",
-    ALL_FETCHED: "All sellers fetched successfully.",
+    FETCHED_SUCCESS: "Sellers fetched successfully.",
   },
 
   ADMIN: {
     NOT_FOUND: "Admin not found.",
   },
+
   ADDRESS: {
-    ALL_FETCHED: "All addresses fetched successfully",
-    FETCHED: "Address fetched successfully",
-    CREATED: "Address created successfully",
-    UPDATED: "Address updated successfully",
-    DELETED: "Address deleted successfully",
+    FETCHED_SUCCESS: "Addresses fetched successfully.",
+    RETRIEVED_SUCCESS: "Address fetched successfully.",
+    CREATED_SUCCESS: "Address created successfully.",
+    UPDATED_SUCCESS: "Address updated successfully.",
+    DELETED_SUCCESS: "Address deleted successfully.",
   },
+
   PAYMENT: {
     CREATED_SUCCESS: "Payment recorded successfully.",
     FETCHED_SUCCESS: "Payments fetched successfully.",
@@ -52,7 +53,7 @@ export const MESSAGES = Object.freeze({
 
   ORDER: {
     CREATED_SUCCESS: "Order placed successfully.",
-    FETCHED_SUCCESS: "Orders retrieved successfully.",
+    FETCHED_SUCCESS: "Orders fetched successfully.",
     RETRIEVED_SUCCESS: "Order retrieved successfully.",
     UPDATED_SUCCESS: "Order updated successfully.",
     STATUS_UPDATED: "Order status updated successfully.",
@@ -84,7 +85,7 @@ export const MESSAGES = Object.freeze({
 
   WISHLIST: {
     CREATED_SUCCESS: "Wishlist created successfully.",
-    FETCHED_SUCCESS: "Wishlists retrieved successfully.",
+    FETCHED_SUCCESS: "Wishlists fetched successfully.",
     RETRIEVED_SUCCESS: "Wishlist retrieved successfully.",
     UPDATED_SUCCESS: "Wishlist updated successfully.",
     DELETED_SUCCESS: "Wishlist deleted successfully.",
@@ -98,29 +99,47 @@ export const MESSAGES = Object.freeze({
   PRODUCT: {
     NOT_FOUND: "Product not found.",
     OUT_OF_STOCK: "Insufficient stock for product.",
-    FETCHED_SUCCESS: "Products data retrieved successfully.",
+    FETCHED_SUCCESS: "Products fetched successfully.",
   },
 
   ANALYTICS: {
     CREATED_SUCCESS: "Analytics event recorded successfully.",
-    FETCHED_SUCCESS: "Analytics data retrieved successfully.",
+    FETCHED_SUCCESS: "Analytics data fetched successfully.",
     DELETED_SUCCESS: "Analytics event deleted successfully.",
     NOT_FOUND: "Analytics data not found.",
   },
+
   INVENTORY: {
     CREATED_SUCCESS: "Inventory created successfully.",
     FETCHED_SUCCESS: "Inventories fetched successfully.",
-    RETRIEVED_SUCCESS: "Inventory retrieved successfully.",
+    RETRIEVED_SUCCESS: "Inventory fetched successfully.",
     UPDATED_SUCCESS: "Inventory updated successfully.",
     DELETED_SUCCESS: "Inventory deleted successfully.",
     NOT_FOUND: "Inventory not found.",
   },
+
+  FINANCE: {
+    CREATED_SUCCESS: "Finance record created successfully.",
+    FETCHED_SUCCESS: "Finance records fetched successfully.",
+    RETRIEVED_SUCCESS: "Finance record fetched successfully.",
+    UPDATED_SUCCESS: "Finance record updated successfully.",
+    DELETED_SUCCESS: "Finance record deleted successfully.",
+    NOT_FOUND: "Finance record not found.",
+  },
+
   SUPPORT: {
-    CREATED: "Support profile created successfully.",
-    FETCHED_ALL: "Support profiles fetched successfully.",
-    FETCHED_SINGLE: "Support profile fetched successfully.",
-    UPDATED: "Support profile updated successfully.",
-    DELETED: "Support profile deleted successfully.",
+    CREATED_SUCCESS: "Support profile created successfully.",
+    FETCHED_SUCCESS: "Support profiles fetched successfully.",
+    RETRIEVED_SUCCESS: "Support profile fetched successfully.",
+    UPDATED_SUCCESS: "Support profile updated successfully.",
+    DELETED_SUCCESS: "Support profile deleted successfully.",
+  },
+
+  VALIDATION: {
+    REQUIRED_FIELDS_MISSING: "Required fields are missing.",
+    INVALID_EMAIL: "Invalid email address.",
+    PASSWORD_TOO_SHORT: "Password must be at least 8 characters.",
+    INVALID_ID: "Invalid ID provided.",
   },
 
   GENERAL: {

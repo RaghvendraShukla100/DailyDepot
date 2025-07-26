@@ -6,9 +6,9 @@ import ApiError from "../utils/ApiError.js";
 const checkPermissions =
   (...requiredPermissions) =>
   (req, res, next) => {
-    console.log(`designation : ${req.admin.designation}`);
-    console.log(`required permissions : ${requiredPermissions}`);
-    console.log(`Available permissions : ${req.admin.permissions}`);
+    // console.log(`designation : ${req.admin.designation}`);
+    // console.log(`required permissions : ${requiredPermissions}`);
+    // console.log(`Available permissions : ${req.admin.permissions}`);
 
     const hasPermission = requiredPermissions.every((perm) =>
       req.admin.permissions.includes(perm)

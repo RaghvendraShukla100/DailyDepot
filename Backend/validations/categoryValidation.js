@@ -1,5 +1,3 @@
-// /backend/validations/categoryValidation.js
-
 import { z } from "zod";
 
 /**
@@ -15,12 +13,11 @@ export const createCategoryValidation = z.object({
     .max(100, "Category name cannot exceed 100 characters."),
 
   slug: z
-    .string({
-      required_error: "Slug is required.",
-    })
+    .string()
     .trim()
     .min(2, "Slug must be at least 2 characters.")
-    .max(100, "Slug cannot exceed 100 characters."),
+    .max(100, "Slug cannot exceed 100 characters.")
+    .optional(),
 
   description: z
     .string()
@@ -34,6 +31,7 @@ export const createCategoryValidation = z.object({
     .object({
       url: z.string().url("Image URL must be valid.").optional(),
       public_id: z.string().optional(),
+      alt: z.string().optional(), // optional alt if you want
     })
     .optional(),
 

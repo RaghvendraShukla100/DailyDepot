@@ -1,5 +1,5 @@
-import mongoose from 'mongoose';
-import slugify from 'slugify'; // recommended for consistent slug generation
+import mongoose from "mongoose";
+import slugify from "slugify";
 
 const categorySchema = new mongoose.Schema(
   {
@@ -7,30 +7,28 @@ const categorySchema = new mongoose.Schema(
       type: String,
       required: true,
       trim: true,
-      unique: true,
-      index: true,
+      unique: true, // ✅ यूनिक इंडेक्स
     },
     slug: {
       type: String,
       required: true,
       trim: true,
-      unique: true,
+      unique: true, // ✅ यूनिक इंडेक्स
       lowercase: true,
-      index: true,
     },
     description: {
       type: String,
       trim: true,
-      default: '',
+      default: "",
     },
     parentCategory: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'Category',
+      ref: "Category",
       default: null,
     },
     image: {
       url: { type: String, trim: true },
-      alt: { type: String, trim: true, default: '' },
+      alt: { type: String, trim: true, default: "" },
       public_id: { type: String, trim: true },
     },
     isFeatured: {
@@ -45,8 +43,8 @@ const categorySchema = new mongoose.Schema(
     },
     status: {
       type: String,
-      enum: ['active', 'inactive', 'deleted'],
-      default: 'active',
+      enum: ["active", "inactive", "deleted"],
+      default: "active",
       index: true,
     },
     deleted: {
@@ -63,19 +61,20 @@ const categorySchema = new mongoose.Schema(
     timestamps: true,
     toJSON: { virtuals: true },
     toObject: { virtuals: true },
-  },
+    autoIndex: true, // ✅ development में यूनिक इंडेक्स बनने के लिए जरूरी
+  }
 );
 
-// Auto-generate slug from name if not provided or name changed
-categorySchema.pre('validate', function (next) {
+// 🔧 Auto-generate slug from name
+categorySchema.pre("validate", function (next) {
   if (!this.slug && this.name) {
     this.slug = slugify(this.name, { lower: true, strict: true });
   }
   next();
 });
 
-// Ensure slug update during findOneAndUpdate if name changes
-categorySchema.pre('findOneAndUpdate', async function (next) {
+// 🔄 Update slug if name changes via findOneAndUpdate
+categorySchema.pre("findOneAndUpdate", async function (next) {
   const update = this.getUpdate();
   if (update.name) {
     update.slug = slugify(update.name, { lower: true, strict: true });
@@ -84,8 +83,8 @@ categorySchema.pre('findOneAndUpdate', async function (next) {
   next();
 });
 
-// Clean JSON output
-categorySchema.set('toJSON', {
+// 🧹 Clean JSON output
+categorySchema.set("toJSON", {
   virtuals: true,
   versionKey: false,
   transform: (_doc, ret) => {
@@ -94,9 +93,20 @@ categorySchema.set('toJSON', {
   },
 });
 
-// Compound indexes for filtering and sorting
+// 📈 Compound indexes
 categorySchema.index({ isFeatured: 1, isPublished: 1 });
 categorySchema.index({ status: 1, deleted: 1 });
 
-const Category = mongoose.model('Category', categorySchema);
+// 📦 Model init to force index creation
+const Category = mongoose.model("Category", categorySchema);
+
+// 🛠️ Force index creation on app start (can be awaited in your app.js or db.js)
+Category.init()
+  .then(() => {
+    console.log("✅ Category indexes ensured.");
+  })
+  .catch((err) => {
+    console.error("❌ Index creation failed:", err.message);
+  });
+
 export default Category;

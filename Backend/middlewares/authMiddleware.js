@@ -29,6 +29,7 @@ export const protect = asyncHandler(async (req, res, next) => {
   let decoded;
   try {
     decoded = jwt.verify(token, process.env.JWT_SECRET);
+    console.log("decoded token in auhMiddleware is : ", decoded);
   } catch (error) {
     throw new ApiError(401, MESSAGES.AUTH.INVALID_TOKEN);
   }
@@ -69,9 +70,9 @@ export const protect = asyncHandler(async (req, res, next) => {
 export const authorizeRoles =
   (...roles) =>
   (req, res, next) => {
-    // console.log("REQUIRED ROLES : ", roles);
-    // console.log("USER DATA : ", req.user);
-    // console.log("ADMIN DATA : ", req.admin);
+    console.log("REQUIRED ROLES : ", roles);
+    console.log("USER DATA : ", req.user);
+    console.log("ADMIN DATA : ", req.admin);
 
     if (req.admin && req.admin.designation === "superadmin") return next();
     if (!roles.includes(req.user.role))

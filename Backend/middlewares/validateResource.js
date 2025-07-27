@@ -1,6 +1,7 @@
 // /backend/middlewares/validateResource.js
 
 import ApiError from "../utils/ApiError.js";
+import multer from "multer";
 
 /**
  * Zod-based request body validation middleware
@@ -11,6 +12,7 @@ import ApiError from "../utils/ApiError.js";
 const validateResource = (schema) => (req, res, next) => {
   try {
     // 🩹 Pre-parse JSON strings if they look like arrays or objects
+
     for (const key in req.body) {
       if (typeof req.body[key] === "string") {
         const value = req.body[key].trim();

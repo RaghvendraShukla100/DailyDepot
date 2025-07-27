@@ -14,12 +14,15 @@ import {
   authorizeRoles,
   attachAdminProfile,
 } from "../middlewares/authMiddleware.js";
+import checkDesignation from "../middlewares/checkDesignation.js";
+import checkPermissions from "../middlewares/checkPermissions.js";
 import validateResource from "../middlewares/validateResource.js";
 import {
   createCategoryValidation,
   updateCategoryValidation,
 } from "../validations/categoryValidation.js";
 import { ROLES } from "../constants/roles.js";
+import { ADMIN_DESIGNATIONS } from "../constants/designation.js";
 
 const router = express.Router();
 
@@ -46,6 +49,8 @@ router.post(
   "/",
   protect,
   authorizeRoles(ROLES.ADMIN),
+  checkDesignation(ADMIN_DESIGNATIONS.SUPERADMIN, ADMIN_DESIGNATIONS.ADMIN),
+  checkPermissions("manage_database"),
   attachAdminProfile,
   validateResource(createCategoryValidation),
   asyncHandler(createCategory)

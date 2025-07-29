@@ -8,7 +8,11 @@ import {
   deleteBrand,
 } from "../controllers/brandController.js";
 import { protect, authorizeRoles } from "../middlewares/authMiddleware.js";
+import checkDesignation from "../middlewares/checkDesignation.js";
+import checkPermissions from "../middlewares/checkPermissions.js";
+
 import { ROLES } from "../constants/roles.js";
+import { ADMIN_DESIGNATIONS } from "../constants/designation.js";
 import validateResource from "../middlewares/validateResource.js";
 import {
   createBrandValidation,
@@ -34,12 +38,14 @@ router.get("/:id", asyncHandler(getBrandById));
 /**
  * @route   POST /api/brands
  * @desc    Create a new brand
- * @access  Private (Admin)
+ * @access  Private (Admin and superadmin)
  */
 router.post(
   "/",
   protect,
   authorizeRoles(ROLES.ADMIN),
+  checkDesignation(ADMIN_DESIGNATIONS.SUPERADMIN, ADMIN_DESIGNATIONS.ADMIN),
+  checkPermissions("manage_database"),
   validateResource(createBrandValidation),
   asyncHandler(createBrand)
 );
@@ -53,6 +59,8 @@ router.put(
   "/:id",
   protect,
   authorizeRoles(ROLES.ADMIN),
+  checkDesignation(ADMIN_DESIGNATIONS.SUPERADMIN, ADMIN_DESIGNATIONS.ADMIN),
+  checkPermissions("manage_database"),
   validateResource(updateBrandValidation),
   asyncHandler(updateBrand)
 );
@@ -66,6 +74,8 @@ router.delete(
   "/:id",
   protect,
   authorizeRoles(ROLES.ADMIN),
+  checkDesignation(ADMIN_DESIGNATIONS.SUPERADMIN, ADMIN_DESIGNATIONS.ADMIN),
+  checkPermissions("manage_database"),
   asyncHandler(deleteBrand)
 );
 

@@ -101,12 +101,8 @@ categorySchema.index({ status: 1, deleted: 1 });
 const Category = mongoose.model("Category", categorySchema);
 
 // 🛠️ Force index creation on app start (can be awaited in your app.js or db.js)
-Category.init()
-  .then(() => {
-    console.log("✅ Category indexes ensured.");
-  })
-  .catch((err) => {
-    console.error("❌ Index creation failed:", err.message);
-  });
+Category.init().catch((err) => {
+  console.error("❌ Index creation failed:", err.message);
+});
 
 export default Category;

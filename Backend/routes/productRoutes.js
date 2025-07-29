@@ -18,7 +18,7 @@ import {
 } from "../validations/productValidation.js";
 import { ROLES } from "../constants/roles.js";
 import { publicLimiter } from "../middlewares/rateLimiter.js";
-
+import productUpdateAuthorization from "../middlewares/productUpdateAuthorization.js";
 const router = express.Router();
 
 /**
@@ -55,12 +55,13 @@ router.get("/:id", asyncHandler(getProductById));
 /**
  * @route   PUT /api/products/:id
  * @desc    Update a product
- * @access  Private (Seller/Admin)
+ * @access  Private (prduct-creater : Seller/Admin)
  */
 router.put(
   "/:id",
   protect,
   authorizeRoles(ROLES.SELLER, ROLES.ADMIN),
+  productUpdateAuthorization,
   productUpload.fields([
     { name: "images", maxCount: 5 },
     { name: "videos", maxCount: 2 },

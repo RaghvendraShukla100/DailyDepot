@@ -1,7 +1,4 @@
-// /backend/controllers/brandController.js
-
-import Brand from "../models/brandSchema.js";
-import ApiError from "../utils/ApiError.js";
+import * as brandService from "../services/brandServices.js";
 import ApiResponse from "../utils/ApiResponse.js";
 import { STATUS_CODES } from "../constants/statusCodes.js";
 import { MESSAGES } from "../constants/messages.js";
@@ -13,7 +10,7 @@ import logger from "../utils/logger.js";
  * @access  Private/Admin
  */
 export const createBrand = async (req, res) => {
-  const brand = await Brand.create(req.body);
+  const brand = await brandService.createBrandService(req.body);
 
   logger.info(`Brand created with id=${brand._id} by adminId=${req.user._id}`);
 
@@ -34,9 +31,7 @@ export const createBrand = async (req, res) => {
  * @access  Public
  */
 export const getBrands = async (req, res) => {
-  const brands = await Brand.find({ deleted: { $ne: true } }).sort({
-    createdAt: -1,
-  });
+  const brands = await brandService.getBrandsService();
 
   logger.info(`Fetched all non-deleted brands. Total=${brands.length}`);
 
@@ -51,11 +46,7 @@ export const getBrands = async (req, res) => {
  * @access  Public
  */
 export const getBrandById = async (req, res) => {
-  const brand = await Brand.findById(req.params.id);
-
-  if (!brand || brand.deleted) {
-    throw ApiError.notFound(MESSAGES.BRAND.NOT_FOUND);
-  }
+  const brand = await brandService.getBrandByIdService(req.params.id);
 
   logger.info(`Fetched brand with id=${req.params.id}`);
 
@@ -72,21 +63,7 @@ export const getBrandById = async (req, res) => {
  * @access  Private/Admin
  */
 export const updateBrand = async (req, res) => {
-  const brand = await Brand.findById(req.params.id);
-
-  if (!brand || brand.deleted) {
-    throw ApiError.notFound(MESSAGES.BRAND.NOT_FOUND);
-  }
-
-  // Update fields if present
-  if (req.body.name !== undefined) brand.name = req.body.name;
-  if (req.body.slug !== undefined) brand.slug = req.body.slug;
-  if (req.body.description !== undefined)
-    brand.description = req.body.description;
-  if (req.body.logo !== undefined) brand.logo = req.body.logo;
-  if (req.body.status !== undefined) brand.status = req.body.status;
-
-  await brand.save();
+  const brand = await brandService.updateBrandService(req.params.id, req.body);
 
   logger.info(
     `Brand with id=${req.params.id} updated by adminId=${req.user._id}`
@@ -105,16 +82,7 @@ export const updateBrand = async (req, res) => {
  * @access  Private/Admin
  */
 export const deleteBrand = async (req, res) => {
-  const brand = await Brand.findById(req.params.id);
-
-  if (!brand || brand.deleted) {
-    throw ApiError.notFound(MESSAGES.BRAND.NOT_FOUND);
-  }
-
-  brand.deleted = true;
-  brand.status = "deleted";
-  brand.deletedAt = new Date();
-  await brand.save();
+  await brandService.deleteBrandService(req.params.id);
 
   logger.info(
     `Brand with id=${req.params.id} soft-deleted by adminId=${req.user._id}`

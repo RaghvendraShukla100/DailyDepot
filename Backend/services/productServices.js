@@ -15,15 +15,32 @@ import logger from "../utils/logger.js";
  * @returns {Promise<Object>} - The newly created product document
  */
 export const createProductService = async (body, files, user) => {
-  const images = files?.images?.map(file => ({
-    url: file.path,
-    alt: file.originalname || "",
-  })) || [];
+  // console.log(
+  //   "##########################################################################"
+  // );
+  // console.log(`                         PRODUCT VALIDAION`);
+  // console.log(
+  //   "##########################################################################"
+  // );
+  // console.log("BODY DATA : ", body);
+  // console.log("FILES DATA : ", files);
+  // console.log("USER DATA : ", user);
 
-  const videos = files?.videos?.map(file => ({
-    url: file.path,
-    alt: file.originalname || "",
-  })) || [];
+  // console.log(
+  //   "##########################################################################"
+  // );
+
+  const images =
+    files?.images?.map((file) => ({
+      url: file.path,
+      alt: file.originalname || "",
+    })) || [];
+
+  const videos =
+    files?.videos?.map((file) => ({
+      url: file.path,
+      alt: file.originalname || "",
+    })) || [];
 
   const product = await Product.create({
     ...body,
@@ -35,7 +52,6 @@ export const createProductService = async (body, files, user) => {
   logger.info(`Product created by userId=${user._id}`);
   return product;
 };
-
 
 /**
  * Retrieve products with optional pagination, filtering, and sorting
@@ -76,7 +92,10 @@ export const getProductsService = async (query) => {
  * @returns {Promise<Object>} - The fetched product document
  */
 export const getProductByIdService = async (id) => {
-  const product = await Product.findById(id).populate("createdBy", "name email");
+  const product = await Product.findById(id).populate(
+    "createdBy",
+    "name email"
+  );
 
   if (!product || product.deleted) {
     throw ApiError.notFound(MESSAGES.PRODUCT.NOT_FOUND);
@@ -97,18 +116,38 @@ export const getProductByIdService = async (id) => {
 
 export const updateProductService = async (id, body, files, user) => {
   const product = await Product.findById(id);
-  if (!product || product.deleted) throw ApiError.notFound(MESSAGES.PRODUCT.NOT_FOUND);
+  if (!product || product.deleted)
+    throw ApiError.notFound(MESSAGES.PRODUCT.NOT_FOUND);
 
-  if (user.role === ROLES.SELLER && product.createdBy.toString() !== user._id.toString()) {
+  if (
+    user.role === ROLES.SELLER &&
+    product.createdBy.toString() !== user._id.toString()
+  ) {
     throw ApiError.forbidden(MESSAGES.AUTH.UNAUTHORIZED);
   }
 
   if (files?.images?.length || files?.videos?.length) {
-    product.images.forEach(img => fs.unlink(img.url, err => { if (err) logger.error("Error deleting old image:", err); }));
-    product.videos.forEach(vid => fs.unlink(vid.url, err => { if (err) logger.error("Error deleting old video:", err); }));
+    product.images.forEach((img) =>
+      fs.unlink(img.url, (err) => {
+        if (err) logger.error("Error deleting old image:", err);
+      })
+    );
+    product.videos.forEach((vid) =>
+      fs.unlink(vid.url, (err) => {
+        if (err) logger.error("Error deleting old video:", err);
+      })
+    );
 
-    product.images = files?.images?.map(file => ({ url: file.path, alt: file.originalname || "" })) || [];
-    product.videos = files?.videos?.map(file => ({ url: file.path, alt: file.originalname || "" })) || [];
+    product.images =
+      files?.images?.map((file) => ({
+        url: file.path,
+        alt: file.originalname || "",
+      })) || [];
+    product.videos =
+      files?.videos?.map((file) => ({
+        url: file.path,
+        alt: file.originalname || "",
+      })) || [];
   }
 
   Object.assign(product, body);
@@ -116,7 +155,6 @@ export const updateProductService = async (id, body, files, user) => {
   logger.info(`Product updated productId=${id}`);
   return product;
 };
-
 
 /**
  * Soft delete a product by marking it as deleted
@@ -132,7 +170,10 @@ export const deleteProductService = async (id, user) => {
   }
 
   // Ensure only the owner (seller) or admin can delete
-  if (user.role === ROLES.SELLER && product.createdBy.toString() !== user._id.toString()) {
+  if (
+    user.role === ROLES.SELLER &&
+    product.createdBy.toString() !== user._id.toString()
+  ) {
     throw ApiError.forbidden(MESSAGES.AUTH.UNAUTHORIZED);
   }
 

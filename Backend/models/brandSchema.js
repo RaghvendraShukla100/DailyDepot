@@ -1,5 +1,5 @@
-import mongoose from 'mongoose';
-import slugify from 'slugify';
+import mongoose from "mongoose";
+import slugify from "slugify";
 
 const brandSchema = new mongoose.Schema(
   {
@@ -18,17 +18,22 @@ const brandSchema = new mongoose.Schema(
       lowercase: true,
       index: true,
     },
-    description: { type: String, trim: true, default: '' },
+    description: { type: String, trim: true, default: "" },
     logo: {
       url: { type: String, trim: true },
       public_id: { type: String, trim: true },
     },
-    website: { type: String, trim: true, default: '' },
+    website: {
+      type: String,
+      trim: true,
+      default: "",
+      match: /^https?:\/\/[\w.-]+\.[a-z]{2,}/i, // Basic URL pattern
+    },
     isFeatured: { type: Boolean, default: false, index: true },
     status: {
       type: String,
-      enum: ['active', 'inactive', 'deleted'],
-      default: 'active',
+      enum: ["active", "inactive", "deleted"],
+      default: "active",
       index: true,
     },
     deleted: { type: Boolean, default: false, index: true },
@@ -38,11 +43,11 @@ const brandSchema = new mongoose.Schema(
     timestamps: true,
     toJSON: { virtuals: true },
     toObject: { virtuals: true },
-  },
+  }
 );
 
 // Auto-generate slug if not provided
-brandSchema.pre('validate', function (next) {
+brandSchema.pre("validate", function (next) {
   if (!this.slug && this.name) {
     this.slug = slugify(this.name, { lower: true, strict: true });
   }
@@ -50,17 +55,28 @@ brandSchema.pre('validate', function (next) {
 });
 
 // Ensure slug updates during findOneAndUpdate if name changes
-brandSchema.pre('findOneAndUpdate', async function (next) {
+brandSchema.pre("findOneAndUpdate", function (next) {
+  this.setOptions({ runValidators: true }); // Enforce validators
   const update = this.getUpdate();
-  if (update.name) {
+  if (update?.name) {
     update.slug = slugify(update.name, { lower: true, strict: true });
     this.setUpdate(update);
   }
   next();
 });
 
+// Virtual: Full logo URL
+brandSchema.virtual("logoUrl").get(function () {
+  return this.logo?.url || "";
+});
+
+// Static method: Get all active and non-deleted brands
+brandSchema.statics.getActiveBrands = function () {
+  return this.find({ status: "active", deleted: false });
+};
+
 // Clean JSON output for frontend
-brandSchema.set('toJSON', {
+brandSchema.set("toJSON", {
   virtuals: true,
   versionKey: false,
   transform: (_doc, ret) => {
@@ -73,5 +89,5 @@ brandSchema.set('toJSON', {
 brandSchema.index({ isFeatured: 1, status: 1 });
 brandSchema.index({ deleted: 1, status: 1 });
 
-const Brand = mongoose.model('Brand', brandSchema);
+const Brand = mongoose.model("Brand", brandSchema);
 export default Brand;

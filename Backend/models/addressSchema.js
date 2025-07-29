@@ -19,7 +19,7 @@ const addressSchema = new mongoose.Schema(
     email: {
       type: String,
       trim: true,
-      match: /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/,
+      match: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
     },
     addressLine1: { type: String, required: true, trim: true },
     addressLine2: { type: String, trim: true },
@@ -30,6 +30,7 @@ const addressSchema = new mongoose.Schema(
       type: String,
       required: true,
       trim: true,
+      match: /^[1-9][0-9]{5}$/,
     },
     landmark: { type: String, trim: true },
     addressType: {
@@ -45,8 +46,18 @@ const addressSchema = new mongoose.Schema(
         default: "Point",
       },
       coordinates: {
-        type: [Number], // [lng, lat]
-        default: [0, 0],
+        type: [Number], // [longitude, latitude]
+        required: true,
+        validate: {
+          validator: function (value) {
+            return value.length === 2;
+          },
+          message: "Coordinates must be an array of [longitude, latitude]",
+        },
+      },
+      accuracy: {
+        type: Number,
+        min: 0,
       },
     },
     notes: { type: String, trim: true },
@@ -58,8 +69,18 @@ const addressSchema = new mongoose.Schema(
       enum: ["primary", "secondary", "billing", "shipping"],
       default: "shipping",
     },
-    deleted: { type: Boolean, default: false },
-    deletedAt: { type: Date, default: null, index: { expireAfterSeconds: 0 } },
+    deleted: {
+      type: Boolean,
+      default: false,
+    },
+    deletedAt: {
+      type: Date,
+      default: null,
+      index: {
+        expireAfterSeconds: 2592000, // 30 days in seconds
+        partialFilterExpression: { deleted: true }, // Only auto-delete if deleted is true
+      },
+    },
   },
   { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } }
 );

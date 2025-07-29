@@ -12,6 +12,8 @@ import multer from "multer";
 const validateResource = (schema) => (req, res, next) => {
   try {
     // 🩹 Pre-parse JSON strings if they look like arrays or objects
+    // console.log("🔍 Incoming req.body BEFORE parsing:", req.body);
+    // console.log("🧩 Variants Received:", req.body.variants);
 
     for (const key in req.body) {
       if (typeof req.body[key] === "string") {

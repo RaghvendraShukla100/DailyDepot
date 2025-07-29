@@ -48,8 +48,9 @@ export const createAddressValidation = z.object({
   postalCode: z
     .string()
     .trim()
-    .min(4, { message: "Postal code must be at least 4 characters long." })
-    .max(20, { message: "Postal code cannot exceed 20 characters." }),
+    .regex(/^[1-9][0-9]{5}$/, {
+      message: "Postal code must be a valid 6-digit PIN code.",
+    }),
 
   country: z
     .string()

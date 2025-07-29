@@ -20,6 +20,7 @@ export const protect = asyncHandler(async (req, res, next) => {
   const token = authHeader?.startsWith("Bearer ")
     ? authHeader.split(" ")[1]
     : null;
+  // console.log("Reached till the protect middleware", token);
 
   if (!token) {
     throw new ApiError(401, MESSAGES.AUTH.TOKEN_MISSING);
@@ -29,13 +30,15 @@ export const protect = asyncHandler(async (req, res, next) => {
   let decoded;
   try {
     decoded = jwt.verify(token, process.env.JWT_SECRET);
-    console.log("decoded token in auhMiddleware is : ", decoded);
+    // console.log("decoded token in auhMiddleware is : ", decoded);
   } catch (error) {
-    throw new ApiError(401, MESSAGES.AUTH.INVALID_TOKEN);
+    throw new ApiError(401, MESSAGES.AUTH.TOKEN_INVALID);
   }
+  // console.log("Decoded Data : ", decoded);
 
   // 3️⃣ Fetch user without password
   const user = await User.findById(decoded.id).select("-password");
+
   if (!user) {
     throw new ApiError(401, MESSAGES.USER.NOT_FOUND);
   }
@@ -70,9 +73,16 @@ export const protect = asyncHandler(async (req, res, next) => {
 export const authorizeRoles =
   (...roles) =>
   (req, res, next) => {
-    console.log("REQUIRED ROLES : ", roles);
-    console.log("USER DATA : ", req.user);
-    console.log("ADMIN DATA : ", req.admin);
+    // console.log(
+    //   "============================================================================================="
+    // );
+
+    // console.log("REQUIRED ROLES : ", roles);
+    // console.log("USER DATA : ", req.user);
+    // console.log("ADMIN DATA : ", req.admin);
+    // console.log(
+    //   "============================================================================================="
+    // );
 
     if (req.admin && req.admin.designation === "superadmin") return next();
     if (!roles.includes(req.user.role))

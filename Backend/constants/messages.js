@@ -82,7 +82,14 @@ export const MESSAGES = Object.freeze({
     DELETED_SUCCESS: "Category deleted successfully.",
     NOT_FOUND: "Category not found.",
   },
-
+  BRAND: {
+    CREATED_SUCCESS: "Brand created successfully.",
+    ALL_FETCHED: "All brands fetched successfully.",
+    FETCHED_SUCCESS: "Brand fetched successfully.",
+    UPDATED_SUCCESS: "Brand updated successfully.",
+    DELETED_SUCCESS: "Brand deleted successfully.",
+    NOT_FOUND: "Brand not found.",
+  },
   WISHLIST: {
     CREATED_SUCCESS: "Wishlist created successfully.",
     FETCHED_SUCCESS: "Wishlists fetched successfully.",

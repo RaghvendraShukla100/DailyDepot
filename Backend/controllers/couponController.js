@@ -1,92 +1,59 @@
-// Backend/controllers/couponController.js
-
-import Coupon from "../models/couponSchema.js";
+import * as couponService from "../services/couponService.js";
 import ApiError from "../utils/ApiError.js";
-import ApiResponse from "../utils/ApiResponse.js";
 import { STATUS_CODES } from "../constants/statusCodes.js";
+import { MESSAGES } from "../constants/messages.js";
 
-// @desc    Create a new coupon
-// @route   POST /api/coupons
-// @access  Admin
+// Create a new coupon
 export const createCoupon = async (req, res) => {
-  const coupon = await Coupon.create(req.body);
-
-  res
-    .status(STATUS_CODES.CREATED)
-    .json(
-      new ApiResponse(
-        STATUS_CODES.CREATED,
-        coupon,
-        "Coupon created successfully."
-      )
-    );
-};
-
-// @desc    Get all coupons
-// @route   GET /api/coupons
-// @access  Public
-export const getAllCoupons = async (req, res) => {
-  const coupons = await Coupon.find({ deleted: false });
-  res.status(STATUS_CODES.OK).json(new ApiResponse(STATUS_CODES.OK, coupons));
-};
-
-// @desc    Get a single coupon by ID
-// @route   GET /api/coupons/:id
-// @access  Public
-export const getCouponById = async (req, res) => {
-  const coupon = await Coupon.findById(req.params.id).where({ deleted: false });
-
-  if (!coupon) {
-    throw ApiError.notFound("Coupon");
-  }
-
-  res.status(STATUS_CODES.OK).json(new ApiResponse(STATUS_CODES.OK, coupon));
-};
-
-// @desc    Update a coupon by ID
-// @route   PUT /api/coupons/:id
-// @access  Admin
-export const updateCouponById = async (req, res) => {
-  const coupon = await Coupon.findById(req.params.id).where({ deleted: false });
-
-  if (!coupon) {
-    throw ApiError.notFound("Coupon");
-  }
-
-  Object.keys(req.body).forEach((field) => {
-    coupon[field] = req.body[field];
+  const newCoupon = await couponService.createCoupon(req.body, req.user);
+  res.status(STATUS_CODES.CREATED).json({
+    message: MESSAGES.COUPON.CREATED,
+    data: newCoupon,
   });
-
-  const updatedCoupon = await coupon.save();
-
-  res
-    .status(STATUS_CODES.OK)
-    .json(
-      new ApiResponse(
-        STATUS_CODES.OK,
-        updatedCoupon,
-        "Coupon updated successfully."
-      )
-    );
 };
 
-// @desc    Soft delete a coupon by ID
-// @route   DELETE /api/coupons/:id
-// @access  Admin
-export const deleteCouponById = async (req, res) => {
-  const coupon = await Coupon.findById(req.params.id).where({ deleted: false });
+// Get all coupons
+export const getAllCoupons = async (req, res) => {
+  const coupons = await couponService.getAllCoupons();
+  res.status(STATUS_CODES.OK).json({ data: coupons });
+};
 
+// Get a coupon by ID
+export const getCouponById = async (req, res) => {
+  const { id } = req.params;
+  const coupon = await couponService.getCouponById(id);
   if (!coupon) {
-    throw ApiError.notFound("Coupon");
+    throw new ApiError(STATUS_CODES.NOT_FOUND, MESSAGES.COUPON.NOT_FOUND);
+  }
+  res.status(STATUS_CODES.OK).json({ data: coupon });
+};
+
+// Update a coupon by ID
+export const updateCouponById = async (req, res) => {
+  const { id } = req.params;
+
+  const updatedCoupon = await couponService.updateCouponById(
+    id,
+    req.body,
+    req.user
+  );
+
+  if (!updatedCoupon) {
+    throw new ApiError(STATUS_CODES.NOT_FOUND, MESSAGES.COUPON.NOT_FOUND);
   }
 
-  coupon.deleted = true;
-  coupon.deletedAt = new Date();
-  await coupon.save();
+  res.status(STATUS_CODES.OK).json({
+    message: MESSAGES.COUPON.UPDATED,
+    data: updatedCoupon,
+  });
+};
 
-  res
-    .status(STATUS_CODES.OK)
-    .json(
-      new ApiResponse(STATUS_CODES.OK, null, "Coupon deleted successfully.")
-    );
+// Soft delete a coupon by ID
+export const deleteCouponById = async (req, res) => {
+  const { id } = req.params;
+  const deleted = await couponService.softDeleteCoupon(id);
+  if (!deleted) {
+    throw new ApiError(STATUS_CODES.NOT_FOUND, MESSAGES.COUPON.NOT_FOUND);
+  }
+  res.status(STATUS_CODES.OK).json({ message: MESSAGES.COUPON.DELETED });
 };

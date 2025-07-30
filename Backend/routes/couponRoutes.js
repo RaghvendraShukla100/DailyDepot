@@ -1,72 +1,45 @@
 import express from "express";
+import * as couponController from "../controllers/couponController.js";
 import asyncHandler from "../middlewares/asyncHandler.js";
-import {
-  createBrand,
-  getBrands,
-  getBrandById,
-  updateBrand,
-  deleteBrand,
-} from "../controllers/brandController.js";
+
 import { protect, authorizeRoles } from "../middlewares/authMiddleware.js";
 import { ROLES } from "../constants/roles.js";
 import validateResource from "../middlewares/validateResource.js";
 import {
-  createBrandValidation,
-  updateBrandValidation,
-} from "../validations/brandValidation.js";
+  createCouponValidation,
+  updateCouponValidation,
+} from "../validations/couponValidation.js";
 
 const router = express.Router();
 
-/**
- * @route   GET /api/brands
- * @desc    Retrieve all brands
- * @access  Public
- */
-router.get("/", asyncHandler(getBrands));
-
-/**
- * @route   GET /api/brands/:id
- * @desc    Retrieve a brand by ID
- * @access  Public
- */
-router.get("/:id", asyncHandler(getBrandById));
-
-/**
- * @route   POST /api/brands
- * @desc    Create a new brand
- * @access  Private (Admin)
- */
+// 🔒 Authenticated + Admin-only
 router.post(
   "/",
   protect,
   authorizeRoles(ROLES.ADMIN),
-  validateResource(createBrandValidation),
-  asyncHandler(createBrand)
+  validateResource(createCouponValidation),
+  asyncHandler(couponController.createCoupon)
 );
 
-/**
- * @route   PUT /api/brands/:id
- * @desc    Update a brand by ID
- * @access  Private (Admin)
- */
+// 🧾 Public or authenticated route (change to `protect` if needed)
+router.get("/", asyncHandler(couponController.getAllCoupons));
+router.get("/:id", asyncHandler(couponController.getCouponById));
+
+// ✏️ Update coupon - Admin only
 router.put(
   "/:id",
   protect,
   authorizeRoles(ROLES.ADMIN),
-  validateResource(updateBrandValidation),
-  asyncHandler(updateBrand)
+  validateResource(updateCouponValidation),
+  asyncHandler(couponController.updateCouponById)
 );
 
-/**
- * @route   DELETE /api/brands/:id
- * @desc    Soft delete a brand by ID
- * @access  Private (Admin)
- */
+// ❌ Soft delete - Admin only
 router.delete(
   "/:id",
   protect,
   authorizeRoles(ROLES.ADMIN),
-  asyncHandler(deleteBrand)
+  asyncHandler(couponController.deleteCouponById)
 );
 
 export default router;

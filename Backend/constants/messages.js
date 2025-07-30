@@ -68,12 +68,12 @@ export const MESSAGES = Object.freeze({
   COUPON: {
     CREATED_SUCCESS: "Coupon created successfully.",
     FETCHED_SUCCESS: "Coupons fetched successfully.",
-    RETRIEVED_SUCCESS: "Coupon retrieved successfully.",
+    FETCHED_SINGLE_SUCCESS: "Coupon fetched successfully.",
     UPDATED_SUCCESS: "Coupon updated successfully.",
     DELETED_SUCCESS: "Coupon deleted successfully.",
     NOT_FOUND: "Coupon not found.",
+    ALREADY_EXISTS: "Coupon with this code already exists.",
   },
-
   CATEGORY: {
     CREATED_SUCCESS: "Category created successfully.",
     FETCHED_SUCCESS: "Categories fetched successfully.",

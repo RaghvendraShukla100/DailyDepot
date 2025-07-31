@@ -6,7 +6,7 @@ function PrimaryCard() {
   return (
     <div>
       {/* Product Card */}
-      <div className="w-[220px] mt-20 overflow-hidden shadow-sm hover:shadow-lg group rounded-xs bg-white mx-20 relative cursor-pointer">
+      <div className="w-[220px]  overflow-hidden shadow-sm hover:shadow-lg group rounded-xs bg-white  relative cursor-pointer">
         {/* Image and Slider Toggle */}
         <div className="relative w-[220px] h-[310px] overflow-hidden z-10">
           {/* Static Image (Hidden on hover) */}

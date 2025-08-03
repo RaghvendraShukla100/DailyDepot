@@ -11,7 +11,7 @@ function PrimaryCard() {
         <div className="relative w-[220px] h-[310px] overflow-hidden z-10">
           {/* Static Image (Hidden on hover) */}
           <img
-            src="https://i.pinimg.com/736x/f6/58/e0/f658e08fec59439ef85d6a4d22ec6133.jpg"
+            src="https://i.pinimg.com/736x/c0/11/2f/c0112f80dfbdec9d3a97c43f803ba989.jpg"
             alt="product"
             className="object-cover w-full h-full group-hover:hidden"
           />

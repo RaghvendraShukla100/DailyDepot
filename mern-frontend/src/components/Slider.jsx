@@ -20,9 +20,9 @@ const Carousel = () => {
     <div className="w-[220px] h-[310px] overflow-hidden relative mx-auto">
       <Slider {...settings}>
         {[
-          "https://i.pinimg.com/736x/db/ec/df/dbecdf3fbf692b47be82c7a6f3b2f908.jpg",
-          "https://i.pinimg.com/1200x/3d/9a/bd/3d9abdb6ca274ea604b0c325fdb26ede.jpg",
-          "https://i.pinimg.com/736x/0f/b2/56/0fb2568f0d355946d0c7de068cf83717.jpg",
+          "https://i.pinimg.com/736x/42/ee/6d/42ee6d1e6a1ab5a4d5b1ea408be7a814.jpg",
+          "https://i.pinimg.com/736x/66/53/38/665338fe45de074950d4eb15a7319785.jpg",
+          "https://i.pinimg.com/736x/4a/0d/55/4a0d5508ef2c21d50a3cdf6e9fecc7d6.jpg",
         ].map((url, index) => (
           <div key={index} className="w-full h-full">
             <img

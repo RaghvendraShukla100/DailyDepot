@@ -19,7 +19,7 @@ function App() {
         <Route path="/product-details" element={<ProductDetailesPage />} />
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
-      <Footer />
+      {/* <Footer / > */}
     </>
   );
 }

@@ -3,7 +3,7 @@ import React from "react";
 function BestOffers() {
   return (
     <div>
-      <div className="border-t pt-6">
+      <div className="border-t border-gray-300 pt-6">
         <h3 className="font-bold mb-2">BEST OFFERS</h3>
         <p className="text-sm text-gray-600 mb-4">
           This product is already at its best price

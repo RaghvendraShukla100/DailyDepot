@@ -19,28 +19,6 @@ function HomePage() {
       >
         product dettails page
       </button>
-
-      <div className="flex">
-        <SecondaryCard
-          image="https://i.pinimg.com/736x/bb/5c/0f/bb5c0f0e1febd5115af530e4fcce93af.jpg"
-          rating="4.2"
-          title="RARE RABBIT"
-          subtitle="Slim Fit Casual Shirt"
-          price="1999"
-          originalPrice="3999"
-          discountPercent="50"
-        />
-
-        <TertiaryCard
-          imageUrl="https://i.pinimg.com/1200x/28/4b/3f/284b3f16e4130fab100e86c3f85014f7.jpg"
-          brand="DeoDap"
-          title="Rakhi Gift Set"
-          price={257}
-          originalPrice={1099}
-          discount={842}
-          onAddToBag={() => console.log("Added to bag")}
-        />
-      </div>
     </div>
   );
 }

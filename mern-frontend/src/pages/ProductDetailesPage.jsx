@@ -13,6 +13,8 @@ import ProductDetailsInfo from "../components/ProductDetailsInfo";
 import ProductRatings from "../components/ProductRatings";
 import CustomerReviews from "../components/CustomerReviews";
 import ProductSellerInfo from "../components/ProductSellerInfo";
+import SimilarProduct from "../components/SimilarProduct";
+import CustomerAlsoLike from "../components/CustomerAlsoLike";
 
 const ProductDetailsPage = () => {
   const productImages = [
@@ -103,6 +105,7 @@ const ProductDetailsPage = () => {
             <ActionButtons />
             <DeliveryOptions />
           </div>
+          <BestOffers />
           <ProductDetailsInfo
             title="Product Details"
             points={points}
@@ -117,6 +120,8 @@ const ProductDetailsPage = () => {
           <ProductSellerInfo />
         </div>
       </div>
+      <SimilarProduct />
+      <CustomerAlsoLike />
     </div>
   );
 };

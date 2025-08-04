@@ -11,11 +11,11 @@ const TertiaryCard = ({
 }) => {
   return (
     <div
-      className="w-48   rounded-xs overflow-hidden 
-    bg-white shadow-sm hover:shadow-md transition duration-200"
+      className="w-48 border border-gray-300 box-border  rounded-xs overflow-hidden 
+    bg-white  hover:shadow-md transition duration-200"
     >
       {/* Image */}
-      <div className="bg-white  h-[280px] border border-gray-300  overflow-clip  flex justify-center items-center ">
+      <div className="bg-white  h-[280px] border-b border-gray-300  overflow-clip  flex justify-center items-center ">
         <img src={imageUrl} alt={title} className=" object-cover" />
       </div>
 

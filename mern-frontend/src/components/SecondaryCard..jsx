@@ -12,7 +12,7 @@ const SecondaryCard = ({
 }) => {
   return (
     <div
-      className=" h-[390px] border-gray-300 mx-10 rounded-xs overflow-hidden shadow-sm hover:shadow-lg 
+      className=" h-[390px] border box-border border-gray-300  rounded-xs overflow-clip  hover:shadow-lg 
     transition-all text-sm w-[220px] hover:cursor-pointer"
     >
       {/* Product Image */}
@@ -20,7 +20,7 @@ const SecondaryCard = ({
         <img
           src={image}
           alt={title}
-          className="w-full h-[290px] border border-gray-300 object-cover"
+          className="w-full h-[290px] border-b box-border border-gray-300 object-cover"
         />
 
         {/* Rating */}

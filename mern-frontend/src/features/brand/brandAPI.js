@@ -1,4 +1,4 @@
-import axios from "../../../utils/axiosInstance";
+import axios from "../../utils/axiosInstance";
 
 // Get all brands
 export const fetchBrandsAPI = async () => {

@@ -1,26 +1,27 @@
 // /backend/config/cloudinary.js
-
 import { v2 as cloudinary } from "cloudinary";
+import { CloudinaryStorage } from "multer-storage-cloudinary";
+import multer from "multer";
 
-// Configure Cloudinary
+// Cloudinary Config
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
   api_key: process.env.CLOUDINARY_API_KEY,
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-// Upload to Cloudinary
-export const uploadToCloudinary = async (filePath, folder = "") => {
-  return await cloudinary.uploader.upload(filePath, {
-    folder,
+// Define storage
+const storage = new CloudinaryStorage({
+  cloudinary,
+  params: {
+    folder: "DailyDepot", // optional folder in Cloudinary
+    allowed_formats: ["jpg", "jpeg", "png", "webp", "mp4", "pdf"],
     resource_type: "auto",
-  });
-};
+  },
+});
 
-// Delete from Cloudinary
-export const deleteFromCloudinary = async (publicId) => {
-  return await cloudinary.uploader.destroy(publicId);
-};
+// Multer middleware
+export const upload = multer({ storage });
 
-// Optionally export the configured cloudinary instance if needed
+// Export cloudinary instance if needed
 export { cloudinary };

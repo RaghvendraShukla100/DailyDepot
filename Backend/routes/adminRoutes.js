@@ -9,10 +9,11 @@ import {
   updateSuperAdmin,
   deleteSuperAdmin,
 } from "../controllers/adminController.js";
+
 import { protect, authorizeRoles } from "../middlewares/authMiddleware.js";
 import { ROLES } from "../constants/roles.js";
 import validateResource from "../middlewares/validateResource.js";
-import upload from "../middlewares/uploadMiddleware.js";
+import { upload } from "../config/cloudinary.js"; //  Use cloudinary upload
 import asyncHandler from "../middlewares/asyncHandler.js";
 import { ADMIN_DESIGNATIONS } from "../constants/designation.js";
 import checkPermissions from "../middlewares/checkPermissions.js";
@@ -149,4 +150,5 @@ router.delete(
   checkPermissions("manage_admins"),
   asyncHandler(deleteAdmin)
 );
+
 export default router;

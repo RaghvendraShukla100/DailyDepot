@@ -9,6 +9,7 @@ import orderReducer from "../features/order/orderSlice";
 import couponReducer from "../features/coupon/couponSlice";
 import adminReducer from "../features/admin/adminSlice";
 import productReducer from "../features/products/productSlice";
+import brandReducer from "../features/brand/brandSlice";
 
 export const store = configureStore({
   reducer: {
@@ -21,5 +22,6 @@ export const store = configureStore({
     coupons: couponReducer,
     admins: adminReducer,
     products: productReducer,
+    brands: brandReducer,
   },
 });

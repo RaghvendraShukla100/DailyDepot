@@ -79,7 +79,9 @@ function ProductFilter() {
         <div className="w-[250px]">
           <div className="uppercase h-16  flex justify-between font-bold text-gray-800 px-5 items-center">
             <span>filters</span>
-            <span className="text-red-500 text-[12px]">clear all</span>
+            <span className="text-red-500 text-[12px] hover:cursor-pointer">
+              clear all
+            </span>
           </div>
 
           {/* ✅ Brand Filter */}
@@ -88,7 +90,7 @@ function ProductFilter() {
               <div className="border-t   border-gray-300 uppercase font-bold flex items-center justify-between px-5 py-3 text-[12px]">
                 <span>brand</span>
                 <span
-                  className="bg-gray-300 p-2 rounded-full"
+                  className="bg-gray-300 p-2 rounded-full cursor-pointer"
                   onClick={() => setShowBrandSearch(true)}
                 >
                   <IoSearchOutline className="w-[13px] h-[13px] text-gray-700" />
@@ -174,21 +176,21 @@ function ProductFilter() {
               >
                 <span>Color</span>
                 <span
-                  className="bg-gray-300 p-2 rounded-full"
+                  className="bg-gray-300 p-2 rounded-full cursor-pointer"
                   onClick={() => setShowColorSearch(true)}
                 >
                   <IoSearchOutline className="w-[13px] h-[13px] text-gray-700" />
                 </span>
               </div>
             ) : (
-              <div className="relative border-t      border-gray-300 px-5 pb-2 text-sm">
+              <div className="relative border-t border-gray-300 px-5 pb-2 text-sm">
                 <input
                   type="text"
                   placeholder="Search for color"
                   className="pl-4 pr-8 py-2 w-full my-3 bg-gray-100 rounded-full placeholder-gray-500 focus:outline-none"
                 />
                 <button
-                  className="absolute right-7 top-5/12 -translate-y-1/2 text-gray-500 text-3xl hover:text-gray-700"
+                  className="cursor-pointer absolute right-7 top-5/12 -translate-y-1/2 text-gray-500 text-3xl hover:text-gray-700"
                   onClick={() => setShowColorSearch(false)}
                 >
                   &times;

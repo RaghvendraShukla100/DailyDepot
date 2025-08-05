@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { FaUser, FaHeart, FaShoppingBag, FaSearch } from "react-icons/fa";
 
 const Navbar = () => {
@@ -58,19 +59,17 @@ const Navbar = () => {
         ],
       },
     ],
-    // Add more like WOMEN, etc. as needed
   };
 
   return (
     <header className="bg-white shadow-md z-50 relative ">
       <div className="max-w-7xl mx-auto flex items-center justify-between px-4 py-3">
         {/* Logo */}
-        {/* <img src="/logo.png" alt="Logo" className="w-8 h-8" /> */}
-        <div>
-          <h1 className="w-8 h-8 text-2xl text-pink-600 font-light cursor-pointer select-none ">
+        <Link to="/">
+          <h1 className="w-8 h-8 text-2xl text-pink-600 font-light cursor-pointer select-none">
             DailyDepot
           </h1>
-        </div>
+        </Link>
 
         {/* Navigation */}
         <nav className="hidden lg:flex items-center space-x-6 font-semibold text-sm text-gray-700 relative">
@@ -97,6 +96,7 @@ const Navbar = () => {
                             key={i}
                             className="hover:underline cursor-pointer"
                           >
+                            {/* You can turn this into a <Link> if you want to route */}
                             {item}
                           </li>
                         ))}
@@ -121,21 +121,30 @@ const Navbar = () => {
           </div>
 
           <div className="flex items-center gap-6 text-sm">
-            <div className="flex flex-col items-center cursor-pointer">
+            <Link
+              to="/profile"
+              className="flex flex-col items-center cursor-pointer"
+            >
               <FaUser className="text-xl text-gray-700 " />
               <span className="text-[12px] font-bold">Profile</span>
-            </div>
-            <div className="flex flex-col items-center cursor-pointer">
+            </Link>
+            <Link
+              to="/wishlist"
+              className="flex flex-col items-center cursor-pointer"
+            >
               <FaHeart className="text-xl text-gray-700 " />
               <span className="text-[12px] font-bold">Wishlist</span>
-            </div>
-            <div className="relative flex flex-col items-center cursor-pointer">
+            </Link>
+            <Link
+              to="/cart"
+              className="relative flex flex-col items-center cursor-pointer"
+            >
               <FaShoppingBag className="text-xl text-gray-700 " />
               <span className="text-[12px] font-bold">Bag</span>
               <span className="absolute top-0 right-0 -mt-2 -mr-2 bg-red-500 text-white text-[10px] px-1 rounded-full">
                 3
               </span>
-            </div>
+            </Link>
           </div>
         </div>
       </div>

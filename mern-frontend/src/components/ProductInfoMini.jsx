@@ -2,7 +2,7 @@ import React from "react";
 
 function ProductInfoMini() {
   return (
-    <div>
+    <div className="">
       {/* Brand Name */}
       <h2 className="text-3xl font-bold text-gray-800">Arrow</h2>
 

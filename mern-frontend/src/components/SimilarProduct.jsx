@@ -1,5 +1,5 @@
 import React from "react";
-import SecondaryCard from "./SecondaryCard.";
+import SecondaryCard from "./cards/SecondaryCard";
 function SimilarProduct() {
   const similarProducts = [
     {
@@ -307,13 +307,13 @@ function SimilarProduct() {
   ];
 
   return (
-    <div className=" mt-10 px-2">
-      <h1 className="uppercase ml-5 mb-3 font-bold text-gray-800">
+    <div className="w-fit  mx-auto mt-10">
+      <h1 className="uppercase  mb-3 font-bold text-gray-800">
         similar products
       </h1>
       <div
-        className="w-fit 
-      grid gap-y-5 gap-x-10 mx-auto lg:grid-cols-5 md:grid-cols-3 grid-cols-2"
+        className="
+      grid gap-y-5 gap-x-3    grid-cols-2 md:grid-cols-3 lg:grid-cols-5"
       >
         {similarProducts.map((item, index) => (
           <SecondaryCard

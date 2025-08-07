@@ -90,10 +90,10 @@ const ProductDetailsPage = () => {
   };
 
   return (
-    <div className="px-4 py-6">
+    <div className=" py-6 px-4">
       <DetailedPageHeading />
 
-      <div className="mt-6 grid grid-cols-1  md:grid-cols-2 gap-8">
+      <div className="mt-6 grid grid-cols-1   lg:grid-cols-2 gap-8">
         <ProductImageDisplay images={productImages} />
         <div className="space-y-4">
           <ProductInfoMini />

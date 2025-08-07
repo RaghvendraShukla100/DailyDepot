@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import PrimaryCard from "../components/PrimaryCard";
+import PrimaryCard from "../components/cards/PrimaryCard";
 import ProductFilter from "../components/ProductFilter";
 import SortDropdown from "../components/SortDropdown";
 import "rc-slider/assets/index.css";

@@ -8,7 +8,10 @@ const ProductImageDisplay = ({ images = [] }) => {
   }
 
   return (
-    <div className=" flex  flex-col md:flex-row gap-4">
+    <div
+      className=" mx-4 flex  
+    flex-col-reverse md:flex-row gap-4"
+    >
       {/* Thumbnails */}
       <div className="flex md:flex-col gap-2 overflow-x-auto md:overflow-visible">
         {images.map((img, index) => (
@@ -17,6 +20,7 @@ const ProductImageDisplay = ({ images = [] }) => {
             src={img}
             alt={`Thumbnail ${index}`}
             onMouseEnter={() => setSelectedImage(img)}
+            onClick={() => setSelectedImage(img)}
             className={`w-12 h-16  object-cover border rounded  cursor-pointer ${
               img === selectedImage ? "border-blue-600" : "border-gray-300"
             }`}

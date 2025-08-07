@@ -1,6 +1,6 @@
 import React from "react";
 import { IoMdHeartEmpty } from "react-icons/io";
-import Slider from "./Slider";
+import Slider from "../sliders/Slider";
 
 function PrimaryCard() {
   return (

@@ -8,7 +8,10 @@ function PriceDetails({
   finalAmount,
 }) {
   return (
-    <div className="bg-white p-4 border-t border-gray-200 rounded-xs text-sm space-y-2">
+    <div
+      className="bg-white pt-4 mx-4 lg:mx-0 border-b mb-18 border-gray-200 
+    rounded-xs text-sm space-y-2 "
+    >
       <strong className="text-gray-700 uppercase">
         PRICE DETAILS ({cartItems.length} Items)
       </strong>
@@ -34,7 +37,7 @@ function PriceDetails({
         <span>₹{platformFee}</span>
       </div>
 
-      <div className="flex justify-between font-semibold border-t border-gray-300 mt-2 py-2">
+      <div className="flex bg-gray-50 px-1 justify-between font-semibold border-t border-gray-300 mt-2 py-2">
         <span>Total Amount</span>
         <span>₹{finalAmount}</span>
       </div>

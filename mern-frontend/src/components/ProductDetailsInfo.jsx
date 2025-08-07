@@ -48,7 +48,7 @@ function ProductDetailsInfo({
 
       {/* Specifications */}
       {specifications.length > 0 && (
-        <div className="mb-4  w-2/3">
+        <div className="mb-4  lg:w-2/3">
           <h3 className="font-semibold mb-3">Specifications</h3>
           <div className="grid grid-cols-2 gap-x-6 gap-y-3 text-sm">
             {specifications.map(({ label, value }, idx) => (

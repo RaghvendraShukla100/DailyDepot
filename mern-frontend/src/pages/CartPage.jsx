@@ -141,17 +141,22 @@ const CartPage = () => {
 
   return (
     <div>
-      <div className="flex flex-col w-[1000px] mx-auto lg:flex-row p-4 lg:p-10 min-h-screen gap-6">
-        <div className="flex-1 space-y-6">
+      <div
+        className="flex flex-col  border-gray-500 lg:w-[1000px] mx-auto lg:flex-row px-4 pt-4 md:pb-4
+      lg:p-10 min-h-screen gap-6"
+      >
+        <div className=" flex-1 space-y-6">
           <AddressBox />
-          <OffersBox />
+          <div className="hidden">
+            <OffersBox />
+          </div>
           <CartSelectionBar />
           {cartItems.map((item, index) => (
             <CartItem key={index} cartItem={item} />
           ))}
           <AddMoreFromWishlist />
         </div>
-        <div className="border-l border-gray-300 pl-5 w-full lg:w-[320px] space-y-6">
+        <div className="lg:border-l border-gray-300 pl-5 w-full lg:w-[320px] space-y-6">
           <CouponBox />
           <DonationBox />
           <PriceDetails
@@ -161,7 +166,18 @@ const CartPage = () => {
             platformFee={platformFee}
             finalAmount={finalAmount}
           />
-          <PlaceOrderButton />
+          {/* Sticky on mobile */}
+          <div
+            className="block md:hidden fixed bottom-0  left-0 right-0 z-50
+           bg-white   px-8"
+          >
+            <PlaceOrderButton />
+          </div>
+
+          {/* Normal position on desktop */}
+          <div className="hidden md:block  ">
+            <PlaceOrderButton />
+          </div>
         </div>
       </div>
       <YouMayAlsoLikeAtCart products={sampleProducts} />

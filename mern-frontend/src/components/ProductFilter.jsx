@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import PrimaryCard from "../components/PrimaryCard";
+import PrimaryCard from "../components/cards/PrimaryCard";
 import { IoSearchOutline } from "react-icons/io5";
 import RcSlider from "rc-slider";
 import "rc-slider/assets/index.css";

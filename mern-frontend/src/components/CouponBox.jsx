@@ -3,7 +3,7 @@ import { Tag } from "lucide-react";
 
 function CouponBox() {
   return (
-    <div className="bg-white p-4 border-b text-gray-700 border-gray-200 rounded-xs space-y-2">
+    <div className="bg-white p-4 border border-b lg:border-x-0 lg:border-t-0 text-gray-700 border-gray-200 rounded-xs space-y-2">
       <h1 className="font-bold text-xs text-gray-800 mb-5 uppercase">
         Coupons
       </h1>

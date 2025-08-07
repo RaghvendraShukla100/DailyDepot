@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import WishlistCard from "./WishlistCard";
+import WishlistCard from "./cards/WishlistCard";
 
 // Simulated API call (replace with real API later)
 const fetchWishlistItems = async () => {

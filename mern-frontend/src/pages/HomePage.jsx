@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { getProductsThunk } from "../features/products/productThunks";
 import { fetchBrands } from "../features/brand/brandThunks";
-
+import TestimonialSlider from "../components/sliders/TestimonialSlider";
 function HomePage() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -26,7 +26,7 @@ function HomePage() {
   }, [dispatch]);
 
   console.log("PRODUCTS : ", products?.data?.products);
-  console.log("BRANDS : ", brands.data);
+  console.log("BRANDS : ", brands?.data);
 
   return (
     <div className=" py-10 ">
@@ -42,7 +42,7 @@ function HomePage() {
       {/* product section */}
       {productsLoading && <p className="text-center">Loading products...</p>}
       {productsError && (
-        <p className="text-center text-red-500">Error: {error}</p>
+        <p className="text-center text-red-500">Error: {productsError}</p>
       )}
       {products?.data?.products?.length > 0 && (
         <ul className="m-5 p-2  border w-fit">
@@ -65,6 +65,9 @@ function HomePage() {
           </h1>
         ))}
       </div>
+
+      {/* testimonial section */}
+      <TestimonialSlider />
     </div>
   );
 }

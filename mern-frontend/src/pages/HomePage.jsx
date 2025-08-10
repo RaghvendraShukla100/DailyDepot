@@ -1,75 +1,128 @@
-import React, { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
-import { getProductsThunk } from "../features/products/productThunks";
-import { fetchBrands } from "../features/brand/brandThunks";
+import React from "react";
 import TestimonialSlider from "../components/sliders/TestimonialSlider";
-function HomePage() {
-  const navigate = useNavigate();
-  const dispatch = useDispatch();
+import banner2 from "../assets/banner2.webp";
+import Banner from "../components/Banner";
+import BannerSlider from "../components/sliders/BannerSlider";
+import PromoBannerSlider from "../components/sliders/PromoBannerSlider";
 
-  const {
-    products,
-    loading: productsLoading,
-    error: productsError,
-  } = useSelector((state) => state.products);
+const promoBannerSliderData = [
+  {
+    image:
+      "https://m.media-amazon.com/images/G/31/IMG25/Fashion/Event/AugArt/AF/Revised/SD-EVENT-BANNER---UPTO-60-OFF_pc._CB804923790_.gif",
+    title: "Upto 60% Off",
+    subtitle: "Big Savings on Fashion",
+    ctaText: "Shop Now",
+  },
+  {
+    image:
+      "https://m.media-amazon.com/images/G/31/IMG25/Fashion/Event/AugArt/AF/Premium/Mens_clothing_1500x460._SX1500_QL85_FMpng_.png",
+    title: "Premium Men's Clothing",
+    subtitle: "Level up your wardrobe",
+    ctaText: "Explore",
+  },
+  {
+    image:
+      "https://m.media-amazon.com/images/G/31/IMG25/Fashion/Event/AugArt/AF/PC/Tophero/Womens_clothing_1500x460._SX1500_QL85_FMpng_.png",
+    title: "Women's Clothing",
+    subtitle: "Trendy styles & great prices",
+    ctaText: "Discover",
+  },
+  {
+    image:
+      "https://m.media-amazon.com/images/G/31/IMG25/Fashion/Event/AugArt/AF/PC/Tophero/Jewellery_1500x460._SX1500_QL85_FMpng_.png",
+    title: "Jewellery Collection",
+    subtitle: "Elegant pieces for every occasion",
+    ctaText: "View Collection",
+  },
+  {
+    image:
+      "https://m.media-amazon.com/images/G/31/IMG25/Fashion/Event/AugArt/AF/Tophero/Rec/Footwear_pc._SX1500_QL85_.jpg",
+    title: "Footwear Fiesta",
+    subtitle: "Stylish & comfy",
+    ctaText: "Shop Shoes",
+  },
+  {
+    image:
+      "https://m.media-amazon.com/images/G/31/IMG25/Fashion/Event/AugArt/AF/PC/Tophero/Luggage_Trolleys_bags_and_more_1500x460._SX1500_QL85_FMpng_.png",
+    title: "Travel in Style",
+    subtitle: "Bags, Trolleys & more",
+    ctaText: "Travel Essentials",
+  },
+  {
+    image:
+      "https://m.media-amazon.com/images/G/31/IMG25/Fashion/Event/AugArt/AF/PC/Tophero/Beauty_1500x460._SX1500_QL85_FMpng_.png",
+    title: "Beauty Bonanza",
+    subtitle: "Glow up with top products",
+    ctaText: "Shop Beauty",
+  },
+];
 
-  const {
-    brands,
-    loading: brandsLoading,
-    error: brandsError,
-  } = useSelector((state) => state.brands);
-
-  useEffect(() => {
-    dispatch(getProductsThunk());
-    dispatch(fetchBrands());
-  }, [dispatch]);
-
-  console.log("PRODUCTS : ", products?.data?.products);
-  console.log("BRANDS : ", brands?.data);
-
+const HomePage = () => {
+  const bannerSlides = [
+    {
+      image:
+        "https://m.media-amazon.com/images/G/31/MA2025/Augart/SD/Hero/PC/Latest_Collection_1500x460._CB804860218_.png",
+      title: "Upgrade Your Style",
+      subtitle: "Get the latest fashion for men",
+      ctaText: "Shop Now",
+    },
+    {
+      image:
+        "https://m.media-amazon.com/images/G/31/MA2025/Augart/SD/Hero/PC/Premium_Styles_1500x460._CB804860218_.png",
+      title: "Big Deals on Top Brands",
+      subtitle: "Save up to 60% off",
+      ctaText: "Explore",
+    },
+    {
+      image:
+        "https://m.media-amazon.com/images/G/31/MA2025/Augart/SD/Hero/PC/Everyday_Essentials_1500x460._CB804860218_.png",
+      title: "New Arrivals",
+      subtitle: "Fresh styles just dropped",
+      ctaText: "Check It Out",
+    },
+    {
+      image:
+        "https://m.media-amazon.com/images/G/31/MA2025/Augart/SD/Hero/PC/Latest_Collection_1500x460._CB804860218_.png",
+      title: "Festive Collection",
+      subtitle: "Celebrate with trendy looks",
+      ctaText: "View Collection",
+    },
+    {
+      image:
+        "https://m.media-amazon.com/images/G/31/MA2025/Augart/SD/Hero/PC/Chic_Sunglasses_1500x460._CB804860218_.png",
+      title: "Minimalist Wardrobe",
+      subtitle: "Simplify your style",
+      ctaText: "Browse Now",
+    },
+    {
+      image:
+        "https://m.media-amazon.com/images/G/31/MA2025/Augart/SD/Hero/PC/Top-Rated_Premium_Styles_1500x460._CB804860218_.png",
+      title: "Exclusive Footwear Deals",
+      subtitle: "Step into comfort and style",
+      ctaText: "Grab Now",
+    },
+    {
+      image:
+        "https://m.media-amazon.com/images/G/31/MA2025/Augart/SD/Hero/PC/Everyday_Essentials_1500x460._CB804860218_.png",
+      title: "Accessories for Every Look",
+      subtitle: "Complete your outfit",
+      ctaText: "Add to Cart",
+    },
+  ];
   return (
-    <div className=" py-10 ">
-      <h1 className="text-3xl text-center uppercase font-bold">Home page</h1>
-      <button
-        className="uppercase text-2xl rounded-xs font-thin
-        px-3 py-1 block mx-auto bg-[#E31033] text-gray-50 cursor-pointer "
-        onClick={() => navigate("/product-details")}
-      >
-        product details page
-      </button>
-
-      {/* product section */}
-      {productsLoading && <p className="text-center">Loading products...</p>}
-      {productsError && (
-        <p className="text-center text-red-500">Error: {productsError}</p>
-      )}
-      {products?.data?.products?.length > 0 && (
-        <ul className="m-5 p-2  border w-fit">
-          {products?.data?.products?.map((product) => (
-            <li key={product.id} className="bg-red-100 my-1 p-1">
-              {product.name}
-            </li>
-          ))}
-        </ul>
-      )}
-
-      {/* brands section */}
-      <div className="grid grid-cols-4 gap-1 border w-fit mx-auto p-3 bg-gray-800">
-        {brands?.data?.map((brand) => (
-          <h1
-            key={brand.id}
-            className=" p-1 bg-green-700 hover:bg-green-800 text-center text-gray-100 w-44 cursor-pointer"
-          >
-            {brand.name}
-          </h1>
-        ))}
+    <div>
+      {/* main banner */}
+      <div className="grid grid-cols-2 px-20 mt-10 ">
+        <img src="https://assets.myntassets.com/w_490,c_limit,fl_progressive,dpr_2.0/assets/images/2025/7/30/ee3a926c-e2d8-4f16-86c8-692de71885dc1753883844058-RTF-Prebuzz-Desktop-KV_01.jpg" />
+        <img src="https://assets.myntassets.com/w_490,c_limit,fl_progressive,dpr_2.0/assets/images/2025/7/30/19b35e33-94cd-49f3-b756-6dbc0141b4091753883882546-RTF-Prebuzz-Desktop-KV_02.jpg" />
       </div>
-
-      {/* testimonial section */}
+      <Banner image={banner2} alt="Men's Fashion Banner" />
+      <BannerSlider slides={bannerSlides} />
+      <PromoBannerSlider slides={promoBannerSliderData} />
+      {/* testimonial */}
       <TestimonialSlider />
     </div>
   );
-}
+};
 
 export default HomePage;

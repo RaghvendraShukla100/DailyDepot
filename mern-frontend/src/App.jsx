@@ -17,6 +17,7 @@ import ElecronicsHomePage from "./pages/ElectronicsHomePage";
 import DecoreHomePage from "./pages/DecoreHomePage";
 import BeautyHomePage from "./pages/BeautyHomePage";
 import GenzHomePage from "./pages/GenzHomePage";
+import Dashboard from "./pages/Dashboard";
 
 function App() {
   return (
@@ -36,6 +37,7 @@ function App() {
         <Route path="/decore-home-page" element={<DecoreHomePage />} />
         <Route path="/beauty-home-page" element={<BeautyHomePage />} />
         <Route path="/genz-home-page" element={<GenzHomePage />} />
+        <Route path="/seller-dashboard" element={<Dashboard />} />
       </Routes>
       <Footer />
     </>

@@ -19,34 +19,17 @@ const BannerSlider = ({ slides = [] }) => {
           delay: 3000,
           disableOnInteraction: false,
         }}
-        className="rounded-lg"
       >
         {slides.map((slide, index) => (
           <SwiperSlide key={index}>
-            <div className="w-full  flex flex-col md:flex-row items-center justify-between bg-blue-100 px-6 py-4 rounded-md">
+            <div className="w-full  rounded-xs py-10 overflow-clip   items-center justify-between ">
               {/* Image section */}
-              <div className="w-full md:w-1/2">
+              <div className="w-full ">
                 <img
                   src={slide.image}
                   alt={slide.title}
-                  className="w-full object-cover rounded-md"
+                  className="w-full  object-cover rounded-xs "
                 />
-              </div>
-
-              {/* Text content section */}
-              <div className="w-full md:w-1/2 text-center md:text-left px-4 py-2">
-                <h2 className="text-4xl font-bold text-blue-900">
-                  {slide.title}
-                </h2>
-                <p className="text-xl font-medium text-gray-700 mt-2">
-                  {slide.subtitle}
-                </p>
-
-                {slide.ctaText && (
-                  <button className="mt-4 px-5 py-2 bg-[#fe4001] text-white font-semibold rounded hover:bg-[#e13900] transition">
-                    {slide.ctaText}
-                  </button>
-                )}
               </div>
             </div>
           </SwiperSlide>

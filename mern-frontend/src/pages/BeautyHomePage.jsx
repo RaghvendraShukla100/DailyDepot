@@ -1,7 +1,12 @@
 import React from "react";
+import ProductPage from "./ProductPage";
 
 const BeautyHomePage = () => {
-  return <div>beauty page</div>;
+  return (
+    <div>
+      <ProductPage />
+    </div>
+  );
 };
 
 export default BeautyHomePage;

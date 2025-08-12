@@ -2,7 +2,7 @@ import React from "react";
 
 const CategoryCard = ({ image, title, discount, cta }) => {
   return (
-    <div className=" bg-[#fe4001]   text-gray-100 p-1  w-fit  hover:shadow-lg">
+    <div className=" bg-[#DA012D]   text-gray-100 p-1  w-fit  hover:shadow-xl">
       <div className="w-38 h-40   overflow-hidden ">
         <img src={image} alt={title} className="w-full h-full object-cover" />
       </div>

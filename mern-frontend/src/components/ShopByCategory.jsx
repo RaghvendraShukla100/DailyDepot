@@ -118,11 +118,11 @@ const categories = [
 
 const ShopByCategory = () => {
   return (
-    <div>
-      <h1 className="uppercase text-2xl sm:text-3xl lg:text-5xl text-[#4a2f34] py-10 font-bold text-center">
+    <div className="bg-red-50  mx-auto pb-10 my-10 border border-red-100">
+      <h1 className="uppercase text-3xl  sm:text-3xl lg:text-5xl text-[#DA012D] py-10 lg:py-14 font-bold text-center">
         shop by category
       </h1>
-      <div className="grid grid-cols-2 lg:grid-cols-6 w-fit  gap-3 mx-auto">
+      <div className="grid grid-cols-2 lg:grid-cols-6 w-fit  gap-5 mx-auto">
         {categories.map((cat, index) => (
           <CategoryCard
             key={index}

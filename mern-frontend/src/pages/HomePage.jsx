@@ -1,6 +1,6 @@
 import React from "react";
 import TestimonialSlider from "../components/sliders/TestimonialSlider";
-import banner2 from "../assets/banner2.webp";
+import banks_banner from "../assets/bank-banner.webp";
 import Banner from "../components/Banner";
 import BannerSlider from "../components/sliders/BannerSlider";
 import PromoBannerSlider from "../components/sliders/PromoBannerSlider";
@@ -112,11 +112,11 @@ const HomePage = () => {
   return (
     <div>
       {/* main banner */}
-      <div className="grid grid-cols-2 px-20 mt-10 ">
+      <div className="grid grid-cols-2 px-20 mt-10  ">
         <img src="https://assets.myntassets.com/w_490,c_limit,fl_progressive,dpr_2.0/assets/images/2025/7/30/ee3a926c-e2d8-4f16-86c8-692de71885dc1753883844058-RTF-Prebuzz-Desktop-KV_01.jpg" />
         <img src="https://assets.myntassets.com/w_490,c_limit,fl_progressive,dpr_2.0/assets/images/2025/7/30/19b35e33-94cd-49f3-b756-6dbc0141b4091753883882546-RTF-Prebuzz-Desktop-KV_02.jpg" />
       </div>
-      <Banner image={banner2} alt="Men's Fashion Banner" />
+      <Banner image={banks_banner} alt="Men's Fashion Banner" />
       <BannerSlider slides={bannerSlides} />
       <PromoBannerSlider slides={promoBannerSliderData} />
       {/* testimonial */}

@@ -3,8 +3,8 @@ import ShopByCategory from "../components/ShopByCategory";
 import Banner from "../components/Banner";
 import LimitedTimeOffer from "../components/LimitedTimeOffer";
 import BigBrandsBigOffers from "../components/BigBrandsBigOffers";
-import banner1 from "../assets/banner1.jpg";
-import banner2 from "../assets/banner2.webp";
+import mens_banner from "../assets/mens-banner.jpg";
+import banks_banner from "../assets/bank-banner.webp";
 import BannerSlider from "../components/sliders/BannerSlider";
 
 const MenHomePage = () => {
@@ -114,8 +114,8 @@ const MenHomePage = () => {
   return (
     <div className="my-10 px-4 sm:px-6 lg:px-8">
       <div className="max-w-screen-xl mx-auto space-y-10">
-        <Banner image={banner1} alt="Men's Fashion Banner" />
-        <Banner image={banner2} alt="Men's Fashion Banner" />
+        <Banner image={mens_banner} alt="Men's Fashion Banner" />
+        <Banner image={banks_banner} alt="banks offer banner" />
         <LimitedTimeOffer />
         <BigBrandsBigOffers />
         <BannerSlider slides={bannerSlides} />

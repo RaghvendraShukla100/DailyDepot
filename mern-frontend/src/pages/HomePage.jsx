@@ -1,9 +1,11 @@
 import React from "react";
 import TestimonialSlider from "../components/sliders/TestimonialSlider";
-import banks_banner from "../assets/bank-banner.webp";
-import Banner from "../components/Banner";
-import BannerSlider from "../components/sliders/BannerSlider";
-import PromoBannerSlider from "../components/sliders/PromoBannerSlider";
+import ShopByCategory from "../components/ShopByCategory";
+import HeroSection from "../components/HeroSection";
+import BestSellers from "../components/BestSellers";
+import NewArivals from "../components/NewArivals";
+import PromoBannerSliderData from "../components/sliders/PromoBannerSlider";
+import BrandSlider from "../components/sliders/BrandSlider";
 
 const promoBannerSliderData = [
   {
@@ -57,70 +59,72 @@ const promoBannerSliderData = [
   },
 ];
 
+const brandsData = [
+  {
+    img: "https://m.media-amazon.com/images/G/31/img2020/fashion/WomensApparel2024/P0PREMIUM/tommy_hilfiger._CB796416313_.png",
+    discount: "Up To 40% Off",
+    name: "TOMMY HILFIGER",
+  },
+  {
+    img: "https://m.media-amazon.com/images/G/31/img2020/fashion/WomensApparel2024/P0PREMIUM/True_Browns._CB796416313_.png",
+    discount: "Up To 50% Off",
+    name: "trueBrowns",
+  },
+  {
+    img: "https://m.media-amazon.com/images/G/31/img2020/fashion/WomensApparel2024/P0PREMIUM/Calvin_klein._CB796416313_.png",
+    discount: "Up To 40% Off",
+    name: "Calvin Klein",
+  },
+  {
+    img: "https://m.media-amazon.com/images/G/31/img2020/fashion/WomensApparel2024/P0PREMIUM/Fab_India._CB796416272_.png",
+    discount: "Up To 50% Off",
+    name: "Fabindia",
+  },
+  {
+    img: "https://m.media-amazon.com/images/G/31/img2020/fashion/WomensApparel2024/P0PREMIUM/Satya_Paul._CB796416313_.png",
+    discount: "Up To 50% Off",
+    name: "Satya Paul",
+  },
+  {
+    img: "https://m.media-amazon.com/images/G/31/img2020/fashion/WomensApparel2024/P0PREMIUM/Wacoal1._CB796416313_.png",
+    discount: "Min. 40% Off",
+    name: "M&S",
+  },
+  {
+    img: "https://m.media-amazon.com/images/G/31/img2020/fashion/WomensApparel2024/P0PREMIUM/MandS1._CB796416313_.png",
+    discount: "Min. 40% Off",
+    name: "M&S",
+  },
+  {
+    img: "https://m.media-amazon.com/images/G/31/img2020/fashion/WomensApparel2024/P0PREMIUM/Ritu_Kumar._CB796416313_.png",
+    discount: "Min. 40% Off",
+    name: "M&S",
+  },
+  {
+    img: "https://m.media-amazon.com/images/G/31/img2020/fashion/WomensApparel2024/Lacoste._CB794826894_.png",
+    discount: "Min. 40% Off",
+    name: "M&S",
+  },
+];
+
 const HomePage = () => {
-  const bannerSlides = [
-    {
-      image:
-        "https://m.media-amazon.com/images/G/31/MA2025/Augart/SD/Hero/PC/Latest_Collection_1500x460._CB804860218_.png",
-      title: "Upgrade Your Style",
-      subtitle: "Get the latest fashion for men",
-      ctaText: "Shop Now",
-    },
-    {
-      image:
-        "https://m.media-amazon.com/images/G/31/MA2025/Augart/SD/Hero/PC/Premium_Styles_1500x460._CB804860218_.png",
-      title: "Big Deals on Top Brands",
-      subtitle: "Save up to 60% off",
-      ctaText: "Explore",
-    },
-    {
-      image:
-        "https://m.media-amazon.com/images/G/31/MA2025/Augart/SD/Hero/PC/Everyday_Essentials_1500x460._CB804860218_.png",
-      title: "New Arrivals",
-      subtitle: "Fresh styles just dropped",
-      ctaText: "Check It Out",
-    },
-    {
-      image:
-        "https://m.media-amazon.com/images/G/31/MA2025/Augart/SD/Hero/PC/Latest_Collection_1500x460._CB804860218_.png",
-      title: "Festive Collection",
-      subtitle: "Celebrate with trendy looks",
-      ctaText: "View Collection",
-    },
-    {
-      image:
-        "https://m.media-amazon.com/images/G/31/MA2025/Augart/SD/Hero/PC/Chic_Sunglasses_1500x460._CB804860218_.png",
-      title: "Minimalist Wardrobe",
-      subtitle: "Simplify your style",
-      ctaText: "Browse Now",
-    },
-    {
-      image:
-        "https://m.media-amazon.com/images/G/31/MA2025/Augart/SD/Hero/PC/Top-Rated_Premium_Styles_1500x460._CB804860218_.png",
-      title: "Exclusive Footwear Deals",
-      subtitle: "Step into comfort and style",
-      ctaText: "Grab Now",
-    },
-    {
-      image:
-        "https://m.media-amazon.com/images/G/31/MA2025/Augart/SD/Hero/PC/Everyday_Essentials_1500x460._CB804860218_.png",
-      title: "Accessories for Every Look",
-      subtitle: "Complete your outfit",
-      ctaText: "Add to Cart",
-    },
-  ];
   return (
     <div>
-      {/* main banner */}
-      <div className="grid grid-cols-2 px-20 mt-10  ">
-        <img src="https://assets.myntassets.com/w_490,c_limit,fl_progressive,dpr_2.0/assets/images/2025/7/30/ee3a926c-e2d8-4f16-86c8-692de71885dc1753883844058-RTF-Prebuzz-Desktop-KV_01.jpg" />
-        <img src="https://assets.myntassets.com/w_490,c_limit,fl_progressive,dpr_2.0/assets/images/2025/7/30/19b35e33-94cd-49f3-b756-6dbc0141b4091753883882546-RTF-Prebuzz-Desktop-KV_02.jpg" />
+      <HeroSection />
+      <PromoBannerSliderData slides={promoBannerSliderData} />
+      <BestSellers />
+      <div className="px-6 dark:bg-gray-900 py-15  border-white">
+        <h1 className="text-4xl font-thin text-blue-700 dark:text-gray-300 pb-8 capitalize text-center">
+          best brands to grabs
+        </h1>
+
+        <BrandSlider brands={brandsData} />
       </div>
-      <Banner image={banks_banner} alt="Men's Fashion Banner" />
-      <BannerSlider slides={bannerSlides} />
-      <PromoBannerSlider slides={promoBannerSliderData} />
+      <NewArivals />
+      <ShopByCategory />
+
       {/* testimonial */}
-      <TestimonialSlider />
+      {/* <TestimonialSlider /> */}
     </div>
   );
 };

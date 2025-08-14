@@ -84,7 +84,7 @@ export default function Navbar() {
             to="/"
             className=" h-12 w-fit flex items-center justify-center  overflow-hidden  "
           >
-            <img src={logo} alt="logo" className="h-28 object-cover" />
+            <img src={logo} alt="logo" className="h-24  object-cover" />
           </Link>
 
           {/* Mobile toggle */}

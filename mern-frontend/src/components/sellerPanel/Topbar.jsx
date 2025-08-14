@@ -1,4 +1,4 @@
-import { Search } from "lucide-react";
+import { Search, ChevronDown } from "lucide-react";
 
 const Topbar = () => {
   return (
@@ -15,18 +15,19 @@ const Topbar = () => {
         </div>
 
         {/* Profile Section */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-1 ">
           <img
-            src="https://via.placeholder.com/40"
+            src="https://i.pinimg.com/1200x/6f/ef/ad/6fefadb03b12512cf91fc01d95069621.jpg"
             alt="profile"
-            className="w-10 h-10 rounded-full border  border-gray-200"
+            className="w-12 h-12 rounded-full border mr-2 border-gray-200"
           />
           <div className="flex flex-col">
             <span className="font-medium text-gray-800">Bishop Healhmund</span>
-            <span className="text-sm text-gray-400">
+            <span className="text-sm text-gray-500">
               bishopheal28@gmail.com
             </span>
           </div>
+          <ChevronDown className="size-5 text-gray-700" />
         </div>
       </header>
       <span>

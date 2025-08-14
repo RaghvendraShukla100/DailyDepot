@@ -7,7 +7,7 @@ import "swiper/css/pagination";
 
 const BannerSlider = ({ slides = [] }) => {
   return (
-    <div className="w-full">
+    <div className="w-full bg-gray-900 ">
       <Swiper
         modules={[Navigation, Pagination, Autoplay]}
         spaceBetween={30}
@@ -22,13 +22,13 @@ const BannerSlider = ({ slides = [] }) => {
       >
         {slides.map((slide, index) => (
           <SwiperSlide key={index}>
-            <div className="w-full  rounded-xs py-10 overflow-clip   items-center justify-between ">
+            <div className="w-full  rounded  overflow-clip   items-center justify-between ">
               {/* Image section */}
               <div className="w-full ">
                 <img
                   src={slide.image}
                   alt={slide.title}
-                  className="w-full  object-cover rounded-xs "
+                  className="w-full    object-cover rounded-xs "
                 />
               </div>
             </div>

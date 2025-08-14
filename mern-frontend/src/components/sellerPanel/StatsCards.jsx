@@ -1,9 +1,10 @@
 import { FaClipboardList, FaDatabase, FaExpand } from "react-icons/fa";
+import { IndianRupee } from "lucide-react";
 
 const stats = [
   {
     title: "AVG. Order Value",
-    value: "$ 77.21",
+    value: "7721",
     change: "+ 3.16%",
     changeColor: "text-green-500",
     icon: <FaDatabase />,
@@ -11,7 +12,7 @@ const stats = [
   },
   {
     title: "Total Orders",
-    value: "$ 2,107",
+    value: "2,107",
     change: "- 1.18%",
     changeColor: "text-red-500",
     icon: <FaClipboardList />,
@@ -19,7 +20,7 @@ const stats = [
   },
   {
     title: "Lifetime Value",
-    value: "$ 653",
+    value: "653",
     change: "+ 2.24%",
     changeColor: "text-green-500",
     icon: <FaExpand />,
@@ -33,7 +34,7 @@ export default function StatsCards() {
       {stats.map((stat, index) => (
         <div
           key={index}
-          className={`${stat.bg} rounded-lg shadow-md p-4 flex flex-col justify-between `}
+          className={`${stat.bg} rounded-lg shadow-md p-4 flex flex-col justify-between  `}
         >
           {/* Top Section */}
           <div className="flex justify-between items-center ">
@@ -42,7 +43,10 @@ export default function StatsCards() {
           </div>
 
           {/* Value */}
-          <p className="text-2xl font-bold mt-2 ">{stat.value}</p>
+          <p className="text-2xl font-bold mt-2  flex items-center">
+            <IndianRupee className="size-5 mr-1" />
+            {stat.value}
+          </p>
 
           {/* Change Info */}
           <p className={`text-sm mt-1 ${stat.changeColor} `}>

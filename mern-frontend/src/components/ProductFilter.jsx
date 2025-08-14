@@ -74,10 +74,10 @@ function ProductFilter() {
 
   return (
     <>
-      <div className="flex border-gray-400">
+      <div className="flex border-gray-400 ">
         {/* Filters Section */}
         <div className="w-[250px]">
-          <div className="uppercase h-16  flex justify-between font-bold text-gray-800 px-5 items-center">
+          <div className="uppercase h-16  flex justify-between font-bold text-gray-800 dark:text-gray-300 px-5 items-center">
             <span>filters</span>
             <span className="text-red-500 text-[12px] hover:cursor-pointer">
               clear all
@@ -87,7 +87,7 @@ function ProductFilter() {
           {/* ✅ Brand Filter */}
           <div>
             {!showBrandSearch ? (
-              <div className="border-t   border-gray-300 uppercase font-bold flex items-center justify-between px-5 py-3 text-[12px]">
+              <div className="border-t   border-gray-300 dark:text-gray-300 uppercase font-bold flex items-center justify-between px-5 py-3 text-[12px]">
                 <span>brand</span>
                 <span
                   className="bg-gray-300 p-2 rounded-full cursor-pointer"
@@ -126,8 +126,12 @@ function ProductFilter() {
                     name={elm.brandName}
                     value={elm.brandName}
                   />
-                  <label htmlFor={elm.brandName}>{elm.brandName}</label>
-                  <span className="text-[12px]">({elm.quantity})</span>
+                  <label htmlFor={elm.brandName} className="dark:text-gray-300">
+                    {elm.brandName}
+                  </label>
+                  <span className="text-[12px] dark:text-gray-300">
+                    ({elm.quantity})
+                  </span>
                 </div>
               ))}
               {clothingBrands.length > visibleLimit && (
@@ -205,7 +209,7 @@ function ProductFilter() {
               ).map((color) => (
                 <div
                   key={color.colorName}
-                  className="flex items-center gap-x-2 text-[14px] text-gray-700"
+                  className="flex items-center gap-x-2 text-[14px]  text-gray-700 dark:text-gray-300 "
                 >
                   <input
                     type="checkbox"
@@ -242,7 +246,7 @@ function ProductFilter() {
               {discountList.map((discount) => (
                 <div
                   key={discount}
-                  className="flex items-center gap-x-2 text-[14px] text-gray-700"
+                  className="flex items-center gap-x-2 text-[14px] dark:text-gray-300 text-gray-700"
                 >
                   <input type="checkbox" name={discount} value={discount} />
                   <label htmlFor={discount}>{discount}</label>

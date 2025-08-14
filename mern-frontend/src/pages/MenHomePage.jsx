@@ -6,6 +6,7 @@ import BigBrandsBigOffers from "../components/BigBrandsBigOffers";
 import mens_banner from "../assets/mens-banner.jpg";
 import banks_banner from "../assets/bank-banner.webp";
 import BannerSlider from "../components/sliders/BannerSlider";
+import CrazyDeals from "../components/CrazyDeals";
 
 const MenHomePage = () => {
   const bannerSlides = [
@@ -112,12 +113,21 @@ const MenHomePage = () => {
   ];
 
   return (
-    <div className="my-10 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-screen-xl mx-auto space-y-10">
-        <Banner image={mens_banner} alt="Men's Fashion Banner" />
-        <Banner image={banks_banner} alt="banks offer banner" />
+    <div className="py-10 dark:bg-gray-900 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-screen-xl mx-auto ">
+        <Banner
+          image={mens_banner}
+          alt="Men's Fashion Banner"
+          className=" rounded-3xl "
+        />
+        <Banner
+          image={banks_banner}
+          alt="banks offer banner"
+          className=" rounded-3xl "
+        />
         <LimitedTimeOffer />
         <BigBrandsBigOffers />
+
         <BannerSlider slides={bannerSlides} />
         <ShopByCategory />
       </div>

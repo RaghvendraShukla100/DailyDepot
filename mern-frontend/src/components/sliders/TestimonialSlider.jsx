@@ -38,7 +38,10 @@ const testimonials = [
 
 const TestimonialSlider = () => {
   return (
-    <div className="bg-green-50 py-10 px-4 sm:px-10">
+    <div className=" py-10 px-8 sm:px-10 border border-gray-200 my-10">
+      <h1 className="capitalize text-2xl text-gray-700 mb-5 font-thin">
+        see what people says about us...
+      </h1>
       <Swiper
         spaceBetween={30}
         slidesPerView={1}

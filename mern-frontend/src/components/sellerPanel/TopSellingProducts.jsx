@@ -1,21 +1,21 @@
 // src/components/TopSellingProducts.jsx
 const products = [
   {
-    img: "https://example.com/shoes.png",
+    img: "https://i.pinimg.com/1200x/08/75/c0/0875c0d3e07eed806a336760328fa80f.jpg",
     name: "Red Tape Sports Shoes for Men",
     sales: "12,429",
     status: "Available",
     stock: 135,
   },
   {
-    img: "https://example.com/watch.png",
+    img: "https://i.pinimg.com/1200x/c5/53/4c/c5534cd9e0ead53321cf17cfa8f20936.jpg",
     name: "Fastrack FS1 Pro Smartwatch",
     sales: "1,543",
     status: "Available",
     stock: 76,
   },
   {
-    img: "https://example.com/shirt.png",
+    img: "https://i.pinimg.com/1200x/c2/83/2e/c2832e0d7e3f13c2ef96df40a936ef07.jpg",
     name: "Leriya Fashion Men's Shirt",
     sales: "7,212",
     status: "Available",

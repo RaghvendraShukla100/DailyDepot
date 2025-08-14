@@ -8,7 +8,7 @@ function ProductPage() {
   return (
     <>
       {/* Header */}
-      <div className="px-10 pt-8 pb-5 text-[14px] text-gray-700">
+      <div className="px-10 pt-8 pb-5 text-[14px] text-gray-700 dark:text-gray-300 dark:bg-gray-900">
         <div className="font-light">
           Home / Clothing / Shirts /{" "}
           <span className="capitalize font-semibold">formal shirt for men</span>
@@ -21,7 +21,7 @@ function ProductPage() {
         </div>
       </div>
 
-      <div className="flex border-gray-400">
+      <div className="flex border-gray-400 dark:bg-gray-900 dark:text-gray-300">
         {/* Filters Section */}
         <div className="w-[20%]">
           <ProductFilter />
@@ -33,13 +33,16 @@ function ProductPage() {
             className="uppercase h-16   justify-between font-bold
           grid grid-cols-12 gap-2 text-gray-800 pr-5 items-center"
           >
-            <div className="pt-5 pl-10 h-full col-span-9">
+            <div className="pt-5 pl-10 h-full col-span-9 dark:text-gray-300">
               {" "}
               applied filters will display here
             </div>
             <SortDropdown className="col-span-5" />
           </div>
-          <div className="border-t border-l border-gray-300 grid grid-cols-4 gap-x-2 gap-y-5 p-10">
+          <div
+            className="border-t border-l border-gray-300 grid grid-cols-4 
+          gap-x-2 gap-y-5 p-10 dark:bg-gray-900"
+          >
             <PrimaryCard />
             <PrimaryCard />
             <PrimaryCard />

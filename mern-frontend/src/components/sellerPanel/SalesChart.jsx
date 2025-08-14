@@ -9,6 +9,7 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import { FaBars } from "react-icons/fa";
+import { IndianRupee } from "lucide-react";
 
 const data = [
   { month: "Jun", revenue: 15000, orders: 5000 },
@@ -40,7 +41,7 @@ const SalesChart = () => {
             tickLine={false}
           />
           <YAxis
-            tickFormatter={(value) => `$${(value / 1000).toFixed(0)}k`}
+            tickFormatter={(value) => `₹${(value / 1000).toFixed(0)}k`}
             tick={{ fill: "#555" }}
             axisLine={false}
             tickLine={false}

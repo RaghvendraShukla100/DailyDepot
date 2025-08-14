@@ -40,12 +40,12 @@ const Sidebar = () => {
         seller dashboard
       </div>
 
-      <nav className="mt-2">
+      <nav className="mt-2 ">
         {menu.map((item) => (
           <a
             key={item.name}
             href="#"
-            className={`flex items-center gap-3 px-4 py-2 text-sm font-medium 
+            className={`flex items-center gap-3 px-4 py-2 text-sm font-semibold border border-gray-200 my-2 capitalize
             ${
               item.active
                 ? "bg-gray-800 text-white rounded-md"

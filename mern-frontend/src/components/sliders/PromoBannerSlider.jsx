@@ -22,7 +22,7 @@ const PromoBannerSlider = ({ slides }) => {
         {slides.map((slide, index) => (
           <div
             key={index}
-            className="min-w-full flex flex-col md:flex-row items-center justify-between bg-yellow-200 p-6 md:p-10"
+            className="min-w-full flex flex-col md:flex-row items-center justify-between dark:bg-gray-900 p-6 md:p-10"
           >
             {/* Left Image */}
             <img

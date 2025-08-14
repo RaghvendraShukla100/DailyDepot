@@ -108,16 +108,20 @@ const imageSliderData = [
 
 const WomenHomePage = () => {
   return (
-    <div className="my-10 px-4 md:px-6 lg:px-8">
-      <Banner image={womens_banner} alt="Womwn's Fashion Banner" />
+    <div className="py-10 px-4 md:px-6 bg-gray-900 lg:px-8">
+      <Banner
+        image={womens_banner}
+        alt="Womwn's Fashion Banner"
+        className=" rounded-3xl "
+      />
       <Banner image={banks_banner} alt="banks offer banner" />
 
       {/* premimum brand */}
-      <div className="px-1 lg:max-w-11/12 bg-[#161d26]  rounded-xs mx-auto my-10 pb-5">
-        <div className="lg:grid lg:grid-cols-12  lg:py-10">
+      <div className="px-1 lg:max-w-11/12  border border-gray-600 dark:bg-gray-950  rounded-xs mx-auto my-10 pb-5">
+        <div className="lg:grid lg:grid-cols-12 border-b mb-5 border-dashed border-gray-600  lg:py-5">
           <h1
-            className="col-span-7  font-bold text-4xl  md:text-4xl lg:text-6xl text-gray-100 py-5 capitalize 
-          flex items-center justify-center  "
+            className="col-span-7  font-bold text-4xl   md:text-4xl lg:text-6xl text-gray-100 py-1 capitalize 
+          flex items-center justify-center  font-stretch-150%"
           >
             the premium brands
           </h1>
@@ -136,7 +140,7 @@ const WomenHomePage = () => {
       <div className="lg:w-11/12 mx-auto  ">
         <img src="https://assets.myntassets.com/w_980,c_limit,fl_progressive,dpr_2.0/assets/images/2025/JULY/30/841rggNY_c6d50d59712f4b878a06ecf8f8d4a195.jpg" />
 
-        <div className="bg-[oklch(0.86_0.14_108.55)]  pb-5 px-2">
+        <div className="bg-[oklch(0.86_0.14_108.55)] py-5 mb-5  px-2">
           <BrandSlider brands={imageSliderData} />
         </div>
       </div>

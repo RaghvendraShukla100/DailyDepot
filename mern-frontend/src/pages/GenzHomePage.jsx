@@ -124,13 +124,13 @@ const GenzHomePage = () => {
   ];
 
   return (
-    <div className="w-11/12 mx-auto ">
+    <div className=" px-5 py-10 lg:px-10 dark:bg-slate-900">
       <BannerSlider slides={bannerSlides} />
 
-      <h1 className=" uppercase text-2xl lg:text-4xl py-5 lg:py-8 font-semibold">
+      <h1 className=" capitalize text-2xl lg:text-4xl dark:text-gray-300 py-5 lg:py-8 font-thin">
         biggest deals on the top drips
       </h1>
-      <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-x-10 gap-y-5 mb-10  mx-auto">
+      <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-x-10 gap-y-5   mx-auto">
         {fashionCategories.map((elm) => (
           <img src={elm.image} alt={elm.title} className="rounded-xs" />
         ))}

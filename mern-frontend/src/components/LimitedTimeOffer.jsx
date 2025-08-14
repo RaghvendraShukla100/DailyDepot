@@ -53,11 +53,14 @@ const limitedTimeOffers = [
 
 const LimitedTimeOffer = () => {
   return (
-    <div className="my-10">
-      <h2 className="text-3xl lg:text-6xl capitalize text-gray-700 py-5 text-center font-bold mb-4">
+    <div className="my-10 rounded-xs  pb-10">
+      <h2
+        className="text-3xl lg:text-5xl capitalize text-gray-700 dark:text-gray-300 
+       rounded-xs py-5 text-center font-thin mb-4"
+      >
         Limited Time Offers
       </h2>
-      <div className="w-fit mx-auto  grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+      <div className="w-fit  mx-auto  grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
         {limitedTimeOffers.map((offer, index) => (
           <div
             key={index}

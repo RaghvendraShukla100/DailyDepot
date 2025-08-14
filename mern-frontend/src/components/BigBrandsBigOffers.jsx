@@ -48,17 +48,23 @@ const BigBrandsBigOffers = () => {
   ];
 
   return (
-    <div className="py-20 ">
-      <h2 className="text-3xl lg:text-6xl capitalize text-gray-700 pb-10 text-center font-bold mb-4">
-        big brands big Offers
+    <div className="py-16 bg-white dark:bg-gray-900 rounded-lg">
+      <h2 className="text-3xl lg:text-5xl font-thin text-center  text-gray-800 dark:text-gray-200 mb-10">
+        Big Brands, Big Offers
       </h2>
-      <div className="w-fit lg:w-10/12 mx-auto grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+
+      <div className="w-fit lg:w-10/12 mx-auto grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6">
         {bigBrandsBigOffers.map((elm, index) => (
           <div
             key={index}
-            className="bg-gray-100 rounded-xs  w-38 h-full overflow-hidden cursor-pointer shadow-xs hover:shadow-xl transition-shadow duration-300"
+            className="bg-gray-50 dark:bg-gray-800 rounded-xs overflow-hidden cursor-pointer 
+                   transition-transform transform hover:scale-105 dark:shadow-gray-300 shadow-gray-600 hover:shadow-lg duration-300"
           >
-            <img src={elm.image} alt={elm.category} className="w-full h-auto" />
+            <img
+              src={elm.image}
+              alt={elm.category}
+              className="w-full  object-contain "
+            />
           </div>
         ))}
       </div>
